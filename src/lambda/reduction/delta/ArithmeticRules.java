@@ -18,44 +18,52 @@ public class ArithmeticRules extends DeltaRule {
     }
 
     @Override
+    public int getNumberOfArguments() {
+        return 2;
+    }
+
+    @Override
+    public boolean isConstantMatching(ASTConstant c) {
+        return (c.getValue() instanceof Operator);
+    }
+
+    @Override
     public Optional<ASTTerm> getRHS(ASTConstant constant, List<ASTTerm> terms) {
-        // the constant must be an arithmetic operator
-        if (constant.getValue() instanceof Operator) {
-            Operator op = (Operator) constant.getValue();
-            // there have to be exactly 2 arguments
-            if (terms.size() == 2) {
-                // both arguments have to be constants
-                if (terms.get(0) instanceof ASTConstant && terms.get(1) instanceof ASTConstant) {
-                    ASTConstant c0 = (ASTConstant) terms.get(0);
-                    ASTConstant c1 = (ASTConstant) terms.get(1);
+        if (!isSignatureMatching(constant, terms)) {
+            return Optional.empty();
+        }
 
-                    // and both constants must be numbers
-                    if (c0.getValue() instanceof Integer && c1.getValue() instanceof Integer) {
-                        int n0 = (Integer) c0.getValue();
-                        int n1 = (Integer) c1.getValue();
+        // the signature is matching, so it's an operator with 2 arguments
+        Operator op = (Operator) constant.getValue();
+        if (terms.get(0) instanceof ASTConstant && terms.get(1) instanceof ASTConstant) {
+            ASTConstant c0 = (ASTConstant) terms.get(0);
+            ASTConstant c1 = (ASTConstant) terms.get(1);
 
-                        // now we calculate the result
-                        Number result;
-                        switch (op) {
-                            case PLUS:
-                                result = n0 + n1;
-                                break;
-                            case MINUS:
-                                result = n0 - n1;
-                                break;
-                            case TIMES:
-                                result = n0 * n1;
-                                break;
-                            case DIVIDED:
-                                result = n0 / n1;
-                                break;
-                            default:
-                                return Optional.empty();
-                        }
+            // and both constants must be numbers
+            if (c0.getValue() instanceof Integer && c1.getValue() instanceof Integer) {
+                int n0 = (Integer) c0.getValue();
+                int n1 = (Integer) c1.getValue();
 
-                        return Optional.of(new ASTConstant(result));
-                    }
+                // now we calculate the result
+                Number result;
+                switch (op) {
+                    case PLUS:
+                        result = n0 + n1;
+                        break;
+                    case MINUS:
+                        result = n0 - n1;
+                        break;
+                    case TIMES:
+                        result = n0 * n1;
+                        break;
+                    case DIVIDED:
+                        result = n0 / n1;
+                        break;
+                    default:
+                        return Optional.empty();
                 }
+
+                return Optional.of(new ASTConstant(result));
             }
         }
 

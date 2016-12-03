@@ -16,9 +16,19 @@ public class FixRule extends DeltaRule {
     }
 
     @Override
+    public int getNumberOfArguments() {
+        return 1;
+    }
+
+    @Override
+    public boolean isConstantMatching(ASTConstant c) {
+        return (c.getValue().equals(Operator.FIX));
+    }
+
+    @Override
     public Optional<ASTTerm> getRHS(ASTConstant constant, List<ASTTerm> terms) {
         // the constant must be FIX and it has only one argument
-        if (constant.getValue().equals(Operator.FIX) && terms.size() == 1) {
+        if (isSignatureMatching(constant, terms)) {
             ASTTerm t = terms.get(0);
             // fix t -> t (fix t)
             ASTApplication fix = new ASTApplication(t, new ASTApplication(new ASTConstant(Operator.FIX), t));

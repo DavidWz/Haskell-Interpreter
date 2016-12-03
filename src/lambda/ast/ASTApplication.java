@@ -1,8 +1,9 @@
 package lambda.ast;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import lambda.reduction.delta.DeltaRule;
+
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Represents an application of a left to an right.
@@ -97,6 +98,46 @@ public class ASTApplication extends ASTTerm {
         else {
             return (left.isBetaReducible() || right.isBetaReducible());
         }
+    }
+
+    @Override
+    public Optional<ASTTerm> applyDeltaReduction(DeltaRule delta) {
+        List<ASTTerm> arguments = getLMOMArguments();
+        ASTTerm lmomTerm = getLMOMTerm();
+        if (lmomTerm instanceof ASTConstant && arguments.size() == delta.getNumberOfArguments()) {
+            // this is a constant with the right number of arguments, so try to apply the delta rule
+            Optional<ASTTerm> result = delta.getRHS((ASTConstant) lmomTerm, arguments);
+            if (result.isPresent()) {
+                return result;
+            }
+        }
+
+        // try to apply the reduction in a left-most inner-most fashion
+        Optional<ASTTerm> result = left.applyDeltaReduction(delta);
+        if (result.isPresent()) {
+            return Optional.of(new ASTApplication(result.get(), right));
+        }
+        else {
+            result = right.applyDeltaReduction(delta);
+            if (result.isPresent()) {
+                return Optional.of(new ASTApplication(left, result.get()));
+            }
+            else {
+                return Optional.empty();
+            }
+        }
+    }
+
+    @Override
+    public List<ASTTerm> getLMOMArguments() {
+        List<ASTTerm> args = left.getLMOMArguments();
+        args.add(right);
+        return args;
+    }
+
+    @Override
+    public ASTTerm getLMOMTerm() {
+        return left.getLMOMTerm();
     }
 
     @Override

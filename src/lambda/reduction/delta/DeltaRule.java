@@ -7,15 +7,39 @@ import java.util.Optional;
 
 /**
  * Represents one or several delta rules, i.e. an actual interpretation of a value or function.
+ * However, every delta rule in the same class must take the same number of arguments and the same types of constants.
  */
 public abstract class DeltaRule {
     /**
-     * Checks whether the list of terms is reducible. I.e., whether no argument contains free variables and
-     * every argument is in beta-normalform.
-     * @param terms
-     * @return
+     * Returns the number of arguments needed for this delta rule.
+     * @return the number of arguments
      */
-    public static boolean isReducible(List<ASTTerm> terms) {
+    public abstract int getNumberOfArguments();
+
+    /**
+     * Returns whether the constant belongs to this delta rule.
+     * @return whether the constant belongs to this delta rule
+     */
+    public abstract boolean isConstantMatching(ASTConstant c);
+
+    /**
+     * Checks whether the signature of the constant and arguments is matching with this delta rule.
+     * @param constant the constant
+     * @param terms the arguments
+     * @return whether it's matching
+     */
+    protected boolean isSignatureMatching(ASTConstant constant, List<ASTTerm> terms) {
+        // check the right number of arguments
+        if (terms.size() != getNumberOfArguments()) {
+            return false;
+        }
+
+        // check the constant value
+        if (!isConstantMatching(constant)) {
+            return false;
+        }
+
+        // check if the terms are closed and in normal form
         for (ASTTerm t : terms) {
             if (t.getFreeVars().size() > 0) {
                 return false;

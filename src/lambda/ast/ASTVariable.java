@@ -1,8 +1,8 @@
 package lambda.ast;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import lambda.reduction.delta.DeltaRule;
+
+import java.util.*;
 
 /**
  * Represents a variable.
@@ -54,6 +54,21 @@ public class ASTVariable extends ASTTerm {
     @Override
     public boolean isBetaReducible() {
         return false;
+    }
+
+    @Override
+    public Optional<ASTTerm> applyDeltaReduction(DeltaRule delta) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<ASTTerm> getLMOMArguments() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public ASTTerm getLMOMTerm() {
+        return this;
     }
 
     @Override
