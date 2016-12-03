@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Represents the delta rules for arithmetic operations on integers.
+ * Represents the delta rules for arithmetic operations on integers and booleans.
  */
 public class ArithmeticRule extends DeltaRule {
     public enum Operator {
@@ -18,7 +18,12 @@ public class ArithmeticRule extends DeltaRule {
         LESS,
         GREATER,
         LESSEQ,
-        GREATEREQ
+        GREATEREQ,
+        EQUAL,
+        INEQUAL,
+        POW,
+        AND,
+        OR
     }
 
     @Override
@@ -45,8 +50,8 @@ public class ArithmeticRule extends DeltaRule {
 
             // and both constants must be numbers
             if (c0.getValue() instanceof Integer && c1.getValue() instanceof Integer) {
-                int n0 = (Integer) c0.getValue();
-                int n1 = (Integer) c1.getValue();
+                Integer n0 = (Integer) c0.getValue();
+                Integer n1 = (Integer) c1.getValue();
 
                 // now we calculate the result
                 Object result;
@@ -74,6 +79,35 @@ public class ArithmeticRule extends DeltaRule {
                         break;
                     case GREATEREQ:
                         result = n0 >= n1;
+                        break;
+                    case EQUAL:
+                        result = n0 == n1;
+                        break;
+                    case INEQUAL:
+                        result = n0 != n1;
+                        break;
+                    case POW:
+                        result = Math.pow(n0, n1);
+                        break;
+                    default:
+                        return Optional.empty();
+                }
+
+                return Optional.of(new ASTConstant(result));
+            }
+            // or both constants must be booleans
+            else if (c0.getValue() instanceof Boolean && c1.getValue() instanceof Boolean) {
+                boolean b0 = (Boolean) c0.getValue();
+                boolean b1 = (Boolean) c1.getValue();
+
+                // now we calculate the result
+                Object result;
+                switch(op) {
+                    case AND:
+                        result = b0 && b1;
+                        break;
+                    case OR:
+                        result = b0 || b1;
                         break;
                     default:
                         return Optional.empty();

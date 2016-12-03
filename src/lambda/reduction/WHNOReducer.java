@@ -1,10 +1,7 @@
 package lambda.reduction;
 
 import lambda.ast.*;
-import lambda.reduction.delta.ArithmeticRule;
-import lambda.reduction.delta.BranchRule;
-import lambda.reduction.delta.DeltaRule;
-import lambda.reduction.delta.FixRule;
+import lambda.reduction.delta.*;
 
 import java.util.*;
 
@@ -20,20 +17,16 @@ public class WHNOReducer {
     public WHNOReducer() {
         deltaRules = new ArrayList<>();
         deltaRules.add(new ArithmeticRule());
-        deltaRules.add(new FixRule());
+        deltaRules.add(new BoolNotRule());
+        deltaRules.add(new BotRule());
         deltaRules.add(new BranchRule());
+        deltaRules.add(new FixRule());
     }
 
-    public WHNOReducer(List<DeltaRule> deltaRules) {
-        assert(deltaRules != null);
-        this.deltaRules = deltaRules;
+    public void addDeltaRule(DeltaRule deltaRule) {
+        deltaRules.add(deltaRule);
     }
 
-    /**
-     * Reduces a term to weak head order normal form.
-     * @param term the term
-     * @return the WHNF
-     */
     public ASTTerm reduceToWHNF(ASTTerm term, boolean verbose) {
         if (verbose) {
             System.out.println(term);
@@ -54,6 +47,11 @@ public class WHNOReducer {
         return whnf;
     }
 
+    /**
+     * Reduces a term to weak head order normal form.
+     * @param term the term
+     * @return the WHNF
+     */
     public ASTTerm reduceToWHNF(ASTTerm term) {
         return reduceToWHNF(term, false);
     }

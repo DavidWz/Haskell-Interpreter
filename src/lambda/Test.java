@@ -2,10 +2,7 @@ package lambda;
 
 import lambda.ast.*;
 import lambda.reduction.WHNOReducer;
-import lambda.reduction.delta.ArithmeticRule;
-import lambda.reduction.delta.BranchRule;
-import lambda.reduction.delta.DeltaRule;
-import lambda.reduction.delta.FixRule;
+import lambda.reduction.delta.*;
 
 import javax.lang.model.type.ArrayType;
 import java.util.ArrayList;
@@ -39,14 +36,14 @@ public class Test {
         // ##########################################
         ASTTerm sub = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRule.Operator.MINUS), new ASTVariable("x")), new ASTConstant(1));
         ASTTerm rec = new ASTApplication(new ASTVariable("fact"), sub);
-        ASTTerm less = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRule.Operator.LESSEQ), new ASTVariable("x")), new ASTConstant(0));
+        ASTTerm less = new ASTApplication(new ASTConstant(BoolNotRule.Operator.NOT), new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRule.Operator.GREATER), new ASTVariable("x")), new ASTConstant(0)));
         ASTTerm cond = new ASTApplication(new ASTConstant(BranchRule.Operator.IF), less);
         ASTTerm condIf = new ASTApplication(cond, new ASTConstant(1));
         ASTTerm val = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRule.Operator.TIMES), rec), new ASTVariable("x"));
         ASTTerm branch = new ASTApplication(condIf, val);
         ASTTerm fact = new ASTAbstraction(new ASTVariable("fact"), new ASTAbstraction(new ASTVariable("x"), branch));
         ASTTerm fixFact = new ASTApplication(new ASTConstant(FixRule.Operator.FIX), fact);
-        lambda = new ASTApplication(fixFact, new ASTConstant(10));
+        lambda = new ASTApplication(fixFact, new ASTConstant(5));
         System.out.println(lambda);
         lambda = reducer.reduceToWHNF(lambda);
         System.out.println(" => " + lambda);
