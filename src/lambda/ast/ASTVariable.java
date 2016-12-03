@@ -1,6 +1,7 @@
 package lambda.ast;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -43,6 +44,11 @@ public class ASTVariable extends ASTTerm {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public Optional<ASTTerm> applyBetaReduction() {
+        return Optional.empty();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package lambda.ast;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -58,6 +59,11 @@ public class ASTAbstraction extends ASTTerm {
     @Override
     public String toString() {
         return "(λ" + input.toString() + "." + output.toString() + ")";
+    }
+
+    @Override
+    public Optional<ASTTerm> applyBetaReduction() {
+        return Optional.empty();
     }
 
     @Override

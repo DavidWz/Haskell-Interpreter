@@ -1,40 +1,41 @@
 package lambda.ast;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
- * Represents an application of a function to an argument.
+ * Represents an application of a left to an right.
  */
 public class ASTApplication extends ASTTerm {
-    private ASTTerm function;
-    private ASTTerm argument;
+    private ASTTerm left;
+    private ASTTerm right;
 
-    public ASTApplication(ASTTerm function, ASTTerm argument) {
-        assert(function != null);
-        assert(argument != null);
+    public ASTApplication(ASTTerm left, ASTTerm right) {
+        assert(left != null);
+        assert(right != null);
 
-        this.function = function;
-        this.argument = argument;
+        this.left = left;
+        this.right = right;
     }
 
-    public ASTTerm getFunction() {
+    public ASTTerm getLeft() {
 
-        return function;
+        return left;
     }
 
-    public void setFunction(ASTTerm function) {
-        assert(function != null);
-        this.function = function;
+    public void setLeft(ASTTerm left) {
+        assert(left != null);
+        this.left = left;
     }
 
-    public ASTTerm getArgument() {
-        return argument;
+    public ASTTerm getRight() {
+        return right;
     }
 
-    public void setArgument(ASTTerm argument) {
-        assert(argument != null);
-        this.argument = argument;
+    public void setRight(ASTTerm right) {
+        assert(right != null);
+        this.right = right;
     }
 
     @Override
@@ -44,37 +45,64 @@ public class ASTApplication extends ASTTerm {
 
         ASTApplication that = (ASTApplication) o;
 
-        if (!getFunction().equals(that.getFunction())) return false;
-        return getArgument().equals(that.getArgument());
+        if (!getLeft().equals(that.getLeft())) return false;
+        return getRight().equals(that.getRight());
 
     }
 
     @Override
     public int hashCode() {
-        int result = getFunction().hashCode();
-        result = 31 * result + getArgument().hashCode();
+        int result = getLeft().hashCode();
+        result = 31 * result + getRight().hashCode();
         return result;
     }
 
     @Override
     public String toString() {
-        return "(" + function.toString() + " " + argument.toString() + ")";
+        return "(" + left.toString() + " " + right.toString() + ")";
+    }
+
+    @Override
+    public Optional<ASTTerm> applyBetaReduction() {
+        if (left instanceof ASTAbstraction) {
+            // we can apply a beta reduction step
+            ASTAbstraction abstraction = (ASTAbstraction) left;
+
+            // apply the beta reduction as follows: (lambda x . t) r -> t [x / r]
+            return Optional.of(abstraction.getOutput().substitute(abstraction.getInput(), right));
+        }
+        else {
+            // try to apply the reduction in a left-most inner-most fashion
+            Optional<ASTTerm> result = left.applyBetaReduction();
+            if (result.isPresent()) {
+                return Optional.of(new ASTApplication(result.get(), right));
+            }
+            else {
+                result = right.applyBetaReduction();
+                if (result.isPresent()) {
+                    return Optional.of(new ASTApplication(left, result.get()));
+                }
+                else {
+                    return Optional.empty();
+                }
+            }
+        }
     }
 
     @Override
     public Set<ASTVariable> getFreeVars() {
-        // we just combine the free variables of the function and argument
+        // we just combine the free variables of the left and right
         HashSet<ASTVariable> freeVars = new HashSet<>();
-        freeVars.addAll(function.getFreeVars());
-        freeVars.addAll(argument.getFreeVars());
+        freeVars.addAll(left.getFreeVars());
+        freeVars.addAll(right.getFreeVars());
         return freeVars;
     }
 
     @Override
     public ASTTerm substitute(ASTVariable var, ASTTerm expr) {
-        // substituting an application is equivalent to substituting the function and argument
-        ASTTerm replacedFunciton = function.substitute(var, expr);
-        ASTTerm replacedArgument = argument.substitute(var, expr);
+        // substituting an application is equivalent to substituting the left and right
+        ASTTerm replacedFunciton = left.substitute(var, expr);
+        ASTTerm replacedArgument = right.substitute(var, expr);
         return new ASTApplication(replacedFunciton, replacedArgument);
     }
 

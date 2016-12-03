@@ -1,6 +1,7 @@
 package lambda.ast;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -30,9 +31,15 @@ public class ASTConstant extends ASTTerm {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ASTVariable that = (ASTVariable) o;
+        ASTConstant that = (ASTConstant) o;
 
         return getName().equals(that.getName());
+
+    }
+
+    @Override
+    public Optional<ASTTerm> applyBetaReduction() {
+        return Optional.empty();
     }
 
     @Override
