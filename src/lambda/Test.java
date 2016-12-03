@@ -4,11 +4,6 @@ import lambda.ast.*;
 import lambda.reduction.WHNOReducer;
 import lambda.reduction.delta.*;
 
-import javax.lang.model.type.ArrayType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 public class Test {
     public static void main(String[] args) {
         WHNOReducer reducer = new WHNOReducer();
