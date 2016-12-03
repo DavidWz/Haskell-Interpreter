@@ -13,6 +13,12 @@ public abstract class ASTTerm {
      */
     public abstract Optional<ASTTerm> applyBetaReduction();
 
+    /**
+     * Checks whether the lambda term is reducible via a beta reduction.
+     * @return whethe it is reducible
+     */
+    public abstract boolean isBetaReducible();
+
     public Optional<ASTTerm> applyDeltaReduction() {
         // TODO
         return Optional.empty();

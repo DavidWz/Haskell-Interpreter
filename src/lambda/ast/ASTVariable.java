@@ -52,6 +52,11 @@ public class ASTVariable extends ASTTerm {
     }
 
     @Override
+    public boolean isBetaReducible() {
+        return false;
+    }
+
+    @Override
     public Set<ASTVariable> getFreeVars() {
         // a variable is always free
         HashSet<ASTVariable> freeVars = new HashSet<>();

@@ -8,22 +8,19 @@ import java.util.Set;
  * Represents a constant.
  */
 public class ASTConstant extends ASTTerm {
-    private String name;
+    private Object value;
 
-    public ASTConstant(String name) {
-        assert(name != null);
-        assert(!name.trim().equals(""));
-        this.name = name;
+    public Object getValue() {
+        return value;
     }
 
-    public String getName() {
-        return name;
+    public void setValue(Object value) {
+        this.value = value;
     }
 
-    public void setName(String name) {
-        assert(name != null);
-        assert(!name.trim().equals(""));
-        this.name = name;
+    public ASTConstant(Object value) {
+        assert(value != null);
+        this.value = value;
     }
 
     @Override
@@ -33,8 +30,13 @@ public class ASTConstant extends ASTTerm {
 
         ASTConstant that = (ASTConstant) o;
 
-        return getName().equals(that.getName());
+        return getValue().equals(that.getValue());
 
+    }
+
+    @Override
+    public int hashCode() {
+        return getValue().hashCode();
     }
 
     @Override
@@ -43,13 +45,13 @@ public class ASTConstant extends ASTTerm {
     }
 
     @Override
-    public int hashCode() {
-        return getName().hashCode();
+    public boolean isBetaReducible() {
+        return false;
     }
 
     @Override
     public String toString() {
-        return name;
+        return value.toString();
     }
 
     @Override

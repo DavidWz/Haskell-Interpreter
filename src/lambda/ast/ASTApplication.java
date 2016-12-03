@@ -90,6 +90,16 @@ public class ASTApplication extends ASTTerm {
     }
 
     @Override
+    public boolean isBetaReducible() {
+        if (left instanceof ASTAbstraction) {
+            return true;
+        }
+        else {
+            return (left.isBetaReducible() || right.isBetaReducible());
+        }
+    }
+
+    @Override
     public Set<ASTVariable> getFreeVars() {
         // we just combine the free variables of the left and right
         HashSet<ASTVariable> freeVars = new HashSet<>();

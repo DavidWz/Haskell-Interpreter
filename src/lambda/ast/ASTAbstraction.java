@@ -67,6 +67,11 @@ public class ASTAbstraction extends ASTTerm {
     }
 
     @Override
+    public boolean isBetaReducible() {
+        return false;
+    }
+
+    @Override
     public Set<ASTVariable> getFreeVars() {
         // free variables of an abstraction are the free variables of the output without the bounded variable
         HashSet<ASTVariable> freeVars = new HashSet<>();
