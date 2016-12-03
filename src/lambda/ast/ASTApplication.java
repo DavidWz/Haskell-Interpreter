@@ -64,7 +64,7 @@ public class ASTApplication extends ASTTerm {
     }
 
     @Override
-    public Optional<ASTTerm> applyBetaReduction() {
+    protected Optional<ASTTerm> applyBetaReduction() {
         if (left instanceof ASTAbstraction) {
             // we can apply a beta reduction step
             ASTAbstraction abstraction = (ASTAbstraction) left;
@@ -73,35 +73,12 @@ public class ASTApplication extends ASTTerm {
             return Optional.of(abstraction.getOutput().substitute(abstraction.getInput(), right));
         }
         else {
-            // try to apply the reduction in a left-most inner-most fashion
-            Optional<ASTTerm> result = left.applyBetaReduction();
-            if (result.isPresent()) {
-                return Optional.of(new ASTApplication(result.get(), right));
-            }
-            else {
-                result = right.applyBetaReduction();
-                if (result.isPresent()) {
-                    return Optional.of(new ASTApplication(left, result.get()));
-                }
-                else {
-                    return Optional.empty();
-                }
-            }
+            return Optional.empty();
         }
     }
 
     @Override
-    public boolean isBetaReducible() {
-        if (left instanceof ASTAbstraction) {
-            return true;
-        }
-        else {
-            return (left.isBetaReducible() || right.isBetaReducible());
-        }
-    }
-
-    @Override
-    public Optional<ASTTerm> applyDeltaReduction(DeltaRule delta) {
+    protected Optional<ASTTerm> applyDeltaReduction(DeltaRule delta) {
         List<ASTTerm> arguments = getLMOMArguments();
         ASTTerm lmomTerm = getLMOMTerm();
         if (lmomTerm instanceof ASTConstant && arguments.size() == delta.getNumberOfArguments()) {
@@ -112,13 +89,33 @@ public class ASTApplication extends ASTTerm {
             }
         }
 
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ASTTerm> applyWHNOReduction(List<DeltaRule> deltaRules) {
+        // first, try to do a beta reduction
+        Optional<ASTTerm> reduced = applyBetaReduction();
+        if(reduced.isPresent()) {
+            return reduced;
+        }
+        else {
+            // if not possible, try to do a delta reduction
+            for (DeltaRule delta : deltaRules) {
+                reduced = applyDeltaReduction(delta);
+                if (reduced.isPresent()) {
+                    return reduced;
+                }
+            }
+        }
+
         // try to apply the reduction in a left-most inner-most fashion
-        Optional<ASTTerm> result = left.applyDeltaReduction(delta);
+        Optional<ASTTerm> result = left.applyWHNOReduction(deltaRules);
         if (result.isPresent()) {
             return Optional.of(new ASTApplication(result.get(), right));
         }
         else {
-            result = right.applyDeltaReduction(delta);
+            result = right.applyWHNOReduction(deltaRules);
             if (result.isPresent()) {
                 return Optional.of(new ASTApplication(left, result.get()));
             }
@@ -129,14 +126,14 @@ public class ASTApplication extends ASTTerm {
     }
 
     @Override
-    public List<ASTTerm> getLMOMArguments() {
+    protected List<ASTTerm> getLMOMArguments() {
         List<ASTTerm> args = left.getLMOMArguments();
         args.add(right);
         return args;
     }
 
     @Override
-    public ASTTerm getLMOMTerm() {
+    protected ASTTerm getLMOMTerm() {
         return left.getLMOMTerm();
     }
 

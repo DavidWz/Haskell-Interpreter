@@ -47,27 +47,27 @@ public class ASTVariable extends ASTTerm {
     }
 
     @Override
-    public Optional<ASTTerm> applyBetaReduction() {
+    protected Optional<ASTTerm> applyBetaReduction() {
         return Optional.empty();
     }
 
     @Override
-    public boolean isBetaReducible() {
-        return false;
-    }
-
-    @Override
-    public Optional<ASTTerm> applyDeltaReduction(DeltaRule delta) {
+    protected Optional<ASTTerm> applyDeltaReduction(DeltaRule delta) {
         return Optional.empty();
     }
 
     @Override
-    public List<ASTTerm> getLMOMArguments() {
+    public Optional<ASTTerm> applyWHNOReduction(List<DeltaRule> deltaRules) {
+        return Optional.empty();
+    }
+
+    @Override
+    protected List<ASTTerm> getLMOMArguments() {
         return new ArrayList<>();
     }
 
     @Override
-    public ASTTerm getLMOMTerm() {
+    protected ASTTerm getLMOMTerm() {
         return this;
     }
 

@@ -2,45 +2,53 @@ package lambda;
 
 import lambda.ast.*;
 import lambda.reduction.WHNOReducer;
-import lambda.reduction.delta.ArithmeticRules;
+import lambda.reduction.delta.ArithmeticRule;
+import lambda.reduction.delta.BranchRule;
+import lambda.reduction.delta.DeltaRule;
+import lambda.reduction.delta.FixRule;
 
+import javax.lang.model.type.ArrayType;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class Test {
     public static void main(String[] args) {
         WHNOReducer reducer = new WHNOReducer();
 
+        // ##########################################
         ASTTerm lambda = new ASTApplication(new ASTAbstraction(new ASTVariable("x"), new ASTVariable("x")), new ASTConstant("Zero"));
-        System.out.println(lambda);
-        Optional<ASTTerm> result = reducer.applyWHNOReduction(lambda);
-        do {
-            System.out.println(" => " + result.get());
-            result = reducer.applyWHNOReduction(result.get());
-        } while(result.isPresent());
+        reducer.reduceToWHNF(lambda, true);
 
+        // ##########################################
         ASTAbstraction b = new ASTAbstraction(new ASTVariable("y"), new ASTApplication(new ASTVariable("x"), new ASTVariable("y")));
         ASTAbstraction a = new ASTAbstraction(new ASTVariable("x"), b);
         ASTApplication c = new ASTApplication(a, new ASTVariable("y"));
         lambda = new ASTApplication(c, new ASTConstant(4));
-        System.out.println(lambda);
-        result = reducer.applyWHNOReduction(lambda);
-        do {
-            System.out.println(" => " + result.get());
-            result = reducer.applyWHNOReduction(result.get());
-        } while(result.isPresent());
+        reducer.reduceToWHNF(lambda, true);
 
-        ASTTerm plus = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRules.Operator.PLUS), new ASTConstant(40)), new ASTVariable("x"));
+        // ##########################################
+        ASTTerm plus = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRule.Operator.PLUS), new ASTConstant(40)), new ASTVariable("x"));
         a = new ASTAbstraction(new ASTVariable("x"), plus);
-        ASTTerm times = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRules.Operator.TIMES), new ASTVariable("y")), new ASTVariable("y"));
+        ASTTerm times = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRule.Operator.TIMES), new ASTVariable("y")), new ASTVariable("y"));
         b = new ASTAbstraction(new ASTVariable("y"), times);
         c = new ASTApplication(b, new ASTConstant(3));
         lambda = new ASTApplication(a, c);
+        reducer.reduceToWHNF(lambda, true);
 
+        // ##########################################
+        ASTTerm sub = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRule.Operator.MINUS), new ASTVariable("x")), new ASTConstant(1));
+        ASTTerm rec = new ASTApplication(new ASTVariable("fact"), sub);
+        ASTTerm less = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRule.Operator.LESSEQ), new ASTVariable("x")), new ASTConstant(0));
+        ASTTerm cond = new ASTApplication(new ASTConstant(BranchRule.Operator.IF), less);
+        ASTTerm condIf = new ASTApplication(cond, new ASTConstant(1));
+        ASTTerm val = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRule.Operator.TIMES), rec), new ASTVariable("x"));
+        ASTTerm branch = new ASTApplication(condIf, val);
+        ASTTerm fact = new ASTAbstraction(new ASTVariable("fact"), new ASTAbstraction(new ASTVariable("x"), branch));
+        ASTTerm fixFact = new ASTApplication(new ASTConstant(FixRule.Operator.FIX), fact);
+        lambda = new ASTApplication(fixFact, new ASTConstant(10));
         System.out.println(lambda);
-        result = reducer.applyWHNOReduction(lambda);
-        do {
-            System.out.println(" => " + result.get());
-            result = reducer.applyWHNOReduction(result.get());
-        } while(result.isPresent());
+        lambda = reducer.reduceToWHNF(lambda);
+        System.out.println(" => " + lambda);
     }
 }

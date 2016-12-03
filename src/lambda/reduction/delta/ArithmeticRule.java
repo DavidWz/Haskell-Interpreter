@@ -9,12 +9,16 @@ import java.util.Optional;
 /**
  * Represents the delta rules for arithmetic operations on integers.
  */
-public class ArithmeticRules extends DeltaRule {
+public class ArithmeticRule extends DeltaRule {
     public enum Operator {
         PLUS,
         MINUS,
         TIMES,
-        DIVIDED
+        DIVIDED,
+        LESS,
+        GREATER,
+        LESSEQ,
+        GREATEREQ
     }
 
     @Override
@@ -45,7 +49,7 @@ public class ArithmeticRules extends DeltaRule {
                 int n1 = (Integer) c1.getValue();
 
                 // now we calculate the result
-                Number result;
+                Object result;
                 switch (op) {
                     case PLUS:
                         result = n0 + n1;
@@ -58,6 +62,18 @@ public class ArithmeticRules extends DeltaRule {
                         break;
                     case DIVIDED:
                         result = n0 / n1;
+                        break;
+                    case LESS:
+                        result = n0 < n1;
+                        break;
+                    case GREATER:
+                        result = n0 > n1;
+                        break;
+                    case LESSEQ:
+                        result = n0 <= n1;
+                        break;
+                    case GREATEREQ:
+                        result = n0 >= n1;
                         break;
                     default:
                         return Optional.empty();

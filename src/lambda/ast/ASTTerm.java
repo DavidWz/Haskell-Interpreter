@@ -11,36 +11,38 @@ import java.util.Set;
  */
 public abstract class ASTTerm {
     /**
-     * Applies a beta reduction step to the left-most outer-most node where such a step can be applied.
+     * Applies a weak head normal order reduction step to this ASTTerm. If no reduction step can be performed, an empty
+     * optional is returned.
+     * @param deltaRules the delta rules
      * @return an optional containing the reduced term or empty if no reduction could be applied
      */
-    public abstract Optional<ASTTerm> applyBetaReduction();
+    public abstract Optional<ASTTerm> applyWHNOReduction(List<DeltaRule> deltaRules);
 
     /**
-     * Checks whether the lambda term is reducible via a beta reduction.
-     * @return whether it is reducible
+     * Applies a beta reduction step on the root node.
+     * @return an optional containing the reduced term or empty if no reduction could be applied
      */
-    public abstract boolean isBetaReducible();
+    protected abstract Optional<ASTTerm> applyBetaReduction();
 
     /**
-     * Applies a delta reduction step to the left-most outer-most node where such a step can be applied.
+     * Applies a delta reduction step on the root node.
      * @param delta the delta rule for this step
      * @return an optional containing the reduced term or empty if no reduction could be applied
      */
-    public abstract Optional<ASTTerm> applyDeltaReduction(DeltaRule delta);
+    protected abstract Optional<ASTTerm> applyDeltaReduction(DeltaRule delta);
 
     /**
      * Returns the arguments of left-most outer-most applications inside this lambda term. For example, the term
      * (((a 1) (b a)) 2) results in {1, (b a), 2}.
      * @return the left-most outer-most depth of this term
      */
-    public abstract List<ASTTerm> getLMOMArguments();
+    protected abstract List<ASTTerm> getLMOMArguments();
 
     /**
      * Returns the left-most outer-most term (this will be something other than an application).
      * @return the left-most outer-most term
      */
-    public abstract ASTTerm getLMOMTerm();
+    protected abstract ASTTerm getLMOMTerm();
 
     /**
      * Returns a set of free variables of this term.

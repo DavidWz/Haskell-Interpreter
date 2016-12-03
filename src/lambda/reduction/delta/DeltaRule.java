@@ -39,12 +39,9 @@ public abstract class DeltaRule {
             return false;
         }
 
-        // check if the terms are closed and in normal form
+        // check if the terms are closed
         for (ASTTerm t : terms) {
             if (t.getFreeVars().size() > 0) {
-                return false;
-            }
-            else if (t.isBetaReducible()) {
                 return false;
             }
         }
