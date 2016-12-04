@@ -36,13 +36,13 @@ public abstract class ASTTerm {
      * (((a 1) (b a)) 2) results in {1, (b a), 2}.
      * @return the left-most outer-most depth of this term
      */
-    protected abstract List<ASTTerm> getLMOMArguments();
+    public abstract List<ASTTerm> getLMOMArguments();
 
     /**
      * Returns the left-most outer-most term (this will be something other than an application).
      * @return the left-most outer-most term
      */
-    protected abstract ASTTerm getLMOMTerm();
+    public abstract ASTTerm getLMOMTerm();
 
     /**
      * Returns a set of free variables of this term.

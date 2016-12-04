@@ -13,9 +13,9 @@ public class Test {
         reducer.reduceToWHNF(lambda, true);
 
         // ##########################################
-        ASTAbstraction b = new ASTAbstraction(new ASTVariable("y"), new ASTApplication(new ASTVariable("x"), new ASTVariable("y")));
-        ASTAbstraction a = new ASTAbstraction(new ASTVariable("x"), b);
-        ASTApplication c = new ASTApplication(a, new ASTVariable("y"));
+        ASTTerm b = new ASTAbstraction(new ASTVariable("y"), new ASTApplication(new ASTVariable("x"), new ASTVariable("y")));
+        ASTTerm a = new ASTAbstraction(new ASTVariable("x"), b);
+        ASTTerm c = new ASTApplication(a, new ASTVariable("y"));
         lambda = new ASTApplication(c, new ASTConstant(4));
         reducer.reduceToWHNF(lambda, true);
 
@@ -42,5 +42,13 @@ public class Test {
         System.out.println(lambda);
         lambda = reducer.reduceToWHNF(lambda);
         System.out.println(" => " + lambda);
+
+        // ############################################
+        a = new ASTAbstraction(new ASTVariable("x"), new ASTVariable("y"));
+        b = new ASTAbstraction(new ASTVariable("x"), new ASTApplication(new ASTVariable("x"), new ASTVariable("x")));
+        c = new ASTAbstraction(new ASTVariable("x"), new ASTApplication(new ASTVariable("x"), new ASTVariable("x")));
+        ASTTerm d = new ASTApplication(b, c);
+        lambda = new ASTApplication(a, d);
+        reducer.reduceToWHNF(lambda, true);
     }
 }

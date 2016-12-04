@@ -56,12 +56,12 @@ public class ASTConstant extends ASTTerm {
     }
 
     @Override
-    protected List<ASTTerm> getLMOMArguments() {
+    public List<ASTTerm> getLMOMArguments() {
         return new ArrayList<>();
     }
 
     @Override
-    protected ASTTerm getLMOMTerm() {
+    public ASTTerm getLMOMTerm() {
         return this;
     }
 

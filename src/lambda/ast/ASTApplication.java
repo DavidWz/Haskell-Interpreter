@@ -126,14 +126,14 @@ public class ASTApplication extends ASTTerm {
     }
 
     @Override
-    protected List<ASTTerm> getLMOMArguments() {
+    public List<ASTTerm> getLMOMArguments() {
         List<ASTTerm> args = left.getLMOMArguments();
         args.add(right);
         return args;
     }
 
     @Override
-    protected ASTTerm getLMOMTerm() {
+    public ASTTerm getLMOMTerm() {
         return left.getLMOMTerm();
     }
 

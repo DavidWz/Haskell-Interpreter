@@ -65,7 +65,7 @@ public class ASTTuple extends ASTExpression {
             return expr.get(0).toLambdaTerm();
         }
         else {
-            lambda.ast.ASTTerm result = new lambda.ast.ASTConstant(new lambda.ast.TupelConstant(n));
+            lambda.ast.ASTTerm result = new lambda.ast.ASTConstant(new lambda.reduction.delta.TupleRule.TupleConstant(n));
 
             for (ASTExpression e : expr) {
                 result = new lambda.ast.ASTApplication(result, e.toLambdaTerm());
