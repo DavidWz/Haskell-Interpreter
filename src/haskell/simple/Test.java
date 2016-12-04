@@ -10,10 +10,6 @@ import java.util.ArrayList;
 public class Test {
     public static void main(String[] args) {
         WHNOReducer reducer = new WHNOReducer();
-        TupleRule tr3 = new TupleRule(3);
-        TupleRule tr2 = new TupleRule(2);
-        reducer.addDeltaRule(tr3);
-        reducer.addDeltaRule(tr2);
 
         // ###############################
         String programText = "let fact = \\x -> if x <= 0 then 1 else fact(x − 1) ∗ x in fact 5";
@@ -40,7 +36,7 @@ public class Test {
         expressions.add(new ASTFunction(new ASTVariable("x"), new ASTVariable("x")));
         expressions.add(new ASTConstant('c'));
         ASTExpression tuple = new ASTTuple(expressions);
-        program = new ASTApplication(new ASTConstant(tr3.getIsaOperator()), tuple);
+        program = new ASTApplication(new ASTConstant(TupleRule.getIsaOperator(3)), tuple);
 
         System.out.println(program);
         lambda = program.toLambdaTerm();
@@ -50,7 +46,7 @@ public class Test {
         // #################################
         programText = "sel_3,2 (5, \\x -> x, 'c')";
 
-        program = new ASTApplication(new ASTConstant(tr3.getSelOperator(2)), tuple);
+        program = new ASTApplication(new ASTConstant(TupleRule.getSelOperator(3, 2)), tuple);
         System.out.println(program);
         lambda = program.toLambdaTerm();
         System.out.println("Lam = " + lambda);

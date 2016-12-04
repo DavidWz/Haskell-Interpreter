@@ -135,35 +135,18 @@ public class TupleRule extends DeltaRule {
         }
     }
 
-    private int n;
-    private final IsATuple isaOperator;
-    private final TupleConstant tupleConstructor;
 
-    /**
-     * Constructs the delta rules for tuples of size n.
-     * @param n the tuple size. must be positive and not 1.
-     */
-    public TupleRule(int n) {
-        assert(n >= 0);
-        assert(n != 1);
-        this.n = n;
-        this.isaOperator = new IsATuple(n);
-        this.tupleConstructor = new TupleConstant(n);
+    public TupleRule() {}
+
+    public static TupleConstant getTupleConstructor(int n) {
+        return new TupleConstant(n);
     }
 
-    public int getN() {
-        return n;
+    public static IsATuple getIsaOperator(int n) {
+        return new IsATuple(n);
     }
 
-    public IsATuple getIsaOperator() {
-        return isaOperator;
-    }
-
-    public TupleConstant getTupleConstructor() {
-        return tupleConstructor;
-    }
-
-    public Sel getSelOperator(int i) {
+    public static Sel getSelOperator(int n, int i) {
         return new Sel(n, i);
     }
 
@@ -174,34 +157,39 @@ public class TupleRule extends DeltaRule {
 
     @Override
     public boolean isConstantMatching(ASTConstant c) {
-        boolean isIsa = c.getValue().equals(isaOperator);
-        boolean isSel = c.getValue() instanceof Sel && ((Sel) c.getValue()).getN() == n;
+        boolean isIsa = c.getValue() instanceof IsATuple;
+        boolean isSel = c.getValue() instanceof Sel;
         return (isIsa || isSel);
     }
 
     @Override
     public Optional<ASTTerm> getRHS(ASTConstant constant, List<ASTTerm> terms) {
-        // the constant must be Isa_n-tuple and it has only one argument
+        // the constant must be Isa_n-tuple or sel_n,i and it has only one argument
         if (isSignatureMatching(constant, terms)) {
             // check if the argument is a n-tupel
             ASTTerm tupel = terms.get(0);
             ASTTerm constr = tupel.getLMOMTerm();
             List<ASTTerm> args = tupel.getLMOMArguments();
 
-            if (constr instanceof ASTConstant && args.size() == n) {
+            if (constr instanceof ASTConstant) {
                 ASTConstant constrConstant = (ASTConstant) constr;
-                if (constrConstant.getValue().equals(tupleConstructor)) {
-                    // it's an n-tuple, so reduce it according to the operator
+                if (constrConstant.getValue() instanceof TupleConstant) {
+                    // it's an tuple, so reduce it according to the operator
 
-                    if (constant.getValue().equals(isaOperator)) {
+                    if (constant.getValue() instanceof IsATuple) {
                         // it's isa
-                        return Optional.of(new ASTConstant(true));
+                        IsATuple op = (IsATuple) constant.getValue();
+                        if (op.getN() == args.size()) {
+                            return Optional.of(new ASTConstant(true));
+                        }
                     }
                     else {
                         // it's sel
                         Sel op = (Sel) constant.getValue();
-                        // -1 because sel is starts counting at 1
-                        return Optional.of(args.get(op.getI()-1));
+                        if (op.getN() == args.size()) {
+                            // -1 because sel is starts counting at 1
+                            return Optional.of(args.get(op.getI()-1));
+                        }
                     }
                 }
             }

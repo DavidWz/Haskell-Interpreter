@@ -21,6 +21,7 @@ public class WHNOReducer {
         deltaRules.add(new BotRule());
         deltaRules.add(new BranchRule());
         deltaRules.add(new FixRule());
+        deltaRules.add(new TupleRule());
     }
 
     public void addDeltaRule(DeltaRule deltaRule) {
