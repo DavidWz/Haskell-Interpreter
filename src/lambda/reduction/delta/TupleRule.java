@@ -90,6 +90,9 @@ public class TupleRule extends DeltaRule {
         }
     }
 
+    /**
+     * Represents the sel_n,i function
+     */
     public static class Sel {
         private int n;
         private int i;

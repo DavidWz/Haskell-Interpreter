@@ -22,10 +22,7 @@ public class WHNOReducer {
         deltaRules.add(new BranchRule());
         deltaRules.add(new FixRule());
         deltaRules.add(new TupleRule());
-    }
-
-    public void addDeltaRule(DeltaRule deltaRule) {
-        deltaRules.add(deltaRule);
+        deltaRules.add(new ConstructorRule());
     }
 
     public ASTTerm reduceToWHNF(ASTTerm term, boolean verbose) {

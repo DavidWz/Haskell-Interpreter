@@ -2,14 +2,15 @@ package haskell.simple;
 
 import haskell.simple.ast.*;
 import lambda.reduction.WHNOReducer;
-import lambda.reduction.delta.ArithmeticRule;
-import lambda.reduction.delta.TupleRule;
+import lambda.reduction.delta.*;
 
 import java.util.ArrayList;
 
 public class Test {
     public static void main(String[] args) {
         WHNOReducer reducer = new WHNOReducer();
+        ConstructorRule.Constructor list = new ConstructorRule.Constructor("List");
+        ConstructorRule.Constructor tree = new ConstructorRule.Constructor("Tree");
 
         // ###############################
         String programText = "let fact = \\x -> if x <= 0 then 1 else fact(x − 1) ∗ x in fact 5";
@@ -51,5 +52,24 @@ public class Test {
         lambda = program.toLambdaTerm();
         System.out.println("Lam = " + lambda);
         System.out.println(" => " +reducer.reduceToWHNF(lambda));
+
+        // ##################################
+        programText = "isa_List ((Tree 3) 5)";
+
+        ASTExpression constr = new ASTApplication(new ASTApplication(new ASTConstant(tree), new ASTConstant(BotRule.Operator.BOT)), new ASTConstant(5));
+        program = new ASTApplication(new ASTConstant(ConstructorRule.getIsaOperator(list)), constr);
+        System.out.println(program);
+        lambda = program.toLambdaTerm();
+        System.out.println("Lam = " + lambda);
+        System.out.println(" => " + reducer.reduceToWHNF(lambda));
+
+        // ##################################
+        programText = "argof_Tree ((Tree 3) 5)";
+
+        program = new ASTApplication(new ASTConstant(ConstructorRule.getArgOfOperator(tree)), constr);
+        System.out.println(program);
+        lambda = program.toLambdaTerm();
+        System.out.println("Lam = " + lambda);
+        System.out.println(" => " + reducer.reduceToWHNF(lambda));
     }
 }
