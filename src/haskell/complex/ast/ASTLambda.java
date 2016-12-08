@@ -5,47 +5,43 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents a let expression, i.e. let decls in expr
+ * Represents an anonymous function.
  */
-public class ASTLet implements ASTExpression {
-    private List<ASTDecl> decls;
+public class ASTLambda implements ASTExpression {
+    private List<ASTPattern> pats;
     private ASTExpression exp;
 
-    public ASTLet(List<ASTDecl> decls, ASTExpression exp) {
-        assert(decls != null);
+    public ASTLambda(List<ASTPattern> pats, ASTExpression exp) {
+        assert(pats != null);
         assert(exp != null);
-        this.decls = decls;
+        assert(pats.size() >= 1);
+        this.pats = pats;
         this.exp = exp;
     }
 
-    public List<ASTDecl> getDecls() {
-        return decls;
+    public List<ASTPattern> getPats() {
+        return pats;
     }
 
     public ASTExpression getExp() {
         return exp;
     }
 
-    public void setDecls(List<ASTDecl> decls) {
-        this.decls = decls;
-    }
-
     @Override
-
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ASTLet astLet = (ASTLet) o;
+        ASTLambda astLambda = (ASTLambda) o;
 
-        if (!getDecls().equals(astLet.getDecls())) return false;
-        return getExp().equals(astLet.getExp());
+        if (!getPats().equals(astLambda.getPats())) return false;
+        return getExp().equals(astLambda.getExp());
 
     }
 
     @Override
     public int hashCode() {
-        int result = getDecls().hashCode();
+        int result = getPats().hashCode();
         result = 31 * result + getExp().hashCode();
         return result;
     }
@@ -53,22 +49,23 @@ public class ASTLet implements ASTExpression {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("let {\n\t");
-        for (ASTDecl decl : decls) {
-            builder.append(decl);
-            builder.append(";\n\t");
+        builder.append("\\");
+
+        for (ASTPattern pat : pats) {
+            builder.append(pat);
+            builder.append(" ");
         }
-        builder.deleteCharAt(builder.length()-1);
-        builder.append("} in ");
+        builder.append("-> ");
         builder.append(exp);
+
         return builder.toString();
     }
 
     @Override
     public Set<ASTVariable> getAllVariables() {
         Set<ASTVariable> vars = new HashSet<>();
-        for (ASTDecl decl : decls) {
-            vars.addAll(decl.getAllVariables());
+        for (ASTPattern pat : pats) {
+            vars.addAll(pat.getAllVariables());
         }
         vars.addAll(exp.getAllVariables());
         return vars;

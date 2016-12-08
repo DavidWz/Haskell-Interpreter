@@ -1,5 +1,6 @@
 package haskell;
 
+import haskell.complex.reduction.SimpleReducer;
 import lambda.reduction.WHNOReducer;
 
 /**
@@ -19,21 +20,41 @@ public class HaskellInterpreter {
      * @param expression a complex haskell expression
      * @return a non-reducible lambda term
      */
-    public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression) {
+    public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression, boolean verbose) throws SimpleReducer.TooComplexException {
         // init: create the expression: let prog in expr
         haskell.complex.ast.ASTExpression letProgInExpr = new haskell.complex.ast.ASTLet(program.getDecls(), expression);
-        System.out.println(letProgInExpr);
+        if (verbose) {
+            System.out.println("\n-- The following expression will be evaluated: ");
+            System.out.println(letProgInExpr);
+        }
 
         // 1. reduce complex haskell expression to simple haskell expression
-        // haskell.simple.ast.ASTExpression simpleExprs = letProgInExpr.toSimpleHaskell();
+        SimpleReducer simpleReducer = new SimpleReducer(letProgInExpr);
+        haskell.simple.ast.ASTExpression simpleExpr = simpleReducer.reduceToSimple();
+        if (verbose) {
+            System.out.println("\n-- In simple haskell, the expression looks like this: ");
+            System.out.println(simpleExpr);
+        }
 
         // 2. reduce simple haskell expression to lambda expression
-        // lambda.ast.ASTTerm lambdaTerm = simpleExprs.toLambdaTerm();
+        lambda.ast.ASTTerm lambdaTerm = simpleExpr.toLambdaTerm();
+        if (verbose) {
+            System.out.println("\n-- The corresponding lambda term looks like this: ");
+            System.out.println(lambdaTerm);
+        }
 
         // 3. reduce lambda expression with WHNO
-        // WHNOReducer whnoReducer = new WHNOReducer();
-        // return whnoReducer.reduceToWHNF(lambdaTerm);
+        WHNOReducer whnoReducer = new WHNOReducer();
+        lambda.ast.ASTTerm result = whnoReducer.reduceToWHNF(lambdaTerm);
+        if (verbose) {
+            System.out.println("\n-- The final result is: ");
+            System.out.println(result);
+        }
 
-        return null;
+        return result;
+    }
+
+    public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression) throws SimpleReducer.TooComplexException {
+        return evaluate(expression, false);
     }
 }

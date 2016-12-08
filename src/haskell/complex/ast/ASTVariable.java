@@ -1,5 +1,8 @@
 package haskell.complex.ast;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Represents a variable, i.e. a name that starts with a lower case.
  */
@@ -36,5 +39,12 @@ public class ASTVariable implements ASTExpression, ASTPattern {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public Set<ASTVariable> getAllVariables() {
+        Set<ASTVariable> vars = new HashSet<>();
+        vars.add(this);
+        return vars;
     }
 }

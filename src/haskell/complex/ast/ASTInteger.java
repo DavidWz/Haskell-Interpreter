@@ -1,5 +1,8 @@
 package haskell.complex.ast;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Represents an integer.
  */
@@ -11,14 +14,15 @@ public class ASTInteger implements ASTExpression, ASTPattern {
 
     }
 
+    public int getValue() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return Integer.toString(value);
     }
 
-    public int getValue() {
-        return value;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -36,4 +40,8 @@ public class ASTInteger implements ASTExpression, ASTPattern {
         return getValue();
     }
 
+    @Override
+    public Set<ASTVariable> getAllVariables() {
+        return new HashSet<>();
+    }
 }

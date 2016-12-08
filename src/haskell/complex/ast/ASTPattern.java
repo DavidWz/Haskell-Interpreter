@@ -3,5 +3,5 @@ package haskell.complex.ast;
 /**
  * Represents a pattern.
  */
-public interface ASTPattern {
+public interface ASTPattern extends ComplexHaskell {
 }

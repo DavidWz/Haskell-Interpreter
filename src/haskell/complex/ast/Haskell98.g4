@@ -40,12 +40,12 @@ aexp : var | gcon | literal | parexp | tupleexp;
 parexp : '(' exp ')';
 tupleexp : '(' exp (',' exp)+ ')';
 alts : alt (';' alt)*;
-alt : pat '->' exp;
+alt : pats '->' exp;
 
-pat : apat | gcon apat+;
+pats : apat | gcon apat+;
 apat : var | gcon | literal | '_' | parpat | tuplepat;
-parpat : '(' pat ')';
-tuplepat : '(' pat (',' pat)+ ')';
+parpat : '(' pats ')';
+tuplepat : '(' pats (',' pats)+ ')';
 
 gcon : unittype | tupleconstr | con;
 

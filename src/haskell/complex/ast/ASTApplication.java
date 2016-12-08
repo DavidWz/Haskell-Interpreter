@@ -1,7 +1,9 @@
 package haskell.complex.ast;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a application, e.g. f x
@@ -51,5 +53,14 @@ public class ASTApplication implements ASTExpression {
         builder.deleteCharAt(builder.length()-1);
         builder.append(")");
         return builder.toString();
+    }
+
+    @Override
+    public Set<ASTVariable> getAllVariables() {
+        Set<ASTVariable> vars = new HashSet<>();
+        for (ASTExpression exp : exps) {
+            vars.addAll(exp.getAllVariables());
+        }
+        return vars;
     }
 }

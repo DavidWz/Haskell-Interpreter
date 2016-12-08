@@ -1,7 +1,9 @@
 package haskell.complex.ast;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a construction.
@@ -68,5 +70,14 @@ public class ASTConstruct implements ASTExpression, ASTPattern {
             builder.append(")");
             return builder.toString();
         }
+    }
+
+    @Override
+    public Set<ASTVariable> getAllVariables() {
+        Set<ASTVariable> vars = new HashSet<>();
+        for (ASTPattern pat : pats) {
+            vars.addAll(pat.getAllVariables());
+        }
+        return vars;
     }
 }

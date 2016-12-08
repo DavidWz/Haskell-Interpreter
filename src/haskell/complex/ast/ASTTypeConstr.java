@@ -1,5 +1,8 @@
 package haskell.complex.ast;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Represents a type constructor, i.e. a name that starts with an upper case.
  */
@@ -36,5 +39,10 @@ public class ASTTypeConstr implements ASTExpression, ASTPattern {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public Set<ASTVariable> getAllVariables() {
+        return new HashSet<>();
     }
 }

@@ -2,6 +2,7 @@ package haskell.complex;
 
 import haskell.HaskellInterpreter;
 import haskell.complex.ast.*;
+import haskell.complex.reduction.SimpleReducer;
 
 public class Test {
     public static void main(String[] args) {
@@ -20,6 +21,12 @@ public class Test {
         ASTFunDecl lenNil = new ASTFunDecl(new ASTInteger(0), len, Nil);
         prog.addDeclaration(lenNil);
 
+        // append Nil z = z
+        ASTVariable append = new ASTVariable("append");
+        ASTVariable z = new ASTVariable("z");
+        ASTFunDecl appendFuncNil = new ASTFunDecl(z, append, Nil, z);
+        prog.addDeclaration(appendFuncNil);
+
         // len (Cons x xs) = (len xs) + 1
         ASTTypeConstr Cons = new ASTTypeConstr("Cons");
         ASTVariable xs = new ASTVariable("xs");
@@ -27,14 +34,9 @@ public class Test {
         ASTFunDecl lenCons = new ASTFunDecl(new ASTApplication(plus, new ASTApplication(len, xs), new ASTInteger(1)), len, new ASTConstruct(Cons, x, xs));
         prog.addDeclaration(lenCons);
 
-        // append Nil ys = ys
-        ASTVariable append = new ASTVariable("append");
-        ASTVariable ys = new ASTVariable("ys");
-        ASTFunDecl appendFuncNil = new ASTFunDecl(ys, append, Nil, ys);
-        prog.addDeclaration(appendFuncNil);
-
-        // append (Cons x ys) ys = Cons x (append xs ys)
-        ASTFunDecl appendFuncCons = new ASTFunDecl(new ASTApplication(Cons, x, new ASTApplication(append, xs, ys)), append, new ASTConstruct(Cons, x, xs), ys);
+        // append (Cons x y) z = Cons x (append y z)
+        ASTVariable y = new ASTVariable("y");
+        ASTFunDecl appendFuncCons = new ASTFunDecl(new ASTApplication(Cons, x, new ASTApplication(append, y, z)), append, new ASTConstruct(Cons, x, y), z);
         prog.addDeclaration(appendFuncCons);
 
         // list3 = (Cons 3) ((Cons 2) ((Cons 1) Nil)))
@@ -47,9 +49,11 @@ public class Test {
         System.out.println(prog);
 
         // evaluate the expression
-        System.out.println("\nWe evaluate the following expression: ");
-        System.out.println(squareLenList3);
         HaskellInterpreter interpreter = new HaskellInterpreter(prog);
-        System.out.println(" => " + interpreter.evaluate(squareLenList3));
+        try {
+            interpreter.evaluate(squareLenList3, true);
+        } catch (SimpleReducer.TooComplexException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

@@ -1,7 +1,9 @@
 package haskell.complex.ast;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a function declaration:
@@ -22,6 +24,12 @@ public class ASTFunDecl extends ASTDecl {
         this.exp = exp;
     }
 
+    /**
+     * Creates a new function declaration.
+     * @param exp The right-hand side expression
+     * @param var The function variable
+     * @param pats The function argument patterns
+     */
     public ASTFunDecl(ASTExpression exp, ASTVariable var, ASTPattern... pats) {
         assert(var != null);
         assert(exp != null);
@@ -75,5 +83,16 @@ public class ASTFunDecl extends ASTDecl {
         builder.append(" = ");
         builder.append(exp);
         return builder.toString();
+    }
+
+    @Override
+    public Set<ASTVariable> getAllVariables() {
+        Set<ASTVariable> vars = new HashSet<>();
+        vars.add(var);
+        for (ASTPattern pat : pats) {
+            vars.addAll(pat.getAllVariables());
+        }
+        vars.addAll(exp.getAllVariables());
+        return vars;
     }
 }
