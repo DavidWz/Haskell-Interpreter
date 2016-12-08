@@ -17,6 +17,10 @@ public class ASTProgram {
         decls.add(decl);
     }
 
+    public List<ASTDecl> getDecls() {
+        return decls;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -24,6 +28,7 @@ public class ASTProgram {
             builder.append(decl);
             builder.append("\n");
         }
+        builder.deleteCharAt(builder.length()-1);
         return builder.toString();
     }
 }
