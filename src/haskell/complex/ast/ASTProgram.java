@@ -1,9 +1,8 @@
 package haskell.complex.ast;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import haskell.complex.reduction.SimpleReducer;
+
+import java.util.*;
 
 /**
  * Represents the root node of a haskell program.
@@ -57,5 +56,25 @@ public class ASTProgram implements ComplexHaskell {
             vars.addAll(decl.getAllVariables());
         }
         return vars;
+    }
+
+    @Override
+    public boolean funcDeclToPatDecl() {
+        // first, we try to apply the transformation as deep as possible
+        for (ASTDecl decl : decls) {
+            if (decl.funcDeclToPatDecl()) {
+                return true;
+            }
+        }
+
+        // try to apply the transformation to the declarations stored in this program-term
+        Optional<List<ASTDecl>> transformedDecls = SimpleReducer.funcDeclToPatDecl(decls);
+        if (transformedDecls.isPresent()) {
+            decls = transformedDecls.get();
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

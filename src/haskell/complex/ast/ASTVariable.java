@@ -47,4 +47,9 @@ public class ASTVariable implements ASTExpression, ASTPattern {
         vars.add(this);
         return vars;
     }
+
+    @Override
+    public boolean funcDeclToPatDecl() {
+        return false;
+    }
 }

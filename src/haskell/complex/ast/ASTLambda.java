@@ -70,4 +70,9 @@ public class ASTLambda implements ASTExpression {
         vars.addAll(exp.getAllVariables());
         return vars;
     }
+
+    @Override
+    public boolean funcDeclToPatDecl() {
+        return exp.funcDeclToPatDecl();
+    }
 }

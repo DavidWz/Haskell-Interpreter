@@ -45,4 +45,9 @@ public class ASTTypeConstr implements ASTExpression, ASTPattern {
     public Set<ASTVariable> getAllVariables() {
         return new HashSet<>();
     }
+
+    @Override
+    public boolean funcDeclToPatDecl() {
+        return false;
+    }
 }

@@ -31,4 +31,9 @@ public class ASTJoker implements ASTPattern {
     public Set<ASTVariable> getAllVariables() {
         return new HashSet<>();
     }
+
+    @Override
+    public boolean funcDeclToPatDecl() {
+        return false;
+    }
 }

@@ -54,4 +54,9 @@ public class ASTPatDecl extends ASTDecl {
         vars.addAll(exp.getAllVariables());
         return vars;
     }
+
+    @Override
+    public boolean funcDeclToPatDecl() {
+        return exp.funcDeclToPatDecl();
+    }
 }

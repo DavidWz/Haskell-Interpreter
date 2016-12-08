@@ -1,8 +1,10 @@
 package haskell.complex.ast;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import haskell.complex.reduction.SimpleReducer;
+import haskell.complex.reduction.VariableManager;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a let expression, i.e. let decls in expr
@@ -24,10 +26,6 @@ public class ASTLet implements ASTExpression {
 
     public ASTExpression getExp() {
         return exp;
-    }
-
-    public void setDecls(List<ASTDecl> decls) {
-        this.decls = decls;
     }
 
     @Override
@@ -72,5 +70,28 @@ public class ASTLet implements ASTExpression {
         }
         vars.addAll(exp.getAllVariables());
         return vars;
+    }
+
+    @Override
+    public boolean funcDeclToPatDecl() {
+        // first, try to apply this transformation as deep as possible
+        for (ASTDecl decl : decls) {
+            if (decl.funcDeclToPatDecl()) {
+                return true;
+            }
+        }
+        if (exp.funcDeclToPatDecl()) {
+            return true;
+        }
+
+        // try to apply the transformation to the declarations stored in this let-term
+        Optional<List<ASTDecl>> transformedDecls = SimpleReducer.funcDeclToPatDecl(decls);
+        if (transformedDecls.isPresent()) {
+            decls = transformedDecls.get();
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

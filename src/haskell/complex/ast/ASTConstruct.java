@@ -80,4 +80,9 @@ public class ASTConstruct implements ASTExpression, ASTPattern {
         }
         return vars;
     }
+
+    @Override
+    public boolean funcDeclToPatDecl() {
+        return false;
+    }
 }

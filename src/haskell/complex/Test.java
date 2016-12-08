@@ -53,7 +53,7 @@ public class Test {
         try {
             interpreter.evaluate(squareLenList3, true);
         } catch (SimpleReducer.TooComplexException e) {
-            System.out.println(e.getMessage());
+            System.out.println("\n"+e.getMessage());
         }
     }
 }

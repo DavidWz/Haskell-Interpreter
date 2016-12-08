@@ -8,21 +8,21 @@ topdecl : (decl | datadecl)*;
 datadecl : 'data' TYCONSTR VAR* '=' TYCONSTR type* ('|' TYCONSTR type*)*;
 decl : fundecl | patdecl;
 fundecl : funlhs '=' rhs;
-funlhs : VAR pats+;
+funlhs : VAR exps+;
 rhs : exp;
-patdecl : pats '=' rhs;
+patdecl : exps '=' rhs;
 decls : '{' decl (';' decl)* '}';
 
 exp : VAR |       INT | constr | tuple | application | branch | let | cases | lambda;
-pats : VAR | '_' | INT | constr | tuple;
+exps : VAR | '_' | INT | constr | tuple;
 
 tuple : '(' (exp (',' exp)*)? ')';
-constr : TYCONSTR | '(' TYCONSTR pats* ')';
+constr : TYCONSTR | '(' TYCONSTR exps* ')';
 application : '(' exp exp+ ')';
 branch : 'if' exp 'then' exp 'else' exp;
 let : 'let' decls 'in' exp;
-cases : 'case' exp 'of' '{' pats '->' exp (';' pats '->' exp)* '}';
-lambda : '\\' pats+ '->' exp;
+cases : 'case' exp 'of' '{' exps '->' exp (';' exps '->' exp)* '}';
+lambda : '\\' exps+ '->' exp;
 
 type : functype | tyconstrval | tupletype | VAR;
 tyconstrval : TYCONSTR | '(' TYCONSTR type* ')';

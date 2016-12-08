@@ -29,12 +29,11 @@ public class SimpleReducer {
     }
 
     private ASTExpression expression;
-    private VariableManager variableManager;
 
     public SimpleReducer(ASTExpression expression) {
         assert(expression != null);
         this.expression = expression;
-        this.variableManager = new VariableManager(expression);
+        VariableManager.init(expression);
     }
 
     public int getNumRules() {
@@ -42,11 +41,56 @@ public class SimpleReducer {
     }
 
     /**
-     * Transforms a series of function declarations for the same function into a single patter declaration.
-     * @param decls
-     * @return
+     * Transforms function declarations for one specific function into a pattern declaration.
+     * @param decls a list of declarations
+     * @return an optional containing a new list of declarations where one function was replaced by a pattern declaration.
+     *         if the rule could not be applied, an empty optional is returned.
      */
-    private ASTPatDecl funcDeclToPatDecl(List<ASTFunDecl> decls) {
+    public static Optional<List<ASTDecl>> funcDeclToPatDecl(List<ASTDecl> decls) {
+        // filter out the function declarations
+        List<ASTFunDecl> funDecls = new ArrayList<>();
+        List<ASTDecl> otherDecls = new ArrayList<>();
+
+        for (ASTDecl decl : decls) {
+            if (decl instanceof ASTFunDecl) {
+                funDecls.add((ASTFunDecl) decl);
+            }
+            else {
+                otherDecls.add(decl);
+            }
+        }
+
+        // now we want to transformed all declaration for one specific function
+        if (funDecls.size() > 0) {
+            // we pick the first function we encounter
+            ASTVariable targetFunction = funDecls.get(0).getVar();
+
+            // then we collect all declarations for that function
+            List<ASTFunDecl> targetFunDecls = funDecls.stream().
+                    filter(decl -> decl.getVar().equals(targetFunction)).
+                    collect(Collectors.toList());
+            otherDecls.addAll(funDecls.stream().
+                    filter(decl -> !decl.getVar().equals(targetFunction)).
+                    collect(Collectors.toList()));
+
+            // now we can actually apply a transformation to those function
+            ASTPatDecl patDecl = SimpleReducer.getPatDeclForFunctionDecls(targetFunDecls);
+
+            // and then we recombine the results
+            otherDecls.add(patDecl);
+            return Optional.of(otherDecls);
+        }
+        else {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Transforms a series of function declarations for the same function into a single pattern declaration.
+     * @param decls a list of function declarations for the same function
+     * @return the equivalent pattern declaration
+     */
+    private static ASTPatDecl getPatDeclForFunctionDecls(List<ASTFunDecl> decls) {
         assert(decls != null);
         assert(decls.size() > 0);
 
@@ -64,72 +108,34 @@ public class SimpleReducer {
          */
 
         // create the lambda variables
-        List<ASTPattern> lambdaVars = new ArrayList<>();
+        List<ASTPattern> lambdaVarsPat = new ArrayList<>();
+        List<ASTExpression> lambdaVarsExp = new ArrayList<>();
         for (int i = 0; i < numArgs; i++) {
-            lambdaVars.add(variableManager.getFreshVariable());
+            ASTVariable var = VariableManager.getFreshVariable();
+            lambdaVarsPat.add(var);
+            lambdaVarsExp.add(var);
         }
 
         // create the case expression
-        // TODO
+        ASTExpTuple varsTuple = new ASTExpTuple(lambdaVarsExp);
 
-        ASTLambda lambda = new ASTLambda(lambdaVars, new ASTVariable("todo"));
+        // create the case patterns and expression
+        List<ASTPattern> casePats = new ArrayList<>();
+        List<ASTExpression> caseExps = new ArrayList<>();
 
+        for (ASTFunDecl funDecl : decls) {
+            ASTPatTuple argsTuple = new ASTPatTuple(funDecl.getPats());
+            ASTExpression funExp = funDecl.getExp();
+            casePats.add(argsTuple);
+            caseExps.add(funExp);
+        }
+
+        ASTCase cases = new ASTCase(varsTuple, casePats, caseExps);
+
+        // create the lambda and return the resulting pattern
+        ASTLambda lambda = new ASTLambda(lambdaVarsPat, cases);
         ASTPatDecl patDecl = new ASTPatDecl(functionName, lambda);
         return patDecl;
-    }
-
-    /**
-     * Transforms a series of function declarations inside the top-level let expression
-     * for one specific function into an equivalent pattern declaration.
-     * @param exp
-     * @return
-     */
-    private Optional<ASTExpression> funcDeclToPatDecl(ASTExpression exp) {
-        if (exp instanceof ASTLet) {
-            ASTLet let = (ASTLet) exp;
-            List<ASTDecl> decls = let.getDecls();
-
-            // filter out the function declarations
-            List<ASTFunDecl> funDecls = new ArrayList<>();
-            List<ASTDecl> otherDecls = new ArrayList<>();
-
-            for (ASTDecl decl : decls) {
-                if (decl instanceof ASTFunDecl) {
-                    funDecls.add((ASTFunDecl) decl);
-                }
-                else {
-                    otherDecls.add(decl);
-                }
-            }
-
-            // now we want to transformed all declaration for one specific function
-            if (funDecls.size() > 0) {
-                // we pick the first function we encounter
-                ASTVariable targetFunction = funDecls.get(0).getVar();
-
-                // then we collect all declarations for that function
-                List<ASTFunDecl> targetFunDecls = funDecls.stream().
-                        filter(decl -> decl.getVar().equals(targetFunction)).
-                        collect(Collectors.toList());
-                otherDecls.addAll(funDecls.stream().
-                        filter(decl -> !decl.getVar().equals(targetFunction)).
-                        collect(Collectors.toList()));
-
-                // now we can actually apply a transformation to those function
-                ASTPatDecl patDecl = funcDeclToPatDecl(targetFunDecls);
-
-                // and then we recombine the results
-                otherDecls.add(patDecl);
-                let.setDecls(otherDecls);
-                return Optional.of(let);
-            }
-            else {
-                return Optional.empty();
-            }
-        }
-        else {
-            return Optional.empty();
-        }
     }
 
     /**
@@ -140,23 +146,20 @@ public class SimpleReducer {
     public haskell.simple.ast.ASTExpression reduceToSimple() throws TooComplexException {
         boolean transformed;
 
-        Optional<ASTExpression> transformedExp;
         // apply rules as long as they still change something
         do {
             {
                 // DEBUG
-                System.out.println("Current simple haskell program: \n");
+                System.out.println("\nCurrent simple haskell program:");
                 System.out.println(expression);
             }
             transformed = false;
 
             // we try to apply every rule in succession
             for (int i=0; i < getNumRules(); i++) {
-                transformedExp = applyRule(i);
-                if (transformedExp.isPresent()) {
+                if (applyRule(i)) {
                     // the rule was successfully applied
                     transformed = true;
-                    expression = transformedExp.get();
                 }
             }
         } while(transformed);
@@ -167,14 +170,15 @@ public class SimpleReducer {
     /**
      * Tries to apply a transformation rule to a complex haskell expression.
      * @param ruleNumber the number of the rule. 0 <= ruleNumber < getNumRules()
-     * @return An optional containing the transformed expression or empty if the rule was not applicable
+     * @return whether a transformation was successfully applied
      */
-    private Optional<ASTExpression> applyRule(int ruleNumber) {
+    private boolean applyRule(int ruleNumber) {
         switch(ruleNumber) {
             case 0:
-                return funcDeclToPatDecl(expression);
+                return expression.funcDeclToPatDecl();
+            // TODO: implement other transformation rules
             default:
-                return Optional.empty();
+                return false;
         }
     }
 

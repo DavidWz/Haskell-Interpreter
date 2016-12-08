@@ -10,17 +10,13 @@ import java.util.Set;
  */
 public class VariableManager {
     // the current index for our x_i variables
-    private int i = 0;
-
-    public VariableManager(ComplexHaskell complexHaskell) {
-        init(complexHaskell);
-    }
+    private static int i = 0;
 
     /**
      * Initializes this variable manager with the variables found in the given complex haskell term.
      * @param complexHaskell
      */
-    public void init(ComplexHaskell complexHaskell) {
+    public static void init(ComplexHaskell complexHaskell) {
         Set<ASTVariable> vars = complexHaskell.getAllVariables();
 
         // all our fresh variables are simply called "x_i", so we need to determine the smallest i which is not used yet
@@ -52,7 +48,7 @@ public class VariableManager {
     /**
      * Returns a fresh variable.
      */
-    public ASTVariable getFreshVariable() {
+    public static ASTVariable getFreshVariable() {
         i++;
         return new ASTVariable("x"+(i-1));
     }
