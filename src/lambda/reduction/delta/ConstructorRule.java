@@ -82,7 +82,43 @@ public class ConstructorRule extends DeltaRule {
 
         @Override
         public String toString() {
-            return "isa_" + constr;
+            return "isa_constr_" + constr;
+        }
+    }
+
+    /**
+     * Represents the isa_int function
+     */
+    public static class IsAInt {
+        private int n;
+
+        public IsAInt(int n) {
+            this.n = n;
+        }
+
+        public int getInt() {
+            return n;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            IsAInt isAInt = (IsAInt) o;
+
+            return n == isAInt.n;
+
+        }
+
+        @Override
+        public int hashCode() {
+            return n;
+        }
+
+        @Override
+        public String toString() {
+            return "isa_int_" + n;
         }
     }
 
@@ -133,6 +169,10 @@ public class ConstructorRule extends DeltaRule {
         return new IsAConstr(constr);
     }
 
+    private static IsAInt getIsaIntOperator(int n) {
+        return new IsAInt(n);
+    }
+
     public static ArgOf getArgOfOperator(Constructor constr) {
         return new ArgOf(constr);
     }
@@ -144,14 +184,14 @@ public class ConstructorRule extends DeltaRule {
 
     @Override
     public boolean isConstantMatching(ASTConstant c) {
-        boolean isIsa = c.getValue() instanceof IsAConstr;
+        boolean isIsa = c.getValue() instanceof IsAConstr || c.getValue() instanceof IsAInt;
         boolean isArgOf = c.getValue() instanceof ArgOf;
         return (isIsa || isArgOf);
     }
 
     @Override
     public Optional<ASTTerm> getRHS(ASTConstant constant, List<ASTTerm> terms) {
-        // the constant must be Isa_constr or argof_constr and it has only one argument
+        // the constant must be isa_constr, isa_int or argof_constr and it has only one argument
         if (isSignatureMatching(constant, terms)) {
             // check if the argument is a fitting constr
             ASTTerm data = terms.get(0);
@@ -160,6 +200,7 @@ public class ConstructorRule extends DeltaRule {
 
             if (constr instanceof ASTConstant) {
                 ASTConstant constrConstant = (ASTConstant) constr;
+
                 if (constrConstant.getValue() instanceof Constructor) {
                     // it's a constructor, so reduce it according to the operator
 
@@ -198,6 +239,23 @@ public class ConstructorRule extends DeltaRule {
                         }
                     }
                 }
+                else if (constrConstant.getValue() instanceof Integer) {
+                    // it's an integer, so try to reduce it with isa_int_ delta rules
+
+                    if (constant.getValue() instanceof IsAInt) {
+                        // it's isa_int
+                        IsAInt op = (IsAInt) constant.getValue();
+                        int val = (int) constrConstant.getValue();
+
+                        // check if the constructors match
+                        if (val == op.getInt()) {
+                            return Optional.of(new ASTConstant(true));
+                        }
+                        else {
+                            return Optional.of(new ASTConstant(false));
+                        }
+                    }
+                }
             }
         }
 
@@ -209,7 +267,12 @@ public class ConstructorRule extends DeltaRule {
             String constrName = name.substring(11);
             return Optional.of(new ASTConstant(getIsaOperator(ConstructorRule.getConstructor(constrName))));
         }
-        else if(name.startsWith("argof_")) {
+        else if (name.startsWith("isa_int_")) {
+            String val = name.substring(8);
+            int n = Integer.parseInt(val);
+            return Optional.of(new ASTConstant(getIsaIntOperator(n)));
+        }
+        else if (name.startsWith("argof_")) {
             String constrName = name.substring(6);
             return Optional.of(new ASTConstant(getArgOfOperator(ConstructorRule.getConstructor(constrName))));
         }

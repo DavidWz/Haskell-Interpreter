@@ -11,13 +11,21 @@ public class Test {
         // square 0 = 0
         ASTVariable square = new ASTVariable("square");
         ASTFunDecl squareBasis = new ASTFunDecl(new ASTInteger(0), square, new ASTInteger(0));
-        //prog.addDeclaration(squareBasis); // TODO
+        prog.addDeclaration(squareBasis);
 
         // square x = times x x
         ASTVariable x = new ASTVariable("x");
         ASTVariable times = new ASTVariable("times");
         ASTFunDecl squareFunc = new ASTFunDecl(new ASTApplication(times, x, x), square, x);
         prog.addDeclaration(squareFunc);
+
+        // fact x = if x <= 0 then 1 else fact(x-1)*x
+        ASTVariable fact = new ASTVariable("fact");
+        ASTExpression lesseq_x_0 = new ASTApplication(new ASTVariable("lesseq"), x, new ASTInteger(0));
+        ASTExpression fact_decr_x = new ASTApplication(fact, new ASTApplication(new ASTVariable("minus"), x, new ASTInteger(1)));
+        ASTExpression factRec = new ASTApplication(times, fact_decr_x, x);
+        ASTFunDecl factFunc = new ASTFunDecl(new ASTBranch(lesseq_x_0, new ASTInteger(1), factRec), fact, x);
+        prog.addDeclaration(factFunc);
 
         // len Nil = 0
         ASTVariable len = new ASTVariable("len");
@@ -51,17 +59,19 @@ public class Test {
         // list 4 = append list3 4
         ASTExpression list4 = new ASTApplication(append, list3, new ASTInteger(4));
 
-        // square the length of the list: square (len list3)
+        // several test expressions
         ASTExpression square2 = new ASTApplication(square, new ASTInteger(2));
         ASTExpression lenList3 = new ASTApplication(len, list3);
         ASTExpression lenList1 = new ASTApplication(len, list1);
+        ASTExpression lenList4 = new ASTApplication(len, list4);
         ASTExpression squareLenList3 = new ASTApplication(square, lenList3);
-        ASTExpression squareLenList4 = new ASTApplication(square, new ASTApplication(len, list4));
+        ASTExpression squareLenList4 = new ASTApplication(square, lenList4);
+        ASTExpression factLenList3 = new ASTApplication(fact, lenList3);
+
+        ASTExpression eval = factLenList3;
 
         System.out.println(prog);
-
-        ASTExpression eval = squareLenList4;
-        System.out.print("eval[" + eval + "] = ");
+        System.out.print("\neval[" + eval + "] = ");
 
         // evaluate the expression
         HaskellInterpreter interpreter = new HaskellInterpreter(prog);

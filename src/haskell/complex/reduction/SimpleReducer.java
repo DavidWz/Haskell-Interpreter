@@ -61,7 +61,7 @@ public class SimpleReducer {
             }
         }
 
-        // now we want to transformed all declaration for one specific function
+        // now we want to transform all declarations for one specific function
         if (funDecls.size() > 0) {
             // we pick the first function we encounter
             ASTVariable targetFunction = funDecls.get(0).getVar();
@@ -70,15 +70,14 @@ public class SimpleReducer {
             List<ASTFunDecl> targetFunDecls = funDecls.stream().
                     filter(decl -> decl.getVar().equals(targetFunction)).
                     collect(Collectors.toList());
-            otherDecls.addAll(funDecls.stream().
-                    filter(decl -> !decl.getVar().equals(targetFunction)).
-                    collect(Collectors.toList()));
+            funDecls.removeAll(targetFunDecls);
 
             // now we can actually apply a transformation to those function
             ASTPatDecl patDecl = SimpleReducer.getPatDeclForFunctionDecls(targetFunDecls);
 
             // and then we recombine the results
             otherDecls.add(patDecl);
+            otherDecls.addAll(funDecls);
             return Optional.of(otherDecls);
         }
         else {
@@ -195,10 +194,7 @@ public class SimpleReducer {
             return matchTupleToExp((ASTPatTuple) pat, exp, exp1, exp2);
         }
         else {
-            // the pattern must be a constant
-            // TODO: implement constants as constructs of arity 0
-            ASTExpression constant = (ASTExpression) pat;
-            return new ASTApplication(VariableManager.getMatchFunc(), constant, exp, exp1, exp2);
+            return matchConstToExp(pat, exp, exp1, exp2);
         }
     }
 
@@ -273,6 +269,24 @@ public class SimpleReducer {
         else {
             // 1-tuples are the same as the underlying expression
             return matchToExpression(tuple.getPats().get(0), exp, exp1, exp2);
+        }
+    }
+
+    private static ASTExpression matchConstToExp(ASTPattern pat, ASTExpression exp, ASTExpression exp1, ASTExpression exp2) {
+        if (pat instanceof ASTInteger) {
+            ASTInteger intPat = (ASTInteger) pat;
+            /*
+                     match INT exp exp1 exp2
+            ----------------------------------------
+            if (isa_int_INT exp) then exp1 else exp2
+             */
+            ASTApplication isaExp = new ASTApplication(VariableManager.getIsaIntFunc(intPat.getValue()), exp);
+            return new ASTBranch(isaExp, exp1, exp2);
+        }
+        else {
+            // unknown constant, leave it as is
+            ASTExpression constant = (ASTExpression) pat;
+            return new ASTApplication(VariableManager.getMatchFunc(), constant, exp, exp1, exp2);
         }
     }
 

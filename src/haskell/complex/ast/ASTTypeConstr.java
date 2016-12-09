@@ -31,7 +31,7 @@ public class ASTTypeConstr implements ASTExpression, ASTPattern {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ASTVariable that = (ASTVariable) o;
+        ASTTypeConstr that = (ASTTypeConstr) o;
 
         return getName().equals(that.getName());
 

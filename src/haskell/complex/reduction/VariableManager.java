@@ -112,4 +112,8 @@ public class VariableManager {
     public static ASTVariable getSelFunc(int n, int i) {
         return new ASTVariable("sel_"+n+"_"+i);
     }
+
+    public static ASTVariable getIsaIntFunc(int value) {
+        return new ASTVariable("isa_int_"+value);
+    }
 }
