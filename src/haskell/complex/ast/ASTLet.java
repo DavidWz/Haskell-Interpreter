@@ -94,4 +94,69 @@ public class ASTLet implements ASTExpression {
             return false;
         }
     }
+
+    @Override
+    public boolean nestMultipleLambdas() {
+        for (ASTDecl decl : decls) {
+            if (decl.nestMultipleLambdas()) {
+                return true;
+            }
+        }
+        return exp.nestMultipleLambdas();
+    }
+
+    @Override
+    public boolean lambdaPatternToCase() {
+        for (ASTDecl decl : decls) {
+            if (decl.lambdaPatternToCase()) {
+                return true;
+            }
+        }
+        return exp.lambdaPatternToCase();
+    }
+
+    @Override
+    public boolean caseToMatch() {
+        for (ASTDecl decl : decls) {
+            if (decl.caseToMatch()) {
+                return true;
+            }
+        }
+        if (exp.caseToMatch()) {
+            return true;
+        }
+
+        if (exp instanceof ASTCase) {
+            ASTCase caseExp = (ASTCase) exp;
+            exp = SimpleReducer.caseToMatch(caseExp);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean nestMultipleLets() {
+        // TODO: entangled functions
+        // we assume functions are not entangled and that functions only depend on earlier defined other functions
+
+        // we construct the nested let terms as follows:
+        /*
+                 let { decl1; ...; decln } in exp
+        -------------------------------------------------------
+        let decl1 in (let decl2 in (... (let decln in exp)...))
+         */
+
+        if (decls.size() > 0) {
+            ASTExpression nestedLets = exp;
+            while (decls.size() > 1) {
+                ASTDecl currentDecl = decls.remove(decls.size()-1);
+                nestedLets = new ASTLet(Collections.singletonList(currentDecl), nestedLets);
+            }
+            exp = nestedLets;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }

@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 /**
  * A class which can reduce complex haskell to simple haskell.
+ * Note: The following functions are predefined, so you cannot overwrite them.
+ * bot, match, isa_constr, argof_constr, isa_n-tuple, sel_{n,1}
  */
 public class SimpleReducer {
     public static class TooComplexException extends Exception {
@@ -34,10 +36,6 @@ public class SimpleReducer {
         assert(expression != null);
         this.expression = expression;
         VariableManager.init(expression);
-    }
-
-    public int getNumRules() {
-        return 1;
     }
 
     /**
@@ -139,32 +137,211 @@ public class SimpleReducer {
     }
 
     /**
+     * Transforms the given case expression to a nested application of the predefined match function.
+     * @param caseExpr the case expression
+     * @return
+     */
+    public static ASTExpression caseToMatch(ASTCase caseExpr) {
+        ASTExpression exp = caseExpr.getExp();
+        List<ASTPattern> casePats = caseExpr.getCasePats();
+        List<ASTExpression> caseExps = caseExpr.getCaseExps();
+
+        // we start with bot
+        ASTExpression nestedMatches = VariableManager.getBot();
+
+        // then we iteratively apply match as follows:
+        /*
+                 case exp of { pat1 -> exp1; ...; patn -> expn }
+        ----------------------------------------------------------------------------
+        match pat1 exp exp1 (match pat2 exp exp2 (... (match patn exp expn bot)...))
+         */
+        while (casePats.size() > 0) {
+            ASTPattern currentPat = casePats.remove(casePats.size()-1);
+            ASTExpression currentExp = caseExps.remove(caseExps.size()-1);
+
+            // An application can only contain expressions, but at this point there is still a pattern (currentPat).
+            // In order to avoid problems with the type system, we need to immediatly apply other transformation rules
+            // which transform a match application with patterns to some other expression.
+            nestedMatches = matchToExpression(currentPat, exp, currentExp, nestedMatches);
+        }
+
+        // we can cast because there is always at least one case (@see ASTCase assertions)
+        return nestedMatches;
+    }
+
+    /**
+     * Applies transformation rules which replace a match application by other expressions. The match application has
+     * the following form: match pat exp exp1 exp2
+     * @param pat
+     * @param exp
+     * @param exp1
+     * @param exp2
+     * @return
+     */
+    private static ASTExpression matchToExpression(ASTPattern pat, ASTExpression exp, ASTExpression exp1, ASTExpression exp2) {
+        if (pat instanceof ASTVariable) {
+           return matchVarToExp((ASTVariable) pat, exp, exp1, exp2);
+        }
+        else if (pat instanceof ASTJoker) {
+            return matchJokerToExp((ASTJoker) pat, exp, exp1, exp2);
+        }
+        else if (pat instanceof ASTConstruct) {
+            return matchConstrToExp((ASTConstruct) pat, exp, exp1, exp2);
+        }
+        else if (pat instanceof ASTPatTuple) {
+            return matchTupleToExp((ASTPatTuple) pat, exp, exp1, exp2);
+        }
+        else {
+            // the pattern must be a constant
+            // TODO: implement constants as constructs of arity 0
+            ASTExpression constant = (ASTExpression) pat;
+            return new ASTApplication(VariableManager.getMatchFunc(), constant, exp, exp1, exp2);
+        }
+    }
+
+    private static ASTExpression matchVarToExp(ASTVariable var, ASTExpression exp, ASTExpression exp1, ASTExpression exp2) {
+        /*
+        match var exp exp1 exp2
+        -----------------------
+           (\var -> exp1) exp
+         */
+        return new ASTApplication(new ASTLambda(var, exp1), exp);
+    }
+
+    private static ASTExpression matchJokerToExp(ASTJoker joker, ASTExpression exp, ASTExpression exp1, ASTExpression exp2) {
+        /*
+        match _ exp exp1 exp2
+        ---------------------
+                 exp1
+         */
+        return exp1;
+    }
+
+    private static ASTExpression matchConstrToExp(ASTConstruct constr, ASTExpression exp, ASTExpression exp1, ASTExpression exp2) {
+        /*
+                          match (constr pat1 ... patn) exp exp1 exp2
+        -----------------------------------------------------------------------------------------
+        if (isa_constr exp) then (match (pat1, ..., patn) (argof_constr exp) exp1 exp2) else exp2
+         */
+        ASTApplication isaExp = new ASTApplication(VariableManager.getIsaConstrFunc(constr.getType()), exp);
+        ASTPatTuple patTuple = new ASTPatTuple(constr.getPats());
+        ASTApplication argofExp = new ASTApplication(VariableManager.getArgofFunc(constr.getType()), exp);
+        ASTExpression tupleArgMatch = matchToExpression(patTuple, argofExp, exp1, exp2);
+
+        return new ASTBranch(isaExp, tupleArgMatch, exp2);
+    }
+
+    private static ASTExpression matchTupleToExp(ASTPatTuple tuple, ASTExpression exp, ASTExpression exp1, ASTExpression exp2) {
+        if (tuple.getPats().size() == 0) {
+            /*
+                    match () exp exp1 exp2
+            ----------------------------------------
+            if (isa_0-tuple exp) then exp1 else exp2
+             */
+            ASTApplication isaExp = new ASTApplication(VariableManager.getIsaTupleFunc(0), exp);
+            return new ASTBranch(isaExp, exp1, exp2);
+        }
+        else if(tuple.getPats().size() >= 2) {
+            /*
+            match (pat1, ..., patn) exp exp1 exp2
+            -------------------------------------------------------
+            if (isa_n-tuple exp) then matchTuple else exp2
+
+            where matchTuple is:
+            match pat1 (sel_n,1 exp) (match pat2 (sel_n,2 exp) (... match patn (sel_n,n exp) exp1 exp2)...) exp2) exp2
+             */
+            int n = tuple.getPats().size();
+
+            ASTApplication isaExp = new ASTApplication(VariableManager.getIsaTupleFunc(n), exp);
+            ASTExpression matchTuple = exp1;
+
+            int i = n;
+            while (i > 0) {
+                matchTuple = matchToExpression(
+                        tuple.getPats().get(i-1),
+                        new ASTApplication(VariableManager.getSelFunc(n,i), exp),
+                        matchTuple,
+                        exp2);
+                i--;
+            }
+
+            return new ASTBranch(isaExp, matchTuple, exp2);
+        }
+        else {
+            // 1-tuples are the same as the underlying expression
+            return matchToExpression(tuple.getPats().get(0), exp, exp1, exp2);
+        }
+    }
+
+    /**
      * Converts a complex haskell expression to a simple haskell expression.
      * @return an equivalent simple haskell expression
      * @throws TooComplexException
      */
     public haskell.simple.ast.ASTExpression reduceToSimple() throws TooComplexException {
+        // first we must transform multiple function declarations for the same function to single declarations
+        applyFuncDeclToPatDecl();
+
+        // then we apply basic transformation rules as long as possible
+        applyBasicTransformationRules();
+
+        // after this, we apply the declarations according to entaglement
+        // and then nest them in multiple let expressions
+        applyDeclarationSplit();
+
+        // then we again apply basic transformation rules as long as possible
+        applyBasicTransformationRules();
+
+        // after this, the complex haskell expression should be in simple haskell form
+        return castToSimple(expression);
+    }
+
+    private void applyFuncDeclToPatDecl() {
+        boolean transformed;
+
+        do {
+            transformed = false;
+            if (expression.funcDeclToPatDecl()) {
+                {
+                    // DEBUG
+                    System.out.println("\nApplied rule #"+0);
+                    System.out.println(expression);
+                }
+                // the rule was successfully applied
+                transformed = true;
+            }
+        } while(transformed);
+    }
+
+    private void applyBasicTransformationRules() {
         boolean transformed;
 
         // apply rules as long as they still change something
         do {
-            {
-                // DEBUG
-                System.out.println("\nCurrent simple haskell program:");
-                System.out.println(expression);
-            }
             transformed = false;
 
             // we try to apply every rule in succession
-            for (int i=0; i < getNumRules(); i++) {
+            for (int i=0; i < getNumBasicRules(); i++) {
                 if (applyRule(i)) {
+                    {
+                        // DEBUG
+                        System.out.println("\nApplied rule #"+(i+2));
+                        System.out.println(expression);
+                    }
                     // the rule was successfully applied
                     transformed = true;
                 }
             }
         } while(transformed);
+    }
 
-        return castToSimple(expression);
+    private void applyDeclarationSplit() {
+        // TODO: actually split them according to entanglement
+        expression.nestMultipleLets();
+    }
+
+    private int getNumBasicRules() {
+        return 3;
     }
 
     /**
@@ -175,8 +352,11 @@ public class SimpleReducer {
     private boolean applyRule(int ruleNumber) {
         switch(ruleNumber) {
             case 0:
-                return expression.funcDeclToPatDecl();
-            // TODO: implement other transformation rules
+                return expression.nestMultipleLambdas();
+            case 1:
+                return expression.lambdaPatternToCase();
+            case 2:
+                return expression.caseToMatch();
             default:
                 return false;
         }

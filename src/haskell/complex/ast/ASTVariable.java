@@ -52,4 +52,24 @@ public class ASTVariable implements ASTExpression, ASTPattern {
     public boolean funcDeclToPatDecl() {
         return false;
     }
+
+    @Override
+    public boolean nestMultipleLambdas() {
+        return false;
+    }
+
+    @Override
+    public boolean lambdaPatternToCase() {
+        return false;
+    }
+
+    @Override
+    public boolean caseToMatch() {
+        return false;
+    }
+
+    @Override
+    public boolean nestMultipleLets() {
+        return false;
+    }
 }

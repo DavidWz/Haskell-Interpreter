@@ -1,5 +1,6 @@
 package haskell.complex.reduction;
 
+import haskell.complex.ast.ASTTypeConstr;
 import haskell.complex.ast.ASTVariable;
 import haskell.complex.ast.ComplexHaskell;
 
@@ -11,6 +12,12 @@ import java.util.Set;
 public class VariableManager {
     // the current index for our x_i variables
     private static int i = 0;
+
+    // the bottom function variable
+    private static ASTVariable botFunc = new ASTVariable("bot");
+
+    // the match function variable
+    private static ASTVariable matchFunc = new ASTVariable("match");
 
     /**
      * Initializes this variable manager with the variables found in the given complex haskell term.
@@ -51,5 +58,37 @@ public class VariableManager {
     public static ASTVariable getFreshVariable() {
         i++;
         return new ASTVariable("x"+(i-1));
+    }
+
+    /**
+     * Returns a variable representing the bottom function.
+     * @return
+     */
+    public static ASTVariable getBot() {
+        return botFunc;
+    }
+
+    /**
+     * Returns a variable representing the match function
+     * @return
+     */
+    public static ASTVariable getMatchFunc() {
+        return matchFunc;
+    }
+
+    public static ASTVariable getIsaConstrFunc(ASTTypeConstr type) {
+        return new ASTVariable("isa_constr_"+type.getName());
+    }
+
+    public static ASTVariable getIsaTupleFunc(int n) {
+        return new ASTVariable("isa_tuple_"+n);
+    }
+
+    public static ASTVariable getArgofFunc(ASTTypeConstr type) {
+        return new ASTVariable("argof_"+type.getName());
+    }
+
+    public static ASTVariable getSelFunc(int n, int i) {
+        return new ASTVariable("sel_"+n+"_"+i);
     }
 }

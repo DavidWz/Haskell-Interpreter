@@ -1,14 +1,11 @@
 package haskell.complex.ast;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents a construction.
  */
-public class ASTConstruct implements ASTExpression, ASTPattern {
+public class ASTConstruct implements ASTPattern {
     private ASTTypeConstr type;
     private List<ASTPattern> pats;
 
@@ -26,6 +23,11 @@ public class ASTConstruct implements ASTExpression, ASTPattern {
 
         this.type = type;
         this.pats = pats;
+    }
+
+    public ASTConstruct(String name) {
+        this.type = new ASTTypeConstr(name);
+        this.pats = Collections.emptyList();
     }
 
     public ASTConstruct(ASTTypeConstr type, ASTPattern... pats) {
@@ -83,6 +85,26 @@ public class ASTConstruct implements ASTExpression, ASTPattern {
 
     @Override
     public boolean funcDeclToPatDecl() {
+        return false;
+    }
+
+    @Override
+    public boolean nestMultipleLambdas() {
+        return false;
+    }
+
+    @Override
+    public boolean lambdaPatternToCase() {
+        return false;
+    }
+
+    @Override
+    public boolean caseToMatch() {
+        return false;
+    }
+
+    @Override
+    public boolean nestMultipleLets() {
         return false;
     }
 }

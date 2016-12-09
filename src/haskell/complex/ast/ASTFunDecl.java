@@ -1,5 +1,7 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.SimpleReducer;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -99,5 +101,34 @@ public class ASTFunDecl extends ASTDecl {
     @Override
     public boolean funcDeclToPatDecl() {
         return exp.funcDeclToPatDecl();
+    }
+
+    @Override
+    public boolean nestMultipleLambdas() {
+        return exp.nestMultipleLambdas();
+    }
+
+    @Override
+    public boolean lambdaPatternToCase() {
+        return exp.lambdaPatternToCase();
+    }
+
+    @Override
+    public boolean caseToMatch() {
+        if (exp.caseToMatch()) {
+            return true;
+        }
+
+        if (exp instanceof ASTCase) {
+            ASTCase caseExp = (ASTCase) exp;
+            exp = SimpleReducer.caseToMatch(caseExp);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean nestMultipleLets() {
+        return exp.nestMultipleLets();
     }
 }

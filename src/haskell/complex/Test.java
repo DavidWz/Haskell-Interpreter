@@ -8,23 +8,27 @@ public class Test {
     public static void main(String[] args) {
         ASTProgram prog = new ASTProgram();
 
+        // square 0 = 0
+        ASTVariable square = new ASTVariable("square");
+        ASTFunDecl squareBasis = new ASTFunDecl(new ASTInteger(0), square, new ASTInteger(0));
+        prog.addDeclaration(squareBasis);
+
         // square x = times x x
         ASTVariable x = new ASTVariable("x");
         ASTVariable times = new ASTVariable("times");
-        ASTVariable square = new ASTVariable("square");
         ASTFunDecl squareFunc = new ASTFunDecl(new ASTApplication(times, x, x), square, x);
         prog.addDeclaration(squareFunc);
 
         // len Nil = 0
         ASTVariable len = new ASTVariable("len");
         ASTTypeConstr Nil = new ASTTypeConstr("Nil");
-        ASTFunDecl lenNil = new ASTFunDecl(new ASTInteger(0), len, Nil);
+        ASTFunDecl lenNil = new ASTFunDecl(new ASTInteger(0), len, new ASTConstruct(Nil));
         prog.addDeclaration(lenNil);
 
         // append Nil z = z
         ASTVariable append = new ASTVariable("append");
         ASTVariable z = new ASTVariable("z");
-        ASTFunDecl appendFuncNil = new ASTFunDecl(z, append, Nil, z);
+        ASTFunDecl appendFuncNil = new ASTFunDecl(z, append, new ASTConstruct(Nil), z);
         prog.addDeclaration(appendFuncNil);
 
         // len (Cons x xs) = (len xs) + 1

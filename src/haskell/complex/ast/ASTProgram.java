@@ -77,4 +77,44 @@ public class ASTProgram implements ComplexHaskell {
             return false;
         }
     }
+
+    @Override
+    public boolean nestMultipleLambdas() {
+        for(ASTDecl decl : decls) {
+            if (decl.nestMultipleLambdas()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean lambdaPatternToCase() {
+        for(ASTDecl decl : decls) {
+            if (decl.lambdaPatternToCase()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean caseToMatch() {
+        for (ASTDecl decl : decls) {
+            if (decl.caseToMatch()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean nestMultipleLets() {
+        for(ASTDecl decl : decls) {
+            if (decl.nestMultipleLets()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

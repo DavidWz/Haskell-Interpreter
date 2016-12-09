@@ -1,5 +1,7 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.SimpleReducer;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -95,6 +97,73 @@ public class ASTCase implements ASTExpression {
         }
         for (ASTExpression exp : caseExps) {
             if (exp.funcDeclToPatDecl()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean nestMultipleLambdas() {
+        if (exp.nestMultipleLambdas()) {
+            return true;
+        }
+        for (ASTExpression exp : caseExps) {
+            if (exp.nestMultipleLambdas()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean lambdaPatternToCase() {
+        if (exp.lambdaPatternToCase()) {
+            return true;
+        }
+        for (ASTExpression exp : caseExps) {
+            if (exp.lambdaPatternToCase()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean caseToMatch() {
+        // try to apply it as deep as possible
+        if (exp.caseToMatch()) {
+            return true;
+        }
+        for (ASTExpression exp : caseExps) {
+            if (exp.caseToMatch()) {
+                return true;
+            }
+        }
+
+        // check if one can replace cases here
+        if (exp instanceof ASTCase) {
+            ASTCase caseExp = (ASTCase) exp;
+            exp = SimpleReducer.caseToMatch(caseExp);
+            return true;
+        }
+        for (int i = 0; i < caseExps.size(); i++) {
+            if (caseExps.get(i) instanceof ASTCase) {
+                ASTCase caseExp = (ASTCase) caseExps.get(i);
+                caseExps.set(i, SimpleReducer.caseToMatch(caseExp));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean nestMultipleLets() {
+        if (exp.nestMultipleLets()) {
+            return true;
+        }
+        for (ASTExpression exp : caseExps) {
+            if (exp.nestMultipleLets()) {
                 return true;
             }
         }

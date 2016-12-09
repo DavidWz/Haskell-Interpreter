@@ -1,5 +1,7 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.SimpleReducer;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,6 +64,56 @@ public class ASTExpTuple implements ASTExpression {
     public boolean funcDeclToPatDecl() {
         for (ASTExpression exp : exps) {
             if (exp.funcDeclToPatDecl()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean nestMultipleLambdas() {
+        for (ASTExpression exp : exps) {
+            if (exp.nestMultipleLambdas()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean lambdaPatternToCase() {
+        for (ASTExpression exp : exps) {
+            if (exp.lambdaPatternToCase()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean caseToMatch() {
+        // try to apply it as deep as possible
+        for (ASTExpression exp : exps) {
+            if (exp.caseToMatch()) {
+                return true;
+            }
+        }
+
+        // check if one can replace cases here
+        for (int i = 0; i < exps.size(); i++) {
+            if (exps.get(i) instanceof ASTCase) {
+                ASTCase caseExp = (ASTCase) exps.get(i);
+                exps.set(i, SimpleReducer.caseToMatch(caseExp));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean nestMultipleLets() {
+        for (ASTExpression exp : exps) {
+            if (exp.nestMultipleLets()) {
                 return true;
             }
         }
