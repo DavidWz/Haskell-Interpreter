@@ -185,6 +185,9 @@ public class TupleRule extends DeltaRule {
                         if (op.getN() == args.size()) {
                             return Optional.of(new ASTConstant(true));
                         }
+                        else {
+                            return Optional.of(new ASTConstant(false));
+                        }
                     }
                     else {
                         // it's sel

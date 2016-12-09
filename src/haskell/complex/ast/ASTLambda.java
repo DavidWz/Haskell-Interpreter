@@ -188,6 +188,11 @@ public class ASTLambda implements ASTExpression {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        return exp.tuplePatLetToSingleVar();
+    }
+
+    @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         if (pats.size() == 1) {
             ASTPattern pat = pats.get(0);

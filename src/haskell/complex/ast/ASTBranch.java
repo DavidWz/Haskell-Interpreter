@@ -153,6 +153,17 @@ public class ASTBranch implements ASTExpression {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        if (condition.tuplePatLetToSingleVar()) {
+            return true;
+        }
+        if (ifBranch.tuplePatLetToSingleVar()) {
+            return true;
+        }
+        return elseBranch.tuplePatLetToSingleVar();
+    }
+
+    @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         return new haskell.simple.ast.ASTBranch(condition.castToSimple(), ifBranch.castToSimple(), elseBranch.castToSimple());
     }

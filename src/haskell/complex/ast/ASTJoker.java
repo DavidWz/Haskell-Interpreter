@@ -68,6 +68,11 @@ public class ASTJoker implements ASTPattern {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        return false;
+    }
+
+    @Override
     public ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         throw new SimpleReducer.TooComplexException(this, "The joker pattern is not part of simple haskell.");
     }

@@ -100,6 +100,11 @@ public class ASTPatDecl extends ASTDecl {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        return exp.tuplePatLetToSingleVar();
+    }
+
+    @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         throw new SimpleReducer.TooComplexException(this, "Pattern declarations are not part of simple haskell.");
     }

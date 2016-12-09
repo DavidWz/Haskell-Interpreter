@@ -130,6 +130,16 @@ public class ASTProgram implements ComplexHaskell {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        for(ASTDecl decl : decls) {
+            if (decl.tuplePatLetToSingleVar()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         throw new SimpleReducer.TooComplexException(this, "Programs are not part of simple haskell. Please use \"Let [program] in [expression]\" instead.");
     }

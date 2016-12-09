@@ -97,6 +97,11 @@ public class ASTPatTuple implements ASTPattern {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        return false;
+    }
+
+    @Override
     public ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         throw new SimpleReducer.TooComplexException(this, "Pattern tuples are not part of simple haskell.");
     }

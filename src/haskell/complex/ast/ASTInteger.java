@@ -78,6 +78,11 @@ public class ASTInteger implements ASTExpression, ASTPattern {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        return false;
+    }
+
+    @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         return new haskell.simple.ast.ASTConstant(value);
     }

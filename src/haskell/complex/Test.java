@@ -18,11 +18,13 @@ public class Test {
         prog.addDeclaration(toIntTrue);
         prog.addDeclaration(toIntFalse);
 
+        // decr x = x - 1
         ASTVariable decr = new ASTVariable("decr");
         ASTVariable minus = new ASTVariable("minus");
         ASTVariable x = new ASTVariable("x");
         ASTExpression decrX = new ASTApplication(minus, x, new ASTInteger(1));
         ASTFunDecl decrFunc = new ASTFunDecl(decrX, decr, x);
+        prog.addDeclaration(decrFunc);
 
         // even 0 = true
         // even x = odd(x-1)
@@ -33,13 +35,10 @@ public class Test {
         prog.addDeclaration(evenBase);
         prog.addDeclaration(evenRec);
 
-        // odd' = even
-        prog.addDeclaration(new ASTPatDecl(new ASTVariable("odd'"), even));
-
         // odd 0 = false
-        // odd x = odd'(x-1)
+        // odd x = even(x-1)
         ASTFunDecl oddBase = new ASTFunDecl(new ASTBoolean(false), odd, new ASTInteger(0));
-        ASTFunDecl oddRec = new ASTFunDecl(new ASTApplication(new ASTVariable("odd'"), new ASTApplication(decr, x)), odd, x);
+        ASTFunDecl oddRec = new ASTFunDecl(new ASTApplication(even, new ASTApplication(decr, x)), odd, x);
         prog.addDeclaration(oddBase);
         prog.addDeclaration(oddRec);
 
@@ -88,9 +87,6 @@ public class Test {
         ASTFunDecl appendFuncCons = new ASTFunDecl(new ASTApplication(Cons, x, new ASTApplication(append, y, z)), append, new ASTConstruct(Cons, x, y), z);
         prog.addDeclaration(appendFuncCons);
 
-        // decr x = x - 1
-        prog.addDeclaration(decrFunc);
-
         // list3 = (Cons 3) ((Cons 2) ((Cons 1) Nil)))
         ASTExpression list1 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(1)), Nil);
         ASTExpression list2 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(2)), list1);
@@ -108,7 +104,7 @@ public class Test {
         ASTExpression squareLenList4 = new ASTApplication(square, lenList4);
         ASTExpression factLenList3 = new ASTApplication(fact, lenList3);
 
-        ASTExpression eval = new ASTApplication(fact, new ASTApplication(toInt, new ASTApplication(even, new ASTInteger(3))));
+        ASTExpression eval = new ASTApplication(fact, new ASTApplication(plus, new ASTApplication(toInt, new ASTApplication(even, new ASTInteger(6))), new ASTInteger(3)));
 
         System.out.println(prog);
         System.out.print("\neval[" + eval + "] = ");
@@ -116,7 +112,7 @@ public class Test {
         // evaluate the expression
         HaskellInterpreter interpreter = new HaskellInterpreter(prog);
         try {
-            System.out.println(interpreter.evaluate(eval, true));
+            System.out.println(interpreter.evaluate(eval));
         } catch (SimpleReducer.TooComplexException e) {
             System.out.println("\n"+e.getMessage());
         }

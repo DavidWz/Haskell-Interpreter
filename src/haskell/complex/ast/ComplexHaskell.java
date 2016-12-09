@@ -52,6 +52,12 @@ public interface ComplexHaskell {
     boolean nestMultipleLets();
 
     /**
+     * Transforms a let expresison with a tuple pattern to a let expression with a single variable as pattern.
+     * @return
+     */
+    boolean tuplePatLetToSingleVar();
+
+    /**
      * Casts this complex haskell term to a simple haskell term. Throws a TooComplexException if the complex haskell term
      * did not have the same structure as an equivalent simple haskell term.
      * @return the equivalent simple haskell term

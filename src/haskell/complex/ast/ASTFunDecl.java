@@ -144,6 +144,11 @@ public class ASTFunDecl extends ASTDecl {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        return exp.tuplePatLetToSingleVar();
+    }
+
+    @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         throw new SimpleReducer.TooComplexException(this, "Function declarations are not part of simple haskell.");
     }

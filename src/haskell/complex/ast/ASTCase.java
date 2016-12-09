@@ -171,6 +171,19 @@ public class ASTCase implements ASTExpression {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        if (exp.tuplePatLetToSingleVar()) {
+            return true;
+        }
+        for (ASTExpression exp : caseExps) {
+            if (exp.tuplePatLetToSingleVar()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         throw new SimpleReducer.TooComplexException(this, "Cases are not part of simple haskell.");
     }

@@ -127,6 +127,16 @@ public class ASTApplication implements ASTExpression {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        for (ASTExpression exp : exps) {
+            if (exp.tuplePatLetToSingleVar()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         haskell.simple.ast.ASTExpression simpleExp = exps.get(0).castToSimple();
 

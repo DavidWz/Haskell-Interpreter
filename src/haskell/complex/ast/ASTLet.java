@@ -171,14 +171,6 @@ public class ASTLet implements ASTExpression {
         // first, we must calculate a seperation of pattern declarations so that entangled functions are grouped together
         List<List<ASTPatDecl>> seperation = SimpleReducer.getSeperation(patDecls);
 
-        System.out.println("The seperation is as follows: ");
-        for (List<ASTPatDecl> group : seperation) {
-            System.out.println("Group: ");
-            for (ASTPatDecl decl : group) {
-                System.out.println("\t" + decl);
-            }
-        }
-
         // then we transform groups of entangled declarations to single declarations
         for (List<ASTPatDecl> group : seperation) {
             nonPatDecls.add(fuseEntangledFunctions(group));
@@ -203,6 +195,72 @@ public class ASTLet implements ASTExpression {
         else {
             return false;
         }
+    }
+
+    @Override
+    public boolean tuplePatLetToSingleVar() {
+        // first, try to apply this transformation as deep as possible
+        for (ASTDecl decl : decls) {
+            if (decl.tuplePatLetToSingleVar()) {
+                return true;
+            }
+        }
+        if (exp.tuplePatLetToSingleVar()) {
+            return true;
+        }
+
+        // we apply the following transformation:
+        /*
+                            let (var1, ..., varn) = exp in exp'
+        --------------------------------------------------------------------------
+        let var = match (var1, ..., varn) (sel_n,1 var, ..., sel_n,n var) exp  bot
+               in match (var1, ..., varn) (sel_n,1 var, ..., sel_n,n var) exp' bot
+         */
+        // it only works if this let has only one pattern declaration though
+        if (decls.size() != 1) {
+            return false;
+        }
+        if (!(decls.get(0) instanceof ASTPatDecl)) {
+            return false;
+        }
+        ASTPatDecl patDecl = (ASTPatDecl) decls.get(0);
+        if (!(patDecl.getPat() instanceof ASTPatTuple)) {
+            return false;
+        }
+        ASTPatTuple varTuple = (ASTPatTuple) patDecl.getPat();
+        // lastly, check if the variable tuple actually contains only variables
+        for (ASTPattern var : varTuple.getPats()) {
+            if (!(var instanceof ASTVariable)) {
+                return false;
+            }
+        }
+        ASTVariable var = VariableManager.getFreshVariable();
+
+        List<ASTExpression> sels = new ArrayList<>();
+        int n = varTuple.getPats().size();
+        for (int i = 1; i <= n; i++) {
+            sels.add(new ASTApplication(VariableManager.getSelFunc(n, i), var));
+        }
+        ASTExpTuple selTuple = new ASTExpTuple(sels);
+
+        ASTExpression matchExpBot = SimpleReducer.matchToExpression(
+                varTuple,
+                selTuple,
+                patDecl.getExp(),
+                VariableManager.getBot());
+
+        ASTExpression matchExpPrimeBot = SimpleReducer.matchToExpression(
+                varTuple,
+                selTuple,
+                exp,
+                VariableManager.getBot());
+
+        ASTPatDecl newDecl = new ASTPatDecl(var, matchExpBot);
+        ASTExpression newExp = matchExpPrimeBot;
+
+        decls = Collections.singletonList(newDecl);
+        exp = newExp;
+        return true;
     }
 
     /**

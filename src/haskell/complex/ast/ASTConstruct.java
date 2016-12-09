@@ -115,6 +115,11 @@ public class ASTConstruct implements ASTPattern {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        return false;
+    }
+
+    @Override
     public ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         if (pats.size() == 0) {
             Optional<lambda.ast.ASTConstant> constant = WHNOReducer.toConst(type.getName());

@@ -178,7 +178,7 @@ public class SimpleReducer {
      * @param exp2
      * @return
      */
-    private static ASTExpression matchToExpression(ASTPattern pat, ASTExpression exp, ASTExpression exp1, ASTExpression exp2) {
+    public static ASTExpression matchToExpression(ASTPattern pat, ASTExpression exp, ASTExpression exp1, ASTExpression exp2) {
         if (pat instanceof ASTVariable) {
            return matchVarToExp((ASTVariable) pat, exp, exp1, exp2);
         }
@@ -370,18 +370,6 @@ public class SimpleReducer {
 
         // we calculate the transitive closure so that we know which functions are [indirectly] dependend of each other
         int[][] transitiveClosure = GraphUtil.getTransitiveClosure(adjacencyMatrix);
-        System.out.println("Transitive Closure: ");
-        for (int i = 0; i < n; i++) {
-            String a = decls.get(i).getPat().toString();
-            while (a.length() < 4) {
-                a = a + " ";
-            }
-            System.out.print(a + "\t");
-            for (int j = 0; j < n; j++) {
-                System.out.print(transitiveClosure[i][j] + " ");
-            }
-            System.out.println();
-        }
 
         // we need to put those functions into a group which are a clique in the transitive closure
         // because they are all mutually dependend of each other, i.e. they are entangled
@@ -389,16 +377,8 @@ public class SimpleReducer {
 
         // afterwards, we need to topologically sort the groups so that functions in a group only refer to
         // function inside the group or earlier defined function, but not function declared afterwards
-        GraphUtil.topologicallySortCliques(cliques, transitiveClosure);
-        // TODO: remove debug output
-        for (Set<Integer> clique : cliques) {
-            System.out.print("Clique: ");
-            for (int i : clique) {
-                System.out.print(decls.get(i).getPat() + ", ");
-            }
-            System.out.println();
-        }
-
+        cliques = GraphUtil.topologicallySortCliques(cliques, transitiveClosure);
+        Collections.reverse(cliques);
 
         // finally, we convert the indices back to ast nodes
         List<List<ASTPatDecl>> seperation = new ArrayList<>();
@@ -440,7 +420,7 @@ public class SimpleReducer {
     }
 
     private int getNumBasicRules() {
-        return 3;
+        return 4;
     }
 
     /**
@@ -456,6 +436,8 @@ public class SimpleReducer {
                 return expression.lambdaPatternToCase();
             case 2:
                 return expression.caseToMatch();
+            case 3:
+                return expression.tuplePatLetToSingleVar();
             default:
                 return false;
         }

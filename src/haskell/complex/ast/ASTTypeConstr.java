@@ -83,6 +83,11 @@ public class ASTTypeConstr implements ASTExpression, ASTPattern {
     }
 
     @Override
+    public boolean tuplePatLetToSingleVar() {
+        return false;
+    }
+
+    @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         Optional<lambda.ast.ASTConstant> constant = WHNOReducer.toConst(name);
         if (constant.isPresent()) {
