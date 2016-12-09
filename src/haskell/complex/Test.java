@@ -8,23 +8,50 @@ public class Test {
     public static void main(String[] args) {
         ASTProgram prog = new ASTProgram();
 
+        // toInt true = 1
+        // toInt false = 0
+        ASTVariable toInt = new ASTVariable("toInt");
+        ASTFunDecl toIntTrue = new ASTFunDecl(new ASTInteger(1), toInt, new ASTBoolean(true));
+        ASTFunDecl toIntFalse = new ASTFunDecl(new ASTInteger(0), toInt, new ASTBoolean(false));
+        prog.addDeclaration(toIntTrue);
+        prog.addDeclaration(toIntFalse);
+
+        // even 0 = true
+        // even x = even(x-1)
+        ASTVariable even = new ASTVariable("even");
+        ASTVariable odd = new ASTVariable("odd");
+        ASTVariable minus = new ASTVariable("minus");
+        ASTVariable x = new ASTVariable("x");
+        ASTExpression decrX = new ASTApplication(minus, x, new ASTInteger(1));
+        ASTFunDecl evenBase = new ASTFunDecl(new ASTBoolean(true), even, new ASTInteger(0));
+        ASTFunDecl evenRec = new ASTFunDecl(new ASTApplication(odd, decrX), even, x);
+        prog.addDeclaration(evenBase);
+        prog.addDeclaration(evenRec);
+
+        // odd 0 = false
+        // odd x = even(x-1)
+        ASTFunDecl oddBase = new ASTFunDecl(new ASTBoolean(false), odd, new ASTInteger(0));
+        ASTFunDecl oddRec = new ASTFunDecl(new ASTApplication(even, decrX), odd, x);
+        prog.addDeclaration(oddBase);
+        prog.addDeclaration(oddRec);
+
         // square 0 = 0
         ASTVariable square = new ASTVariable("square");
         ASTFunDecl squareBasis = new ASTFunDecl(new ASTInteger(0), square, new ASTInteger(0));
         prog.addDeclaration(squareBasis);
 
         // square x = times x x
-        ASTVariable x = new ASTVariable("x");
         ASTVariable times = new ASTVariable("times");
         ASTFunDecl squareFunc = new ASTFunDecl(new ASTApplication(times, x, x), square, x);
         prog.addDeclaration(squareFunc);
 
-        // fact x = if x <= 0 then 1 else fact(x-1)*x
+        // fact 0 = 1
+        // fact x = fact(x-1)*x
         ASTVariable fact = new ASTVariable("fact");
-        ASTExpression lesseq_x_0 = new ASTApplication(new ASTVariable("lesseq"), x, new ASTInteger(0));
-        ASTExpression fact_decr_x = new ASTApplication(fact, new ASTApplication(new ASTVariable("minus"), x, new ASTInteger(1)));
-        ASTExpression factRec = new ASTApplication(times, fact_decr_x, x);
-        ASTFunDecl factFunc = new ASTFunDecl(new ASTBranch(lesseq_x_0, new ASTInteger(1), factRec), fact, x);
+        ASTFunDecl factBase = new ASTFunDecl(new ASTInteger(1), fact, new ASTInteger(0));
+        ASTApplication factRec = new ASTApplication(times, new ASTApplication(fact, decrX), x);
+        ASTFunDecl factFunc = new ASTFunDecl(factRec, fact, x);
+        prog.addDeclaration(factBase);
         prog.addDeclaration(factFunc);
 
         // len Nil = 0
@@ -68,7 +95,7 @@ public class Test {
         ASTExpression squareLenList4 = new ASTApplication(square, lenList4);
         ASTExpression factLenList3 = new ASTApplication(fact, lenList3);
 
-        ASTExpression eval = factLenList3;
+        ASTExpression eval = new ASTApplication(even, new ASTInteger(3));
 
         System.out.println(prog);
         System.out.print("\neval[" + eval + "] = ");

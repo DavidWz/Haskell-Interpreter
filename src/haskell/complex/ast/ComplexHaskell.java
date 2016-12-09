@@ -53,4 +53,6 @@ public interface ComplexHaskell {
      * @throws SimpleReducer.TooComplexException
      */
     haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException;
+
+
 }

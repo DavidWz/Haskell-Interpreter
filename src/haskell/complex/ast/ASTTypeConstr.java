@@ -5,7 +5,7 @@ import haskell.simple.ast.ASTConstant;
 import lambda.reduction.WHNOReducer;
 import lambda.reduction.delta.ConstructorRule;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -49,7 +49,7 @@ public class ASTTypeConstr implements ASTExpression, ASTPattern {
 
     @Override
     public Set<ASTVariable> getAllVariables() {
-        return new HashSet<>();
+        return Collections.emptySet();
     }
 
     @Override

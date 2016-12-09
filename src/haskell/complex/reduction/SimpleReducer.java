@@ -283,6 +283,16 @@ public class SimpleReducer {
             ASTApplication isaExp = new ASTApplication(VariableManager.getIsaIntFunc(intPat.getValue()), exp);
             return new ASTBranch(isaExp, exp1, exp2);
         }
+        else if (pat instanceof ASTBoolean) {
+            ASTBoolean boolPat = (ASTBoolean) pat;
+            /*
+                     match BOOL exp exp1 exp2
+            ----------------------------------------
+            if (isa_bool_INT exp) then exp1 else exp2
+             */
+            ASTApplication isaExp = new ASTApplication(VariableManager.getIsaBoolFunc(boolPat.getValue()), exp);
+            return new ASTBranch(isaExp, exp1, exp2);
+        }
         else {
             // unknown constant, leave it as is
             ASTExpression constant = (ASTExpression) pat;

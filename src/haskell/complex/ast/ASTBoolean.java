@@ -6,32 +6,25 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Represents an integer.
+ * Represents a complex haskell boolean.
  */
-public class ASTInteger implements ASTExpression, ASTPattern {
-    private int value;
+public class ASTBoolean implements ASTExpression, ASTPattern {
+    private boolean value;
 
-    public ASTInteger(int value) {
+    public ASTBoolean(boolean value) {
         this.value = value;
-
     }
 
-    public int getValue() {
+    public boolean getValue() {
         return value;
     }
-
-    @Override
-    public String toString() {
-        return Integer.toString(value);
-    }
-
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ASTInteger that = (ASTInteger) o;
+        ASTBoolean that = (ASTBoolean) o;
 
         return getValue() == that.getValue();
 
@@ -39,7 +32,12 @@ public class ASTInteger implements ASTExpression, ASTPattern {
 
     @Override
     public int hashCode() {
-        return getValue();
+        return (getValue() ? 1 : 0);
+    }
+
+    @Override
+    public String toString() {
+        return Boolean.toString(value);
     }
 
     @Override

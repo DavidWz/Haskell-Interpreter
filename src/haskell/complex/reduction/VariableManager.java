@@ -116,4 +116,8 @@ public class VariableManager {
     public static ASTVariable getIsaIntFunc(int value) {
         return new ASTVariable("isa_int_"+value);
     }
+
+    public static ASTVariable getIsaBoolFunc(boolean value) {
+        return new ASTVariable("isa_bool_"+value);
+    }
 }

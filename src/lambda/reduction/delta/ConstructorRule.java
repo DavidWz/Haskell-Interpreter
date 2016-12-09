@@ -123,6 +123,42 @@ public class ConstructorRule extends DeltaRule {
     }
 
     /**
+     * Represents the isa_bool function
+     */
+    public static class IsABool {
+        private boolean b;
+
+        public IsABool(boolean b) {
+            this.b = b;
+        }
+
+        public boolean getBool() {
+            return b;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            IsABool isABool = (IsABool) o;
+
+            return b == isABool.b;
+
+        }
+
+        @Override
+        public int hashCode() {
+            return (b ? 1 : 0);
+        }
+
+        @Override
+        public String toString() {
+            return "isa_bool_" + b;
+        }
+    }
+
+    /**
      * Represents the argof_constr function
      */
     public static class ArgOf {
@@ -173,6 +209,10 @@ public class ConstructorRule extends DeltaRule {
         return new IsAInt(n);
     }
 
+    private static IsABool getIsaBoolOperator(boolean b) {
+        return new IsABool(b);
+    }
+
     public static ArgOf getArgOfOperator(Constructor constr) {
         return new ArgOf(constr);
     }
@@ -184,7 +224,9 @@ public class ConstructorRule extends DeltaRule {
 
     @Override
     public boolean isConstantMatching(ASTConstant c) {
-        boolean isIsa = c.getValue() instanceof IsAConstr || c.getValue() instanceof IsAInt;
+        boolean isIsa = c.getValue() instanceof IsAConstr ||
+                        c.getValue() instanceof IsAInt ||
+                        c.getValue() instanceof IsABool;
         boolean isArgOf = c.getValue() instanceof ArgOf;
         return (isIsa || isArgOf);
     }
@@ -256,6 +298,23 @@ public class ConstructorRule extends DeltaRule {
                         }
                     }
                 }
+                else if (constrConstant.getValue() instanceof Boolean) {
+                    // it's a boolean, so try to reduce it with isa_bool_ delta rules
+
+                    if (constant.getValue() instanceof IsABool) {
+                        // it's isa_bool
+                        IsABool op = (IsABool) constant.getValue();
+                        boolean val = (boolean) constrConstant.getValue();
+
+                        // check if the constructors match
+                        if (val == op.getBool()) {
+                            return Optional.of(new ASTConstant(true));
+                        }
+                        else {
+                            return Optional.of(new ASTConstant(false));
+                        }
+                    }
+                }
             }
         }
 
@@ -271,6 +330,11 @@ public class ConstructorRule extends DeltaRule {
             String val = name.substring(8);
             int n = Integer.parseInt(val);
             return Optional.of(new ASTConstant(getIsaIntOperator(n)));
+        }
+        else if (name.startsWith("isa_bool_")) {
+            String val = name.substring(9);
+            boolean b = Boolean.parseBoolean(val);
+            return Optional.of(new ASTConstant(getIsaBoolOperator(b)));
         }
         else if (name.startsWith("argof_")) {
             String constrName = name.substring(6);
