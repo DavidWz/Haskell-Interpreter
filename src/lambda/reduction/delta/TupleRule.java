@@ -200,4 +200,23 @@ public class TupleRule extends DeltaRule {
 
         return Optional.empty();
     }
+
+    public static Optional<ASTConstant> toConst(String name) {
+        if (name.startsWith("isa_tuple_")) {
+            String tupleN = name.substring(10);
+            int n = Integer.parseInt(tupleN);
+            return Optional.of(new ASTConstant(getIsaOperator(n)));
+        }
+        else if(name.startsWith("sel_")) {
+            String niStr = name.substring(4);
+            String[] niArray = niStr.split("_");
+            assert(niArray.length == 2);
+            int n = Integer.parseInt(niArray[0]);
+            int i = Integer.parseInt(niArray[1]);
+            return Optional.of(new ASTConstant(getSelOperator(n, i)));
+        }
+        else {
+            return Optional.empty();
+        }
+    }
 }

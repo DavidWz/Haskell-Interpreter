@@ -2,9 +2,7 @@ package haskell.complex.ast;
 
 import haskell.complex.reduction.SimpleReducer;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents a complex haskell tuple of expressions. (exp, ..., exp)
@@ -118,5 +116,14 @@ public class ASTExpTuple implements ASTExpression {
             }
         }
         return false;
+    }
+
+    @Override
+    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        List<haskell.simple.ast.ASTExpression> simpleExps = new ArrayList<>();
+        for (ASTExpression exp : exps) {
+            simpleExps.add(exp.castToSimple());
+        }
+        return new haskell.simple.ast.ASTTuple(simpleExps);
     }
 }

@@ -69,25 +69,46 @@ public class VariableManager {
     }
 
     /**
-     * Returns a variable representing the match function
+     * Returns a variable representing the match function.
      * @return
      */
     public static ASTVariable getMatchFunc() {
         return matchFunc;
     }
 
+    /**
+     * Returns a variable representing the isa_constr function.
+     * @param type the constructor
+     * @return
+     */
     public static ASTVariable getIsaConstrFunc(ASTTypeConstr type) {
         return new ASTVariable("isa_constr_"+type.getName());
     }
 
+    /**
+     * Returns a variable representing the isa_n-tuple function.
+     * @param n
+     * @return
+     */
     public static ASTVariable getIsaTupleFunc(int n) {
         return new ASTVariable("isa_tuple_"+n);
     }
 
+    /**
+     * Returns a variable representing the argof_constr function.
+     * @param type the constructor
+     * @return
+     */
     public static ASTVariable getArgofFunc(ASTTypeConstr type) {
         return new ASTVariable("argof_"+type.getName());
     }
 
+    /**
+     * Returns a variable representing the sel_{n,i} function.
+     * @param n
+     * @param i
+     * @return
+     */
     public static ASTVariable getSelFunc(int n, int i) {
         return new ASTVariable("sel_"+n+"_"+i);
     }

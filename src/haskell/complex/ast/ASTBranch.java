@@ -151,4 +151,9 @@ public class ASTBranch implements ASTExpression {
         }
         return elseBranch.nestMultipleLets();
     }
+
+    @Override
+    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        return new haskell.simple.ast.ASTBranch(condition.castToSimple(), ifBranch.castToSimple(), elseBranch.castToSimple());
+    }
 }

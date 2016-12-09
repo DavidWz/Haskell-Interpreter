@@ -25,6 +25,43 @@ public class WHNOReducer {
         deltaRules.add(new ConstructorRule());
     }
 
+    /**
+     * Converts a predefined variable name to the actual ast constant that represents it. If the given name is not
+     * predefined, then a new constant with a corresponding constructor is created.
+     * @param name
+     * @return
+     */
+    public static Optional<ASTConstant> toConst(String name) {
+        Optional<ASTConstant> constant;
+
+        constant = ArithmeticRule.toConst(name);
+        if (constant.isPresent()) {
+            return constant;
+        }
+
+        constant = BoolNotRule.toConst(name);
+        if (constant.isPresent()) {
+            return constant;
+        }
+
+        constant = BotRule.toConst(name);
+        if (constant.isPresent()) {
+            return constant;
+        }
+
+        constant = ConstructorRule.toConst(name);
+        if (constant.isPresent()) {
+            return constant;
+        }
+
+        constant = TupleRule.toConst(name);
+        if (constant.isPresent()) {
+            return constant;
+        }
+
+        return Optional.empty();
+    }
+
     public ASTTerm reduceToWHNF(ASTTerm term, boolean verbose) {
         if (verbose) {
             System.out.println(term);

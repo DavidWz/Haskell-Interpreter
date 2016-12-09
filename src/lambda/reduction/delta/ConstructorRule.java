@@ -203,4 +203,18 @@ public class ConstructorRule extends DeltaRule {
 
         return Optional.empty();
     }
+
+    public static Optional<ASTConstant> toConst(String name) {
+        if (name.startsWith("isa_constr_")) {
+            String constrName = name.substring(11);
+            return Optional.of(new ASTConstant(getIsaOperator(ConstructorRule.getConstructor(constrName))));
+        }
+        else if(name.startsWith("argof_")) {
+            String constrName = name.substring(6);
+            return Optional.of(new ASTConstant(getArgOfOperator(ConstructorRule.getConstructor(constrName))));
+        }
+        else {
+            return Optional.empty();
+        }
+    }
 }

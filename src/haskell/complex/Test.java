@@ -11,7 +11,7 @@ public class Test {
         // square 0 = 0
         ASTVariable square = new ASTVariable("square");
         ASTFunDecl squareBasis = new ASTFunDecl(new ASTInteger(0), square, new ASTInteger(0));
-        prog.addDeclaration(squareBasis);
+        //prog.addDeclaration(squareBasis); // TODO
 
         // square x = times x x
         ASTVariable x = new ASTVariable("x");
@@ -25,17 +25,17 @@ public class Test {
         ASTFunDecl lenNil = new ASTFunDecl(new ASTInteger(0), len, new ASTConstruct(Nil));
         prog.addDeclaration(lenNil);
 
-        // append Nil z = z
+        // append Nil z = (Cons z Nil)
+        ASTTypeConstr Cons = new ASTTypeConstr("Cons");
         ASTVariable append = new ASTVariable("append");
         ASTVariable z = new ASTVariable("z");
-        ASTFunDecl appendFuncNil = new ASTFunDecl(z, append, new ASTConstruct(Nil), z);
+        ASTFunDecl appendFuncNil = new ASTFunDecl(new ASTApplication(Cons, z, Nil), append, new ASTConstruct(Nil), z);
         prog.addDeclaration(appendFuncNil);
 
-        // len (Cons x xs) = (len xs) + 1
-        ASTTypeConstr Cons = new ASTTypeConstr("Cons");
+        // len (Cons _ xs) = (len xs) + 1
         ASTVariable xs = new ASTVariable("xs");
         ASTVariable plus = new ASTVariable("plus");
-        ASTFunDecl lenCons = new ASTFunDecl(new ASTApplication(plus, new ASTApplication(len, xs), new ASTInteger(1)), len, new ASTConstruct(Cons, x, xs));
+        ASTFunDecl lenCons = new ASTFunDecl(new ASTApplication(plus, new ASTApplication(len, xs), new ASTInteger(1)), len, new ASTConstruct(Cons, new ASTJoker(), xs));
         prog.addDeclaration(lenCons);
 
         // append (Cons x y) z = Cons x (append y z)
@@ -48,14 +48,25 @@ public class Test {
         ASTExpression list2 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(2)), list1);
         ASTExpression list3 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(3)), list2);
 
+        // list 4 = append list3 4
+        ASTExpression list4 = new ASTApplication(append, list3, new ASTInteger(4));
+
         // square the length of the list: square (len list3)
-        ASTExpression squareLenList3 = new ASTApplication(square, new ASTApplication(len, list3));
+        ASTExpression square2 = new ASTApplication(square, new ASTInteger(2));
+        ASTExpression lenList3 = new ASTApplication(len, list3);
+        ASTExpression lenList1 = new ASTApplication(len, list1);
+        ASTExpression squareLenList3 = new ASTApplication(square, lenList3);
+        ASTExpression squareLenList4 = new ASTApplication(square, new ASTApplication(len, list4));
+
         System.out.println(prog);
+
+        ASTExpression eval = squareLenList4;
+        System.out.print("eval[" + eval + "] = ");
 
         // evaluate the expression
         HaskellInterpreter interpreter = new HaskellInterpreter(prog);
         try {
-            interpreter.evaluate(squareLenList3, true);
+            System.out.println(interpreter.evaluate(eval));
         } catch (SimpleReducer.TooComplexException e) {
             System.out.println("\n"+e.getMessage());
         }

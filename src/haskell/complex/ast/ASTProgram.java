@@ -1,6 +1,8 @@
 package haskell.complex.ast;
 
 import haskell.complex.reduction.SimpleReducer;
+import haskell.simple.ast.*;
+import haskell.simple.ast.ASTExpression;
 
 import java.util.*;
 
@@ -117,4 +119,11 @@ public class ASTProgram implements ComplexHaskell {
         }
         return false;
     }
+
+    @Override
+    public ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        throw new SimpleReducer.TooComplexException(this, "Programs are not part of simple haskell. Please use \"Let [program] in [expression]\" instead.");
+    }
+
+
 }

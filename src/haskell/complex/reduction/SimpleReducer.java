@@ -10,21 +10,24 @@ import java.util.stream.Collectors;
 /**
  * A class which can reduce complex haskell to simple haskell.
  * Note: The following functions are predefined, so you cannot overwrite them.
- * bot, match, isa_constr, argof_constr, isa_n-tuple, sel_{n,1}
+ * match and all functions defined in the delta rules
  */
 public class SimpleReducer {
     public static class TooComplexException extends Exception {
-        private ASTExpression exp;
+        private ComplexHaskell exp;
+        private String msg;
 
-        public TooComplexException(ASTExpression exp) {
+        public TooComplexException(ComplexHaskell exp, String msg) {
             this.exp = exp;
+            this.msg = msg;
         }
 
         @Override
         public String getMessage() {
             StringBuilder builder = new StringBuilder();
-            builder.append("The complex haskell expression cannot be fully reduced to a simple haskell expression.\n");
-            builder.append("The expression was: \n");
+            builder.append("The complex haskell expression cannot be fully reduced to a simple haskell expression, because:\n");
+            builder.append(msg);
+            builder.append("\nThe expression was: \n");
             builder.append(exp);
             return builder.toString();
         }
@@ -293,7 +296,7 @@ public class SimpleReducer {
         applyBasicTransformationRules();
 
         // after this, the complex haskell expression should be in simple haskell form
-        return castToSimple(expression);
+        return expression.castToSimple();
     }
 
     private void applyFuncDeclToPatDecl() {
@@ -302,11 +305,6 @@ public class SimpleReducer {
         do {
             transformed = false;
             if (expression.funcDeclToPatDecl()) {
-                {
-                    // DEBUG
-                    System.out.println("\nApplied rule #"+0);
-                    System.out.println(expression);
-                }
                 // the rule was successfully applied
                 transformed = true;
             }
@@ -323,11 +321,6 @@ public class SimpleReducer {
             // we try to apply every rule in succession
             for (int i=0; i < getNumBasicRules(); i++) {
                 if (applyRule(i)) {
-                    {
-                        // DEBUG
-                        System.out.println("\nApplied rule #"+(i+2));
-                        System.out.println(expression);
-                    }
                     // the rule was successfully applied
                     transformed = true;
                 }
@@ -360,16 +353,5 @@ public class SimpleReducer {
             default:
                 return false;
         }
-    }
-
-    /**
-     * Casts a complex haskell expression to a simple haskell expression. The complex haskell expression must already be
-     * in a simple haskell format, otherwise a TooComplexException is thrown.
-     * @param exp the complex haskell expression
-     * @return the equivalent simple haskell expression
-     * @throws TooComplexException
-     */
-    private haskell.simple.ast.ASTExpression castToSimple(ASTExpression exp) throws TooComplexException {
-        throw new TooComplexException(exp);
     }
 }

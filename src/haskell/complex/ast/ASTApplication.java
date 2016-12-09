@@ -125,4 +125,15 @@ public class ASTApplication implements ASTExpression {
         }
         return false;
     }
+
+    @Override
+    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        haskell.simple.ast.ASTExpression simpleExp = exps.get(0).castToSimple();
+
+        for (int i = 1; i < exps.size(); i++) {
+            simpleExp = new haskell.simple.ast.ASTApplication(simpleExp, exps.get(i).castToSimple());
+        }
+
+        return simpleExp;
+    }
 }

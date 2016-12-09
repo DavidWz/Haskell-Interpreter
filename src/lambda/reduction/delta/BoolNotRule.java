@@ -41,4 +41,16 @@ public class BoolNotRule extends DeltaRule {
 
         return Optional.empty();
     }
+
+    public static Optional<ASTConstant> toConst(String name) {
+        if (name.equals("true")) {
+            return Optional.of(new ASTConstant(true));
+        }
+        else if (name.equals("false")) {
+            return Optional.of(new ASTConstant(false));
+        }
+        else {
+            return Optional.empty();
+        }
+    }
 }

@@ -1,6 +1,12 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.SimpleReducer;
+import haskell.simple.ast.ASTConstant;
+import lambda.reduction.WHNOReducer;
+import lambda.reduction.delta.ConstructorRule;
+
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -69,5 +75,16 @@ public class ASTTypeConstr implements ASTExpression, ASTPattern {
     @Override
     public boolean nestMultipleLets() {
         return false;
+    }
+
+    @Override
+    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        Optional<lambda.ast.ASTConstant> constant = WHNOReducer.toConst(name);
+        if (constant.isPresent()) {
+            return new ASTConstant(constant.get().getValue());
+        }
+        else {
+            return new ASTConstant(ConstructorRule.getConstructor(name));
+        }
     }
 }

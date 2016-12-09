@@ -1,5 +1,9 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.SimpleReducer;
+import haskell.simple.ast.*;
+import haskell.simple.ast.ASTExpression;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -55,5 +59,10 @@ public class ASTJoker implements ASTPattern {
     @Override
     public boolean nestMultipleLets() {
         return false;
+    }
+
+    @Override
+    public ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        throw new SimpleReducer.TooComplexException(this, "The joker pattern is not part of simple haskell.");
     }
 }

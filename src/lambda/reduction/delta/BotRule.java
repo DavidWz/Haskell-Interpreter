@@ -35,4 +35,13 @@ public class BotRule extends DeltaRule {
             return Optional.empty();
         }
     }
+
+    public static Optional<ASTConstant> toConst(String name) {
+        if (name.equals("bot")) {
+            return Optional.of(new ASTConstant(Operator.BOT));
+        }
+        else {
+            return Optional.empty();
+        }
+    }
 }

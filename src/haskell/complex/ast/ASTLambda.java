@@ -176,4 +176,23 @@ public class ASTLambda implements ASTExpression {
     public boolean nestMultipleLets() {
         return exp.nestMultipleLets();
     }
+
+    @Override
+    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        if (pats.size() == 1) {
+            ASTPattern pat = pats.get(0);
+
+            if (pat instanceof ASTVariable) {
+                ASTVariable var = (ASTVariable) pat;
+
+                return new haskell.simple.ast.ASTFunction((haskell.simple.ast.ASTVariable) var.castToSimple(), exp.castToSimple());
+            }
+            else {
+                throw new SimpleReducer.TooComplexException(this, "Lambdas must map a variable.");
+            }
+        }
+        else {
+            throw new SimpleReducer.TooComplexException(this, "Lambdas must only map one variable.");
+        }
+    }
 }

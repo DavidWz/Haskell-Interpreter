@@ -1,5 +1,7 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.SimpleReducer;
+
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,4 +45,12 @@ public interface ComplexHaskell {
      * @return
      */
     boolean nestMultipleLets();
+
+    /**
+     * Casts this complex haskell term to a simple haskell term. Throws a TooComplexException if the complex haskell term
+     * did not have the same structure as an equivalent simple haskell term.
+     * @return the equivalent simple haskell term
+     * @throws SimpleReducer.TooComplexException
+     */
+    haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException;
 }

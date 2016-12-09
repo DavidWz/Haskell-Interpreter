@@ -45,7 +45,7 @@ public class HaskellInterpreter {
 
         // 3. reduce lambda expression with WHNO
         WHNOReducer whnoReducer = new WHNOReducer();
-        lambda.ast.ASTTerm result = whnoReducer.reduceToWHNF(lambdaTerm);
+        lambda.ast.ASTTerm result = whnoReducer.reduceToWHNF(lambdaTerm, verbose);
         if (verbose) {
             System.out.println("\n-- The final result is: ");
             System.out.println(result);

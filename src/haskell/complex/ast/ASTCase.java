@@ -169,4 +169,9 @@ public class ASTCase implements ASTExpression {
         }
         return false;
     }
+
+    @Override
+    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        throw new SimpleReducer.TooComplexException(this, "Cases are not part of simple haskell.");
+    }
 }

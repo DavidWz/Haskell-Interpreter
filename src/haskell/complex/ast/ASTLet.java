@@ -159,4 +159,26 @@ public class ASTLet implements ASTExpression {
             return false;
         }
     }
+
+    @Override
+    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        if (decls.size() != 1) {
+            throw new SimpleReducer.TooComplexException(this, "Let expressions in simple haskel must only contain one declaration.");
+        }
+
+        ASTDecl decl = decls.get(0);
+        if (!(decl instanceof ASTPatDecl)) {
+            throw new SimpleReducer.TooComplexException(this, "Declarations in let expressions must be pattern declarations.");
+        }
+
+        ASTPatDecl patDecl = (ASTPatDecl) decl;
+        ASTPattern pat = patDecl.getPat();
+        if (!(pat instanceof ASTVariable)) {
+            throw new SimpleReducer.TooComplexException(this, "The pattern of a pattern declaration in let expressions must be a variable.");
+        }
+
+        return new haskell.simple.ast.ASTLet((haskell.simple.ast.ASTVariable) pat.castToSimple(),
+                patDecl.getExp().castToSimple(),
+                exp.castToSimple());
+    }
 }

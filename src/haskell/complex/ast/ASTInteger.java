@@ -1,5 +1,7 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.SimpleReducer;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,5 +70,10 @@ public class ASTInteger implements ASTExpression, ASTPattern {
     @Override
     public boolean nestMultipleLets() {
         return false;
+    }
+
+    @Override
+    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        return new haskell.simple.ast.ASTConstant(value);
     }
 }

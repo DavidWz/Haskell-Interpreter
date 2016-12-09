@@ -1,6 +1,10 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.SimpleReducer;
+import lambda.reduction.WHNOReducer;
+
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -71,5 +75,16 @@ public class ASTVariable implements ASTExpression, ASTPattern {
     @Override
     public boolean nestMultipleLets() {
         return false;
+    }
+
+    @Override
+    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        Optional<lambda.ast.ASTConstant> constant = WHNOReducer.toConst(name);
+        if (constant.isPresent()) {
+            return new haskell.simple.ast.ASTConstant(constant.get().getValue());
+        }
+        else {
+            return new haskell.simple.ast.ASTVariable(name);
+        }
     }
 }

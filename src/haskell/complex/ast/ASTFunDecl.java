@@ -131,4 +131,9 @@ public class ASTFunDecl extends ASTDecl {
     public boolean nestMultipleLets() {
         return exp.nestMultipleLets();
     }
+
+    @Override
+    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        throw new SimpleReducer.TooComplexException(this, "Function declarations are not part of simple haskell.");
+    }
 }

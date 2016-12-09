@@ -90,4 +90,9 @@ public class ASTPatDecl extends ASTDecl {
     public boolean nestMultipleLets() {
         return exp.nestMultipleLets();
     }
+
+    @Override
+    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+        throw new SimpleReducer.TooComplexException(this, "Pattern declarations are not part of simple haskell.");
+    }
 }

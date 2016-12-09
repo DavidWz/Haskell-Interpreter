@@ -102,7 +102,7 @@ public class ArithmeticRule extends DeltaRule {
 
                 // now we calculate the result
                 Object result;
-                switch(op) {
+                switch (op) {
                     case AND:
                         result = b0 && b1;
                         break;
@@ -118,5 +118,37 @@ public class ArithmeticRule extends DeltaRule {
         }
 
         return Optional.empty();
+    }
+
+    public static Optional<ASTConstant> toConst(String name) {
+        if (name.equals("plus")) {
+            return Optional.of(new ASTConstant(Operator.PLUS));
+        } else if (name.equals("minus")) {
+            return Optional.of(new ASTConstant(Operator.MINUS));
+        } else if (name.equals("times")) {
+            return Optional.of(new ASTConstant(Operator.TIMES));
+        } else if (name.equals("divided")) {
+            return Optional.of(new ASTConstant(Operator.DIVIDED));
+        } else if (name.equals("less")) {
+            return Optional.of(new ASTConstant(Operator.LESS));
+        } else if (name.equals("greater")) {
+            return Optional.of(new ASTConstant(Operator.GREATER));
+        } else if (name.equals("lesseq")) {
+            return Optional.of(new ASTConstant(Operator.LESSEQ));
+        } else if (name.equals("greatereq")) {
+            return Optional.of(new ASTConstant(Operator.GREATEREQ));
+        } else if (name.equals("equal")) {
+            return Optional.of(new ASTConstant(Operator.EQUAL));
+        } else if (name.equals("inequal")) {
+            return Optional.of(new ASTConstant(Operator.INEQUAL));
+        } else if (name.equals("pow")) {
+            return Optional.of(new ASTConstant(Operator.POW));
+        } else if (name.equals("and")) {
+            return Optional.of(new ASTConstant(Operator.AND));
+        } else if (name.equals("or")) {
+            return Optional.of(new ASTConstant(Operator.OR));
+        } else {
+            return Optional.empty();
+        }
     }
 }
