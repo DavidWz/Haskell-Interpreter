@@ -136,4 +136,13 @@ public class ASTApplication implements ASTExpression {
 
         return simpleExp;
     }
+
+    @Override
+    public Set<ASTVariable> getFreeVars() {
+        HashSet<ASTVariable> vars = new HashSet<>();
+        for (ASTExpression exp : exps) {
+            vars.addAll(exp.getFreeVars());
+        }
+        return vars;
+    }
 }

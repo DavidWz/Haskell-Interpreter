@@ -61,6 +61,15 @@ public class ASTProgram implements ComplexHaskell {
     }
 
     @Override
+    public Set<ASTVariable> getFreeVars() {
+        Set<ASTVariable> vars = new HashSet<>();
+        for (ASTDecl decl : decls) {
+            vars.addAll(decl.getFreeVars());
+        }
+        return vars;
+    }
+
+    @Override
     public boolean funcDeclToPatDecl() {
         // first, we try to apply the transformation as deep as possible
         for (ASTDecl decl : decls) {

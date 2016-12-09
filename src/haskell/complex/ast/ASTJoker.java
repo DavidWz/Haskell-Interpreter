@@ -4,6 +4,7 @@ import haskell.complex.reduction.SimpleReducer;
 import haskell.simple.ast.*;
 import haskell.simple.ast.ASTExpression;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +34,12 @@ public class ASTJoker implements ASTPattern {
 
     @Override
     public Set<ASTVariable> getAllVariables() {
-        return new HashSet<>();
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<ASTVariable> getFreeVars() {
+        return Collections.emptySet();
     }
 
     @Override

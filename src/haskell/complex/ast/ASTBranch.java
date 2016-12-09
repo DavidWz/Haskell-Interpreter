@@ -156,4 +156,13 @@ public class ASTBranch implements ASTExpression {
     public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         return new haskell.simple.ast.ASTBranch(condition.castToSimple(), ifBranch.castToSimple(), elseBranch.castToSimple());
     }
+
+    @Override
+    public Set<ASTVariable> getFreeVars() {
+        HashSet<ASTVariable> vars = new HashSet<>();
+        vars.addAll(condition.getFreeVars());
+        vars.addAll(ifBranch.getFreeVars());
+        vars.addAll(elseBranch.getFreeVars());
+        return vars;
+    }
 }

@@ -53,6 +53,11 @@ public class ASTTypeConstr implements ASTExpression, ASTPattern {
     }
 
     @Override
+    public Set<ASTVariable> getFreeVars() {
+        return Collections.emptySet();
+    }
+
+    @Override
     public boolean funcDeclToPatDecl() {
         return false;
     }

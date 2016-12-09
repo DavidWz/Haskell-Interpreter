@@ -74,4 +74,9 @@ public class ASTBoolean implements ASTExpression, ASTPattern {
     public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         return new haskell.simple.ast.ASTConstant(value);
     }
+
+    @Override
+    public Set<ASTVariable> getFreeVars() {
+        return Collections.emptySet();
+    }
 }

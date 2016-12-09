@@ -129,4 +129,13 @@ public class ASTConstruct implements ASTPattern {
             throw new SimpleReducer.TooComplexException(this, "Arguments of constructs must be arguments of an application.");
         }
     }
+
+    @Override
+    public Set<ASTVariable> getFreeVars() {
+        Set<ASTVariable> vars = new HashSet<>();
+        for (ASTPattern pat : pats) {
+            vars.addAll(pat.getFreeVars());
+        }
+        return vars;
+    }
 }

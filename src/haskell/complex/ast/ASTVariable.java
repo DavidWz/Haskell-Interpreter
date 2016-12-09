@@ -53,6 +53,13 @@ public class ASTVariable implements ASTExpression, ASTPattern {
     }
 
     @Override
+    public Set<ASTVariable> getFreeVars() {
+        Set<ASTVariable> vars = new HashSet<>();
+        vars.add(this);
+        return vars;
+    }
+
+    @Override
     public boolean funcDeclToPatDecl() {
         return false;
     }

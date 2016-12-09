@@ -99,6 +99,17 @@ public class ASTFunDecl extends ASTDecl {
     }
 
     @Override
+    public Set<ASTVariable> getFreeVars() {
+        Set<ASTVariable> vars = new HashSet<>();
+        vars.addAll(exp.getFreeVars());
+        for (ASTPattern pat : pats) {
+            vars.removeAll(pat.getAllVariables());
+        }
+        vars.remove(var);
+        return vars;
+    }
+
+    @Override
     public boolean funcDeclToPatDecl() {
         return exp.funcDeclToPatDecl();
     }

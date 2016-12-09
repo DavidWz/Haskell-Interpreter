@@ -63,6 +63,15 @@ public class ASTPatTuple implements ASTPattern {
     }
 
     @Override
+    public Set<ASTVariable> getFreeVars() {
+        Set<ASTVariable> vars = new HashSet<>();
+        for (ASTPattern pat : pats) {
+            vars.addAll(pat.getFreeVars());
+        }
+        return vars;
+    }
+
+    @Override
     public boolean funcDeclToPatDecl() {
         return false;
     }

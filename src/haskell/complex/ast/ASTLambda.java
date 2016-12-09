@@ -81,6 +81,16 @@ public class ASTLambda implements ASTExpression {
     }
 
     @Override
+    public Set<ASTVariable> getFreeVars() {
+        Set<ASTVariable> vars = new HashSet<>();
+        vars.addAll(exp.getFreeVars());
+        for (ASTPattern pat : pats) {
+            vars.removeAll(pat.getAllVariables());
+        }
+        return vars;
+    }
+
+    @Override
     public boolean funcDeclToPatDecl() {
         return exp.funcDeclToPatDecl();
     }

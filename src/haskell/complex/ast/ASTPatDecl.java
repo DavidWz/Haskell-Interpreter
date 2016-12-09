@@ -58,6 +58,14 @@ public class ASTPatDecl extends ASTDecl {
     }
 
     @Override
+    public Set<ASTVariable> getFreeVars() {
+        Set<ASTVariable> vars = new HashSet<>();
+        vars.addAll(exp.getFreeVars());
+        vars.removeAll(pat.getFreeVars());
+        return vars;
+    }
+
+    @Override
     public boolean funcDeclToPatDecl() {
         return exp.funcDeclToPatDecl();
     }

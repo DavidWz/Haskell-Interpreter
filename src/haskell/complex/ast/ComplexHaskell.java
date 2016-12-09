@@ -2,7 +2,6 @@ package haskell.complex.ast;
 
 import haskell.complex.reduction.SimpleReducer;
 
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -14,6 +13,12 @@ public interface ComplexHaskell {
      * @return a set of all variables
      */
     Set<ASTVariable> getAllVariables();
+
+    /**
+     * Returns a set of free variables of this term.
+     * @return
+     */
+    Set<ASTVariable> getFreeVars();
 
     /**
      * Transforms a series of function declarations for one specific function
@@ -53,6 +58,4 @@ public interface ComplexHaskell {
      * @throws SimpleReducer.TooComplexException
      */
     haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException;
-
-
 }

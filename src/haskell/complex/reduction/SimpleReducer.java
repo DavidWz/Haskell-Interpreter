@@ -2,9 +2,7 @@ package haskell.complex.reduction;
 
 import haskell.complex.ast.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -352,8 +350,92 @@ public class SimpleReducer {
         } while(transformed);
     }
 
+    /**
+     * Calculates a seperation of the given list of declarations, so that entangled declarations are grouped together.
+     * @param decls
+     * @return
+     */
+    public static List<List<ASTPatDecl>> getSeperation(List<ASTPatDecl> decls) {
+        // we set up the adjacency matrix representing direct dependence
+        int n = decls.size();
+        int[][] adjacencyMatrix = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                ASTPatDecl decl1 = decls.get(i);
+                ASTPatDecl decl2 = decls.get(j);
+                boolean isDepended = isDirectlyDependend(decl1, decl2);
+                adjacencyMatrix[i][j] = isDepended ? 1 : 0;
+            }
+        }
+
+        // we calculate the transitive closure so that we know which functions are [indirectly] dependend of each other
+        int[][] transitiveClosure = GraphUtil.getTransitiveClosure(adjacencyMatrix);
+        System.out.println("Transitive Closure: ");
+        for (int i = 0; i < n; i++) {
+            String a = decls.get(i).getPat().toString();
+            while (a.length() < 4) {
+                a = a + " ";
+            }
+            System.out.print(a + "\t");
+            for (int j = 0; j < n; j++) {
+                System.out.print(transitiveClosure[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        // we need to put those functions into a group which are a clique in the transitive closure
+        // because they are all mutually dependend of each other, i.e. they are entangled
+        List<Set<Integer>> cliques = GraphUtil.getMaximalCliques(transitiveClosure);
+
+        // afterwards, we need to topologically sort the groups so that functions in a group only refer to
+        // function inside the group or earlier defined function, but not function declared afterwards
+        GraphUtil.topologicallySortCliques(cliques, transitiveClosure);
+        // TODO: remove debug output
+        for (Set<Integer> clique : cliques) {
+            System.out.print("Clique: ");
+            for (int i : clique) {
+                System.out.print(decls.get(i).getPat() + ", ");
+            }
+            System.out.println();
+        }
+
+
+        // finally, we convert the indices back to ast nodes
+        List<List<ASTPatDecl>> seperation = new ArrayList<>();
+        for (Set<Integer> clique : cliques) {
+            List<ASTPatDecl> group = new ArrayList<>();
+            for (int node : clique) {
+                group.add(decls.get(node));
+            }
+            seperation.add(group);
+        }
+
+        return seperation;
+    }
+
+    /**
+     * Checks whether a pattern declaration is directly dependend of another pattern declaration.
+     * That is, it will not check transitivity.
+     * @param decl1
+     * @param decl2
+     * @return
+     */
+    private static boolean isDirectlyDependend(ASTPatDecl decl1, ASTPatDecl decl2) {
+        ASTPattern var1 = decl1.getPat();
+        ASTPattern var2 = decl2.getPat();
+
+        if (var1.equals(var2)) {
+            // if they are the same they are obviously entangled
+            return true;
+        }
+        else {
+            // check if var2 appears as a free variable in exp1
+            Set<ASTVariable> freeVars = decl1.getExp().getFreeVars();
+            return freeVars.contains(var2);
+        }
+    }
+
     private void applyDeclarationSplit() {
-        // TODO: actually split them according to entanglement
         expression.nestMultipleLets();
     }
 

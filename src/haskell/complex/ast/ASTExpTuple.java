@@ -59,6 +59,15 @@ public class ASTExpTuple implements ASTExpression {
     }
 
     @Override
+    public Set<ASTVariable> getFreeVars() {
+        Set<ASTVariable> vars = new HashSet<>();
+        for (ASTExpression exp : exps) {
+            vars.addAll(exp.getFreeVars());
+        }
+        return vars;
+    }
+
+    @Override
     public boolean funcDeclToPatDecl() {
         for (ASTExpression exp : exps) {
             if (exp.funcDeclToPatDecl()) {

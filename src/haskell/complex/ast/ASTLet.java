@@ -73,6 +73,26 @@ public class ASTLet implements ASTExpression {
     }
 
     @Override
+    public Set<ASTVariable> getFreeVars() {
+        Set<ASTVariable> vars = new HashSet<>();
+        vars.addAll(exp.getFreeVars());
+        for (ASTDecl decl : decls) {
+            if (decl instanceof ASTFunDecl) {
+                vars.addAll(((ASTFunDecl) decl).getExp().getFreeVars());
+            }
+        }
+        for (ASTDecl decl : decls) {
+            if (decl instanceof ASTFunDecl) {
+                vars.remove(((ASTFunDecl) decl).getVar());
+                for (ASTPattern pat : ((ASTFunDecl) decl).getPats()) {
+                    vars.removeAll(pat.getFreeVars());
+                }
+            }
+        }
+        return vars;
+    }
+
+    @Override
     public boolean funcDeclToPatDecl() {
         // first, try to apply this transformation as deep as possible
         for (ASTDecl decl : decls) {
@@ -136,8 +156,34 @@ public class ASTLet implements ASTExpression {
 
     @Override
     public boolean nestMultipleLets() {
-        // TODO: entangled functions
-        // we assume functions are not entangled and that functions only depend on earlier defined other functions
+        // we seperate pattern declarations from other types of declarations
+        List<ASTDecl> nonPatDecls = new ArrayList<>();
+        List<ASTPatDecl> patDecls = new ArrayList<>();
+        for (ASTDecl decl : decls) {
+            if (decl instanceof ASTPatDecl) {
+                patDecls.add((ASTPatDecl) decl);
+            }
+            else {
+                nonPatDecls.add(decl);
+            }
+        }
+
+        // first, we must calculate a seperation of pattern declarations so that entangled functions are grouped together
+        List<List<ASTPatDecl>> seperation = SimpleReducer.getSeperation(patDecls);
+
+        System.out.println("The seperation is as follows: ");
+        for (List<ASTPatDecl> group : seperation) {
+            System.out.println("Group: ");
+            for (ASTPatDecl decl : group) {
+                System.out.println("\t" + decl);
+            }
+        }
+
+        // then we transform groups of entangled declarations to single declarations
+        for (List<ASTPatDecl> group : seperation) {
+            nonPatDecls.add(fuseEntangledFunctions(group));
+        }
+        decls = nonPatDecls;
 
         // we construct the nested let terms as follows:
         /*
@@ -145,7 +191,6 @@ public class ASTLet implements ASTExpression {
         -------------------------------------------------------
         let decl1 in (let decl2 in (... (let decln in exp)...))
          */
-
         if (decls.size() > 0) {
             ASTExpression nestedLets = exp;
             while (decls.size() > 1) {
@@ -157,6 +202,37 @@ public class ASTLet implements ASTExpression {
         }
         else {
             return false;
+        }
+    }
+
+    /**
+     * Transforms a group of entangled functions into one single declarations
+     * @param decls
+     * @return
+     */
+    private ASTPatDecl fuseEntangledFunctions(List<ASTPatDecl> decls) {
+        if (decls.size() < 2) {
+            return decls.get(0);
+        }
+        else {
+            // we apply the following transformation to fuse the group together
+            /*
+              var1 = exp1; ...; varn = expn
+            ---------------------------------
+            (var1,...,varn) = (exp1,...,expn)
+             */
+            List<ASTPattern> vars = new ArrayList<>();
+            List<ASTExpression> exps = new ArrayList<>();
+            for (ASTPatDecl decl : decls) {
+                vars.add(decl.getPat());
+                exps.add(decl.getExp());
+            }
+
+            ASTPatTuple varTuple = new ASTPatTuple(vars);
+            ASTExpTuple expTuple = new ASTExpTuple(exps);
+
+            ASTPatDecl fusedGroup = new ASTPatDecl(varTuple, expTuple);
+            return fusedGroup;
         }
     }
 

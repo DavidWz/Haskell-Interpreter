@@ -174,4 +174,17 @@ public class ASTCase implements ASTExpression {
     public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         throw new SimpleReducer.TooComplexException(this, "Cases are not part of simple haskell.");
     }
+
+    @Override
+    public Set<ASTVariable> getFreeVars() {
+        Set<ASTVariable> vars = new HashSet<>();
+        vars.addAll(exp.getFreeVars());
+        for (ASTPattern pat : casePats) {
+            vars.addAll(pat.getFreeVars());
+        }
+        for (ASTExpression exp : caseExps) {
+            vars.addAll(exp.getFreeVars());
+        }
+        return vars;
+    }
 }
