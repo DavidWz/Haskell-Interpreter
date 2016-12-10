@@ -2,9 +2,11 @@ package haskell;
 
 import haskell.complex.ast.ASTDecl;
 import haskell.complex.ast.ASTExpression;
+import haskell.complex.ast.ASTProgram;
 import haskell.complex.parser.ASTGenerator;
 import haskell.complex.reduction.TooComplexException;
 import lambda.ast.ASTTerm;
+import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 
@@ -21,6 +23,7 @@ public class InteractiveEnvironment {
     private HaskellInterpreter interpreter;
     private BufferedReader bufferedReader;
     private final String QUIT_COMMAND = ":quit";
+    private final String LOAD_COMMAND = ":load";
 
     public InteractiveEnvironment() {
         this.astGenerator = new ASTGenerator();
@@ -46,7 +49,12 @@ public class InteractiveEnvironment {
                 if (line.equals(QUIT_COMMAND)) {
                     endProgram = true;
                 }
-                // TODO: add: load program from file
+                // check if the user wants to load a program
+                else if (line.startsWith(LOAD_COMMAND)) {
+                    // +1 because space between :load <filename>
+                    String fileName = line.substring(LOAD_COMMAND.length()+1);
+                    load(fileName);
+                }
                 else {
                     handleLine(line);
                 }
@@ -57,10 +65,33 @@ public class InteractiveEnvironment {
     }
 
     /**
+     * Loads the program in the file specifiec by the fileName.
+     * @param fileName
+     */
+    private void load(String fileName) {
+        ANTLRFileStream fileStream;
+
+        try {
+            fileStream = new ANTLRFileStream(fileName);
+        } catch (IOException e) {
+            System.out.println("Error: Could not load file.");
+            return;
+        }
+
+        Optional<ASTProgram> program = astGenerator.parseProgram(fileStream);
+        if (program.isPresent()) {
+            interpreter.addProgram(program.get());
+        }
+        else {
+            System.out.println("Error: The file did not contain a syntactically correct program.");
+        }
+    }
+
+    /**
      * Reads a line from the console.
      * @return the line
      */
-    public String readLine() throws IOException {
+    private String readLine() throws IOException {
         return bufferedReader.readLine();
     }
 

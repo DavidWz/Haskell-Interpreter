@@ -38,6 +38,16 @@ public class HaskellInterpreter {
     }
 
     /**
+     * Adds all declarations of the given program to this interpreter.
+     * @param program
+     */
+    public void addProgram(ASTProgram program) {
+        for (ASTDecl decl : program.getDecls()) {
+            addDeclaration(decl);
+        }
+    }
+
+    /**
      * Evaluates a complex haskell expression with the given complex haskell program to a non-reducible lambda term.
      * @param expression a complex haskell expression
      * @return a non-reducible lambda term
