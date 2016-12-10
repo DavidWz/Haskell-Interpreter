@@ -16,9 +16,6 @@ public class VariableManager {
     // the bottom function variable
     private static ASTVariable botFunc = new ASTVariable("bot");
 
-    // the match function variable
-    private static ASTVariable matchFunc = new ASTVariable("match");
-
     /**
      * Initializes this variable manager with the variables found in the given complex haskell term.
      * @param complexHaskell
@@ -66,14 +63,6 @@ public class VariableManager {
      */
     public static ASTVariable getBot() {
         return botFunc;
-    }
-
-    /**
-     * Returns a variable representing the match function.
-     * @return
-     */
-    public static ASTVariable getMatchFunc() {
-        return matchFunc;
     }
 
     /**

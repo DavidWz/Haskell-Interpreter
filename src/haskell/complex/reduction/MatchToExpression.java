@@ -129,9 +129,8 @@ public class MatchToExpression {
             return new ASTBranch(isaExp, exp1, exp2);
         }
         else {
-            // unknown constant, leave it as is
-            ASTExpression constant = (ASTExpression) pat;
-            return new ASTApplication(VariableManager.getMatchFunc(), constant, exp, exp1, exp2);
+            // unknown constant, this is undefined behavior
+            return VariableManager.getBot();
         }
     }
 }
