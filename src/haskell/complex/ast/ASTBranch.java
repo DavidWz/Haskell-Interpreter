@@ -1,6 +1,6 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.SimpleReducer;
+import haskell.complex.reduction.TooComplexException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +32,21 @@ public class ASTBranch implements ASTExpression {
 
     public ASTExpression getElseBranch() {
         return elseBranch;
+    }
+
+    public void setCondition(ASTExpression condition) {
+        assert(condition != null);
+        this.condition = condition;
+    }
+
+    public void setIfBranch(ASTExpression ifBranch) {
+        assert(ifBranch != null);
+        this.ifBranch = ifBranch;
+    }
+
+    public void setElseBranch(ASTExpression elseBranch) {
+        assert(elseBranch != null);
+        this.elseBranch = elseBranch;
     }
 
     @Override
@@ -77,83 +92,7 @@ public class ASTBranch implements ASTExpression {
     }
 
     @Override
-    public boolean nestMultipleLambdas() {
-        if (condition.nestMultipleLambdas()) {
-            return true;
-        }
-        if (ifBranch.nestMultipleLambdas()) {
-            return true;
-        }
-        return elseBranch.nestMultipleLambdas();
-    }
-
-    @Override
-    public boolean lambdaPatternToCase() {
-        if (condition.lambdaPatternToCase()) {
-            return true;
-        }
-        if (ifBranch.lambdaPatternToCase()) {
-            return true;
-        }
-        return elseBranch.lambdaPatternToCase();
-    }
-
-    @Override
-    public boolean caseToMatch() {
-        // try to apply it as deep as possible
-        if (condition.caseToMatch()) {
-            return true;
-        }
-        if (ifBranch.caseToMatch()) {
-            return true;
-        }
-        if (elseBranch.caseToMatch()) {
-            return true;
-        }
-
-        // check if one can replace cases here
-        if (condition instanceof ASTCase) {
-            ASTCase caseExp = (ASTCase) condition;
-            condition = SimpleReducer.caseToMatch(caseExp);
-            return true;
-        }
-        if (ifBranch instanceof ASTCase) {
-            ASTCase caseExp = (ASTCase) ifBranch;
-            condition = SimpleReducer.caseToMatch(caseExp);
-            return true;
-        }
-        if (elseBranch instanceof ASTCase) {
-            ASTCase caseExp = (ASTCase) elseBranch;
-            condition = SimpleReducer.caseToMatch(caseExp);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean nestMultipleLets() {
-        if (condition.nestMultipleLets()) {
-            return true;
-        }
-        if (ifBranch.nestMultipleLets()) {
-            return true;
-        }
-        return elseBranch.nestMultipleLets();
-    }
-
-    @Override
-    public boolean tuplePatLetToSingleVar() {
-        if (condition.tuplePatLetToSingleVar()) {
-            return true;
-        }
-        if (ifBranch.tuplePatLetToSingleVar()) {
-            return true;
-        }
-        return elseBranch.tuplePatLetToSingleVar();
-    }
-
-    @Override
-    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+    public haskell.simple.ast.ASTExpression castToSimple() throws TooComplexException {
         return new haskell.simple.ast.ASTBranch(condition.castToSimple(), ifBranch.castToSimple(), elseBranch.castToSimple());
     }
 

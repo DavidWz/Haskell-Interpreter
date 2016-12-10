@@ -1,6 +1,6 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.SimpleReducer;
+import haskell.complex.reduction.TooComplexException;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -51,6 +51,11 @@ public class ASTFunDecl extends ASTDecl {
 
     public ASTExpression getExp() {
         return exp;
+    }
+
+    public void setExp(ASTExpression exp) {
+        assert(exp != null);
+        this.exp = exp;
     }
 
     @Override
@@ -110,41 +115,7 @@ public class ASTFunDecl extends ASTDecl {
     }
 
     @Override
-    public boolean nestMultipleLambdas() {
-        return exp.nestMultipleLambdas();
-    }
-
-    @Override
-    public boolean lambdaPatternToCase() {
-        return exp.lambdaPatternToCase();
-    }
-
-    @Override
-    public boolean caseToMatch() {
-        if (exp.caseToMatch()) {
-            return true;
-        }
-
-        if (exp instanceof ASTCase) {
-            ASTCase caseExp = (ASTCase) exp;
-            exp = SimpleReducer.caseToMatch(caseExp);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean nestMultipleLets() {
-        return exp.nestMultipleLets();
-    }
-
-    @Override
-    public boolean tuplePatLetToSingleVar() {
-        return exp.tuplePatLetToSingleVar();
-    }
-
-    @Override
-    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
-        throw new SimpleReducer.TooComplexException(this, "Function declarations are not part of simple haskell.");
+    public haskell.simple.ast.ASTExpression castToSimple() throws TooComplexException {
+        throw new TooComplexException(this, "Function declarations are not part of simple haskell.");
     }
 }

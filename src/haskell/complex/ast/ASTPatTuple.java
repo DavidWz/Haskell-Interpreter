@@ -1,7 +1,6 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.SimpleReducer;
-import haskell.simple.ast.*;
+import haskell.complex.reduction.TooComplexException;
 import haskell.simple.ast.ASTExpression;
 
 import java.util.HashSet;
@@ -72,32 +71,7 @@ public class ASTPatTuple implements ASTPattern {
     }
 
     @Override
-    public boolean nestMultipleLambdas() {
-        return false;
-    }
-
-    @Override
-    public boolean lambdaPatternToCase() {
-        return false;
-    }
-
-    @Override
-    public boolean caseToMatch() {
-        return false;
-    }
-
-    @Override
-    public boolean nestMultipleLets() {
-        return false;
-    }
-
-    @Override
-    public boolean tuplePatLetToSingleVar() {
-        return false;
-    }
-
-    @Override
-    public ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
-        throw new SimpleReducer.TooComplexException(this, "Pattern tuples are not part of simple haskell.");
+    public ASTExpression castToSimple() throws TooComplexException {
+        throw new TooComplexException(this, "Pattern tuples are not part of simple haskell.");
     }
 }

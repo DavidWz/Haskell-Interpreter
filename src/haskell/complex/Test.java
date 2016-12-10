@@ -2,9 +2,7 @@ package haskell.complex;
 
 import haskell.HaskellInterpreter;
 import haskell.complex.ast.*;
-import haskell.complex.reduction.SimpleReducer;
-
-import java.util.Set;
+import haskell.complex.reduction.TooComplexException;
 
 public class Test {
     public static void main(String[] args) {
@@ -106,14 +104,23 @@ public class Test {
 
         ASTExpression eval = new ASTApplication(fact, new ASTApplication(plus, new ASTApplication(toInt, new ASTApplication(even, new ASTInteger(6))), new ASTInteger(3)));
 
-        System.out.println(prog);
-        System.out.print("\neval[" + eval + "] = ");
+        System.out.println(prog+"\n");
 
         // evaluate the expression
         HaskellInterpreter interpreter = new HaskellInterpreter(prog);
         try {
+            System.out.print("eval[" + eval + "] = ");
             System.out.println(interpreter.evaluate(eval));
-        } catch (SimpleReducer.TooComplexException e) {
+        } catch (TooComplexException e) {
+            System.out.println("\n"+e.getMessage());
+        }
+
+        eval = squareLenList4;
+
+        try {
+            System.out.print("eval[" + eval + "] = ");
+            System.out.println(interpreter.evaluate(eval));
+        } catch (TooComplexException e) {
             System.out.println("\n"+e.getMessage());
         }
     }

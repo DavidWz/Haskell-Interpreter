@@ -1,7 +1,6 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.SimpleReducer;
-import haskell.complex.reduction.VariableManager;
+import haskell.complex.reduction.TooComplexException;
 
 import java.util.*;
 
@@ -13,8 +12,8 @@ public class ASTLambda implements ASTExpression {
     private ASTExpression exp;
 
     public ASTLambda(List<ASTPattern> pats, ASTExpression exp) {
-        assert(pats != null);
         assert(exp != null);
+        assert(pats != null);
         assert(pats.size() >= 1);
         this.pats = pats;
         this.exp = exp;
@@ -31,8 +30,19 @@ public class ASTLambda implements ASTExpression {
         return pats;
     }
 
+    public void setPats(List<ASTPattern> pats) {
+        assert(pats != null);
+        assert(pats.size() >= 1);
+        this.pats = pats;
+    }
+
     public ASTExpression getExp() {
         return exp;
+    }
+
+    public void setExp(ASTExpression exp) {
+        assert(exp != null);
+        this.exp = exp;
     }
 
     @Override
@@ -91,104 +101,7 @@ public class ASTLambda implements ASTExpression {
     }
 
     @Override
-    public boolean nestMultipleLambdas() {
-        // first try to apply the transformation as deep as possible
-        if (exp.nestMultipleLambdas()) {
-            return true;
-        }
-
-        // we can only apply the transformation if there are multiple arguments
-        if (pats.size() >= 2) {
-            ASTExpression nestedLambdas = exp;
-
-            // The transformation looks like this:
-            /*
-                    \pat1 pat2 ... patn -> exp
-            ----------------------------------------------
-            \pat1 -> (\pat2 -> (... -> (\patn -> exp)...))
-             */
-
-            while (pats.size() >= 2) {
-                // take the last pattern and remove it from the argument list
-                ASTPattern currentPat = pats.remove(pats.size()-1);
-
-                // create a new lambda term with only that pattern and the current expression
-                nestedLambdas = new ASTLambda(currentPat, nestedLambdas);
-            }
-
-            // finally, there is only one argument left in this lambda term
-            // so replace this lambda term's expression by the nested lambdas
-            exp = nestedLambdas;
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean lambdaPatternToCase() {
-        // first try to apply the transformation as deep as possible
-        if (exp.nestMultipleLambdas()) {
-            return true;
-        }
-
-        // we can only apply the transformation if there is only one argument
-        if (pats.size() == 1) {
-            ASTPattern pat = pats.get(0);
-
-            // the transformation looks like this
-            /*
-                     \pat -> exp
-            ----------------------------------
-            \var -> case var of { pat -> exp }
-             */
-
-            // and the pattern must not be a variable
-            if (!(pat instanceof ASTVariable)) {
-                // then we can replace that pattern by a variable
-                ASTVariable var = VariableManager.getFreshVariable();
-                ASTCase caseExp = new ASTCase(var, Collections.singletonList(pat), Collections.singletonList(exp));
-
-                pats = Collections.singletonList(var);
-                exp = caseExp;
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean caseToMatch() {
-        if (exp.caseToMatch()) {
-            return true;
-        }
-
-        if (exp instanceof ASTCase) {
-            ASTCase caseExp = (ASTCase) exp;
-            exp = SimpleReducer.caseToMatch(caseExp);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean nestMultipleLets() {
-        return exp.nestMultipleLets();
-    }
-
-    @Override
-    public boolean tuplePatLetToSingleVar() {
-        return exp.tuplePatLetToSingleVar();
-    }
-
-    @Override
-    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+    public haskell.simple.ast.ASTExpression castToSimple() throws TooComplexException {
         if (pats.size() == 1) {
             ASTPattern pat = pats.get(0);
 
@@ -198,11 +111,11 @@ public class ASTLambda implements ASTExpression {
                 return new haskell.simple.ast.ASTFunction((haskell.simple.ast.ASTVariable) var.castToSimple(), exp.castToSimple());
             }
             else {
-                throw new SimpleReducer.TooComplexException(this, "Lambdas must map a variable.");
+                throw new TooComplexException(this, "Lambdas must map a variable.");
             }
         }
         else {
-            throw new SimpleReducer.TooComplexException(this, "Lambdas must only map one variable.");
+            throw new TooComplexException(this, "Lambdas must only map one variable.");
         }
     }
 }

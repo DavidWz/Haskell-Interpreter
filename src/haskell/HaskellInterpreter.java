@@ -1,6 +1,7 @@
 package haskell;
 
-import haskell.complex.reduction.SimpleReducer;
+import haskell.complex.reduction.ComplexToSimpleReducer;
+import haskell.complex.reduction.TooComplexException;
 import lambda.reduction.WHNOReducer;
 
 /**
@@ -20,7 +21,7 @@ public class HaskellInterpreter {
      * @param expression a complex haskell expression
      * @return a non-reducible lambda term
      */
-    public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression, boolean verbose) throws SimpleReducer.TooComplexException {
+    public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression, boolean verbose) throws TooComplexException {
         // init: create the expression: let prog in expr
         haskell.complex.ast.ASTExpression letProgInExpr = new haskell.complex.ast.ASTLet(program.getDecls(), expression);
         if (verbose) {
@@ -29,8 +30,8 @@ public class HaskellInterpreter {
         }
 
         // 1. reduce complex haskell expression to simple haskell expression
-        SimpleReducer simpleReducer = new SimpleReducer(letProgInExpr);
-        haskell.simple.ast.ASTExpression simpleExpr = simpleReducer.reduceToSimple();
+        ComplexToSimpleReducer complexToSimpleReducer = new ComplexToSimpleReducer(letProgInExpr);
+        haskell.simple.ast.ASTExpression simpleExpr = complexToSimpleReducer.reduceToSimple();
         if (verbose) {
             System.out.println("\n-- In simple haskell, the expression looks like this: ");
             System.out.println(simpleExpr);
@@ -54,7 +55,7 @@ public class HaskellInterpreter {
         return result;
     }
 
-    public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression) throws SimpleReducer.TooComplexException {
+    public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression) throws TooComplexException {
         return evaluate(expression, false);
     }
 }

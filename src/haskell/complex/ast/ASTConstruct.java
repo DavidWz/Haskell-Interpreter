@@ -1,6 +1,6 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.SimpleReducer;
+import haskell.complex.reduction.TooComplexException;
 import haskell.simple.ast.ASTConstant;
 import haskell.simple.ast.ASTExpression;
 import lambda.reduction.WHNOReducer;
@@ -90,32 +90,7 @@ public class ASTConstruct implements ASTPattern {
     }
 
     @Override
-    public boolean nestMultipleLambdas() {
-        return false;
-    }
-
-    @Override
-    public boolean lambdaPatternToCase() {
-        return false;
-    }
-
-    @Override
-    public boolean caseToMatch() {
-        return false;
-    }
-
-    @Override
-    public boolean nestMultipleLets() {
-        return false;
-    }
-
-    @Override
-    public boolean tuplePatLetToSingleVar() {
-        return false;
-    }
-
-    @Override
-    public ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+    public ASTExpression castToSimple() throws TooComplexException {
         if (pats.size() == 0) {
             Optional<lambda.ast.ASTConstant> constant = WHNOReducer.toConst(type.getName());
             if (constant.isPresent()) {
@@ -126,7 +101,7 @@ public class ASTConstruct implements ASTPattern {
             }
         }
         else {
-            throw new SimpleReducer.TooComplexException(this, "Arguments of constructs must be arguments of an application.");
+            throw new TooComplexException(this, "Arguments of constructs must be arguments of an application.");
         }
     }
 

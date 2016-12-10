@@ -1,7 +1,6 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.SimpleReducer;
-import haskell.simple.ast.*;
+import haskell.complex.reduction.TooComplexException;
 import haskell.simple.ast.ASTExpression;
 
 import java.util.*;
@@ -75,57 +74,7 @@ public class ASTProgram implements ComplexHaskell {
     }
 
     @Override
-    public boolean nestMultipleLambdas() {
-        for(ASTDecl decl : decls) {
-            if (decl.nestMultipleLambdas()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean lambdaPatternToCase() {
-        for(ASTDecl decl : decls) {
-            if (decl.lambdaPatternToCase()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean caseToMatch() {
-        for (ASTDecl decl : decls) {
-            if (decl.caseToMatch()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean nestMultipleLets() {
-        for(ASTDecl decl : decls) {
-            if (decl.nestMultipleLets()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean tuplePatLetToSingleVar() {
-        for(ASTDecl decl : decls) {
-            if (decl.tuplePatLetToSingleVar()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
-        throw new SimpleReducer.TooComplexException(this, "Programs are not part of simple haskell. Please use \"Let [program] in [expression]\" instead.");
+    public ASTExpression castToSimple() throws TooComplexException {
+        throw new TooComplexException(this, "Programs are not part of simple haskell. Please use \"Let [program] in [expression]\" instead.");
     }
 }

@@ -1,6 +1,6 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.SimpleReducer;
+import haskell.complex.reduction.TooComplexException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +13,8 @@ public class ASTPatDecl extends ASTDecl {
     private ASTExpression exp;
 
     public ASTPatDecl(ASTPattern pat, ASTExpression exp) {
+        assert(pat != null);
+        assert(exp != null);
         this.pat = pat;
         this.exp = exp;
     }
@@ -23,6 +25,11 @@ public class ASTPatDecl extends ASTDecl {
 
     public ASTExpression getExp() {
         return exp;
+    }
+
+    public void setExp(ASTExpression exp) {
+        assert(exp != null);
+        this.exp = exp;
     }
 
     @Override
@@ -66,41 +73,7 @@ public class ASTPatDecl extends ASTDecl {
     }
 
     @Override
-    public boolean nestMultipleLambdas() {
-        return exp.nestMultipleLambdas();
-    }
-
-    @Override
-    public boolean lambdaPatternToCase() {
-        return exp.lambdaPatternToCase();
-    }
-
-    @Override
-    public boolean caseToMatch() {
-        if (exp.caseToMatch()) {
-            return true;
-        }
-
-        if (exp instanceof ASTCase) {
-            ASTCase caseExp = (ASTCase) exp;
-            exp = SimpleReducer.caseToMatch(caseExp);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean nestMultipleLets() {
-        return exp.nestMultipleLets();
-    }
-
-    @Override
-    public boolean tuplePatLetToSingleVar() {
-        return exp.tuplePatLetToSingleVar();
-    }
-
-    @Override
-    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
-        throw new SimpleReducer.TooComplexException(this, "Pattern declarations are not part of simple haskell.");
+    public haskell.simple.ast.ASTExpression castToSimple() throws TooComplexException {
+        throw new TooComplexException(this, "Pattern declarations are not part of simple haskell.");
     }
 }

@@ -1,6 +1,6 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.SimpleReducer;
+import haskell.complex.reduction.TooComplexException;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -67,67 +67,7 @@ public class ASTApplication implements ASTExpression {
     }
 
     @Override
-    public boolean nestMultipleLambdas() {
-        for (ASTExpression exp : exps) {
-            if (exp.nestMultipleLambdas()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean lambdaPatternToCase() {
-        for (ASTExpression exp : exps) {
-            if (exp.lambdaPatternToCase()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean caseToMatch() {
-        // try to apply it as deep as possible
-        for (ASTExpression exp : exps) {
-            if (exp.caseToMatch()) {
-                return true;
-            }
-        }
-
-        // check if one can replace cases here
-        for (int i = 0; i < exps.size(); i++) {
-            if (exps.get(i) instanceof ASTCase) {
-                ASTCase caseExp = (ASTCase) exps.get(i);
-                exps.set(i, SimpleReducer.caseToMatch(caseExp));
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean nestMultipleLets() {
-        for (ASTExpression exp : exps) {
-            if (exp.nestMultipleLets()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean tuplePatLetToSingleVar() {
-        for (ASTExpression exp : exps) {
-            if (exp.tuplePatLetToSingleVar()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
+    public haskell.simple.ast.ASTExpression castToSimple() throws TooComplexException {
         haskell.simple.ast.ASTExpression simpleExp = exps.get(0).castToSimple();
 
         for (int i = 1; i < exps.size(); i++) {

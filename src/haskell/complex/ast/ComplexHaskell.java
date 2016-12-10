@@ -1,6 +1,6 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.SimpleReducer;
+import haskell.complex.reduction.TooComplexException;
 
 import java.util.Set;
 
@@ -20,42 +20,11 @@ public interface ComplexHaskell {
      */
     Set<ASTVariable> getFreeVars();
 
-
-    /**
-     * Transforms a lambda expression with multiple arguments to nested lambda terms with only one argument each.
-     * @return whether the transformation was successful
-     */
-    boolean nestMultipleLambdas();
-
-    /**
-     * Transforms a lambda expression with a pattern which is not a variable to a case expression.
-     * @return whether the transformation was successful
-     */
-    boolean lambdaPatternToCase();
-
-    /**
-     * Transforms a case term to nested applications of the predefined match function.
-     * @return whether the transformation was successful
-     */
-    boolean caseToMatch();
-
-    /**
-     * Transforms a let term with several declarations to nested let-terms with one declaration each.
-     * @return
-     */
-    boolean nestMultipleLets();
-
-    /**
-     * Transforms a let expresison with a tuple pattern to a let expression with a single variable as pattern.
-     * @return
-     */
-    boolean tuplePatLetToSingleVar();
-
     /**
      * Casts this complex haskell term to a simple haskell term. Throws a TooComplexException if the complex haskell term
      * did not have the same structure as an equivalent simple haskell term.
      * @return the equivalent simple haskell term
-     * @throws SimpleReducer.TooComplexException
+     * @throws TooComplexException
      */
-    haskell.simple.ast.ASTExpression castToSimple() throws SimpleReducer.TooComplexException;
+    haskell.simple.ast.ASTExpression castToSimple() throws TooComplexException;
 }
