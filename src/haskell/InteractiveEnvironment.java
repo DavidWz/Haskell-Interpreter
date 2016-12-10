@@ -53,7 +53,7 @@ public class InteractiveEnvironment {
                 else if(line.equals(HELP_COMMAND)) {
                     printHelpMessage();
                 }
-                else if (line.startsWith(LOAD_COMMAND)) {
+                else if (line.startsWith(LOAD_COMMAND) && line.length() > LOAD_COMMAND.length()) {
                     // +1 because space between :load <filename>
                     String fileName = line.substring(LOAD_COMMAND.length()+1);
                     loadProgramFromFile(fileName);
