@@ -24,6 +24,8 @@ public class InteractiveEnvironment {
     private BufferedReader bufferedReader;
     private final String QUIT_COMMAND = ":quit";
     private final String LOAD_COMMAND = ":load";
+    private final String HELP_COMMAND = ":help";
+    private final String HELP_URL = "https://github.com/DavidWz/Haskell-Interpreter";
 
     public InteractiveEnvironment() {
         this.astGenerator = new ASTGenerator();
@@ -45,15 +47,16 @@ public class InteractiveEnvironment {
             try {
                 line = readLine();
 
-                // check if the user wants to quit
                 if (line.equals(QUIT_COMMAND)) {
                     endProgram = true;
                 }
-                // check if the user wants to load a program
+                else if(line.equals(HELP_COMMAND)) {
+                    printHelpMessage();
+                }
                 else if (line.startsWith(LOAD_COMMAND)) {
                     // +1 because space between :load <filename>
                     String fileName = line.substring(LOAD_COMMAND.length()+1);
-                    load(fileName);
+                    loadProgramFromFile(fileName);
                 }
                 else {
                     handleLine(line);
@@ -65,10 +68,21 @@ public class InteractiveEnvironment {
     }
 
     /**
-     * Loads the program in the file specifiec by the fileName.
+     * Prints a help message to the console.
+     */
+    private void printHelpMessage() {
+        StringBuilder msg = new StringBuilder();
+        msg.append("Type \"" + QUIT_COMMAND + "\" to exit the interactive environment.\n");
+        msg.append("Type \"" + LOAD_COMMAND + " <filename>\" to load a program from a file.\n");
+        msg.append("For further information, please refer to " + HELP_URL);
+        System.out.println(msg.toString());
+    }
+
+    /**
+     * Loads the program in the file specified by the fileName.
      * @param fileName
      */
-    private void load(String fileName) {
+    private void loadProgramFromFile(String fileName) {
         ANTLRFileStream fileStream;
 
         try {
@@ -114,11 +128,11 @@ public class InteractiveEnvironment {
                     ASTTerm result = interpreter.evaluate(expression.get());
                     System.out.println(result);
                 } catch (TooComplexException e) {
-                    System.out.println("Error: Could not evaluate the expression.");
+                    System.out.println("Error: Could not evaluate the expression. Type \""+HELP_COMMAND+"\" for help.");
                 }
             }
             else {
-                System.out.println("Error: Input must be a declaration or expression.");
+                System.out.println("Syntax error. Type \""+HELP_COMMAND+"\" for help.");
             }
         }
     }

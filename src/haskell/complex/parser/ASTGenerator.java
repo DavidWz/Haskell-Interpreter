@@ -22,6 +22,7 @@ public class ASTGenerator {
     public Optional<ASTProgram> parseProgram(CharStream charStream) {
         ComplexHaskellLexer lexer = new ComplexHaskellLexer(charStream);
         TokenStream tokens = new CommonTokenStream(lexer);
+        lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
         ComplexHaskellParser parser = new ComplexHaskellParser(tokens);
         parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
 
@@ -41,6 +42,7 @@ public class ASTGenerator {
      */
     public Optional<ASTDecl> parseDeclaration(CharStream charStream) {
         ComplexHaskellLexer lexer = new ComplexHaskellLexer(charStream);
+        lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
         TokenStream tokens = new CommonTokenStream(lexer);
         ComplexHaskellParser parser = new ComplexHaskellParser(tokens);
         parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
@@ -62,6 +64,7 @@ public class ASTGenerator {
     public Optional<ASTExpression> parseExpression(CharStream charStream) {
         ComplexHaskellLexer lexer = new ComplexHaskellLexer(charStream);
         TokenStream tokens = new CommonTokenStream(lexer);
+        lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
         ComplexHaskellParser parser = new ComplexHaskellParser(tokens);
         parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
 
