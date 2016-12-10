@@ -11,6 +11,11 @@ import java.util.*;
 public class ASTProgram implements ComplexHaskell {
     private List<ASTDecl> decls;
 
+    public ASTProgram(List<ASTDecl> decls) {
+        assert(decls != null);
+        this.decls = decls;
+    }
+
     public ASTProgram() {
         this.decls = new ArrayList<>();
     }
