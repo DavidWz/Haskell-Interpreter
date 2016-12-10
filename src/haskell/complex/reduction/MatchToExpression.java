@@ -25,6 +25,9 @@ public class MatchToExpression {
         else if (pat instanceof ASTConstruct) {
             return matchConstrToExp((ASTConstruct) pat, exp, exp1, exp2);
         }
+        else if (pat instanceof ASTTypeConstr) {
+            return matchConstrToExp(new ASTConstruct((ASTTypeConstr) pat), exp, exp1, exp2);
+        }
         else if (pat instanceof ASTPatTuple) {
             return matchTupleToExp((ASTPatTuple) pat, exp, exp1, exp2);
         }

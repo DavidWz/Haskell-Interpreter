@@ -1,11 +1,10 @@
 package haskell.complex.parser;
 
 import haskell.complex.ast.*;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -18,43 +17,61 @@ public class ASTGenerator {
     /**
      * Parses program code to an ASTProgram.
      * @param charStream the input char stream
-     * @return the ast of the program
+     * @return the ast of the program or empty if it could not be parsed
      */
-    public ASTProgram parseProgram(CharStream charStream) {
+    public Optional<ASTProgram> parseProgram(CharStream charStream) {
         ComplexHaskellLexer lexer = new ComplexHaskellLexer(charStream);
         TokenStream tokens = new CommonTokenStream(lexer);
         ComplexHaskellParser parser = new ComplexHaskellParser(tokens);
+        parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
 
         ASTGenerator.ProgramVisitor progParser = new ASTGenerator.ProgramVisitor();
-        return progParser.visit(parser.program());
+        try {
+            return Optional.of(progParser.visit(parser.program()));
+        }
+        catch(Exception e) {
+            return Optional.empty();
+        }
     }
 
     /**
      * Parses a declaration to an ASTDecl.
      * @param charStream the input char stream
-     * @return the ast of the declaration
+     * @return the ast of the declaration or empty if it could not be parsed
      */
-    public ASTDecl parseDeclaration(CharStream charStream) {
+    public Optional<ASTDecl> parseDeclaration(CharStream charStream) {
         ComplexHaskellLexer lexer = new ComplexHaskellLexer(charStream);
         TokenStream tokens = new CommonTokenStream(lexer);
         ComplexHaskellParser parser = new ComplexHaskellParser(tokens);
+        parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
 
         ASTGenerator.DeclVisitor declParser = new ASTGenerator.DeclVisitor();
-        return declParser.visit(parser.decl());
+        try {
+            return Optional.of(declParser.visit(parser.decl()));
+        }
+        catch(Exception e) {
+            return Optional.empty();
+        }
     }
 
     /**
      * Parses an expression to an ASTExpression.
      * @param charStream the input char stream
-     * @return the ast of the expression
+     * @return the ast of the expression or empty if it could not be parsed
      */
-    public ASTExpression parseExpression(CharStream charStream) {
+    public Optional<ASTExpression> parseExpression(CharStream charStream) {
         ComplexHaskellLexer lexer = new ComplexHaskellLexer(charStream);
         TokenStream tokens = new CommonTokenStream(lexer);
         ComplexHaskellParser parser = new ComplexHaskellParser(tokens);
+        parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
 
         ASTGenerator.ExpVisitor expParser = new ASTGenerator.ExpVisitor();
-        return expParser.visit(parser.exp());
+        try {
+            return Optional.of(expParser.visit(parser.exp()));
+        }
+        catch(Exception e) {
+            return Optional.empty();
+        }
     }
 
     private static class ProgramVisitor extends ComplexHaskellBaseVisitor<ASTProgram> {
@@ -74,10 +91,11 @@ public class ASTGenerator {
             if (ctx.fundecl() != null) {
                 FunDeclVisitor funDeclVisitor = new FunDeclVisitor();
                 return ctx.fundecl().accept(funDeclVisitor);
-            } else {
-                assert (ctx.patdecl() != null);
+            } else if (ctx.patdecl() != null) {
                 PatDeclVisitor patDeclVisitor = new PatDeclVisitor();
                 return ctx.patdecl().accept(patDeclVisitor);
+            } else {
+                throw new RuntimeException();
             }
         }
     }
@@ -135,10 +153,11 @@ public class ASTGenerator {
             } else if (ctx.patTuple() != null) {
                 PatTupleVisitor patTupleVisitor = new PatTupleVisitor();
                 return ctx.patTuple().accept(patTupleVisitor);
-            } else {
-                assert (ctx.construct() != null);
+            } else if (ctx.construct() != null) {
                 ConstructVisitor constructVisitor = new ConstructVisitor();
                 return ctx.construct().accept(constructVisitor);
+            } else {
+                throw new RuntimeException();
             }
         }
     }
@@ -201,10 +220,11 @@ public class ASTGenerator {
             } else if (ctx.cases() != null) {
                 CasesVisitor casesVisitor = new CasesVisitor();
                 return ctx.cases().accept(casesVisitor);
-            } else {
-                assert (ctx.lambda() != null);
+            } else if (ctx.lambda() != null) {
                 LambdaVisitor lambdaVisitor = new LambdaVisitor();
                 return ctx.lambda().accept(lambdaVisitor);
+            } else {
+                throw new RuntimeException();
             }
         }
     }

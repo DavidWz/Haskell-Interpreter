@@ -16,8 +16,8 @@ public class Test {
 
         String evalCode = "(fact (decr 6))";
 
-        ASTProgram program = gen.parseProgram(new ANTLRInputStream(sourceCode));
-        ASTExpression eval = gen.parseExpression(new ANTLRInputStream(evalCode));
+        ASTProgram program = gen.parseProgram(new ANTLRInputStream(sourceCode)).get();
+        ASTExpression eval = gen.parseExpression(new ANTLRInputStream(evalCode)).get();
 
         System.out.println(program);
         System.out.print("eval["+eval+"] = ");
