@@ -43,11 +43,6 @@ public class ASTJoker implements ASTPattern {
     }
 
     @Override
-    public boolean funcDeclToPatDecl() {
-        return false;
-    }
-
-    @Override
     public boolean nestMultipleLambdas() {
         return false;
     }

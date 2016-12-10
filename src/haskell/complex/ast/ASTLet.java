@@ -24,6 +24,11 @@ public class ASTLet implements ASTExpression {
         return decls;
     }
 
+    public void setDecls(List<ASTDecl> decls) {
+        assert(decls != null);
+        this.decls = decls;
+    }
+
     public ASTExpression getExp() {
         return exp;
     }
@@ -90,29 +95,6 @@ public class ASTLet implements ASTExpression {
             }
         }
         return vars;
-    }
-
-    @Override
-    public boolean funcDeclToPatDecl() {
-        // first, try to apply this transformation as deep as possible
-        for (ASTDecl decl : decls) {
-            if (decl.funcDeclToPatDecl()) {
-                return true;
-            }
-        }
-        if (exp.funcDeclToPatDecl()) {
-            return true;
-        }
-
-        // try to apply the transformation to the declarations stored in this let-term
-        Optional<List<ASTDecl>> transformedDecls = SimpleReducer.funcDeclToPatDecl(decls);
-        if (transformedDecls.isPresent()) {
-            decls = transformedDecls.get();
-            return true;
-        }
-        else {
-            return false;
-        }
     }
 
     @Override

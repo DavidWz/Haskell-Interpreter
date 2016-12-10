@@ -91,11 +91,6 @@ public class ASTLambda implements ASTExpression {
     }
 
     @Override
-    public boolean funcDeclToPatDecl() {
-        return exp.funcDeclToPatDecl();
-    }
-
-    @Override
     public boolean nestMultipleLambdas() {
         // first try to apply the transformation as deep as possible
         if (exp.nestMultipleLambdas()) {

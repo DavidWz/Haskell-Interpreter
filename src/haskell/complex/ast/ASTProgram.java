@@ -24,6 +24,11 @@ public class ASTProgram implements ComplexHaskell {
         return decls;
     }
 
+    public void setDecls(List<ASTDecl> decls) {
+        assert(decls != null);
+        this.decls = decls;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -67,26 +72,6 @@ public class ASTProgram implements ComplexHaskell {
             vars.addAll(decl.getFreeVars());
         }
         return vars;
-    }
-
-    @Override
-    public boolean funcDeclToPatDecl() {
-        // first, we try to apply the transformation as deep as possible
-        for (ASTDecl decl : decls) {
-            if (decl.funcDeclToPatDecl()) {
-                return true;
-            }
-        }
-
-        // try to apply the transformation to the declarations stored in this program-term
-        Optional<List<ASTDecl>> transformedDecls = SimpleReducer.funcDeclToPatDecl(decls);
-        if (transformedDecls.isPresent()) {
-            decls = transformedDecls.get();
-            return true;
-        }
-        else {
-            return false;
-        }
     }
 
     @Override
@@ -143,6 +128,4 @@ public class ASTProgram implements ComplexHaskell {
     public ASTExpression castToSimple() throws SimpleReducer.TooComplexException {
         throw new SimpleReducer.TooComplexException(this, "Programs are not part of simple haskell. Please use \"Let [program] in [expression]\" instead.");
     }
-
-
 }

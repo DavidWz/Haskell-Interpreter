@@ -91,19 +91,6 @@ public class ASTCase implements ASTExpression {
     }
 
     @Override
-    public boolean funcDeclToPatDecl() {
-        if (exp.funcDeclToPatDecl()) {
-            return true;
-        }
-        for (ASTExpression exp : caseExps) {
-            if (exp.funcDeclToPatDecl()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public boolean nestMultipleLambdas() {
         if (exp.nestMultipleLambdas()) {
             return true;

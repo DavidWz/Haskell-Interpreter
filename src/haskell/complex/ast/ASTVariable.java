@@ -60,11 +60,6 @@ public class ASTVariable implements ASTExpression, ASTPattern {
     }
 
     @Override
-    public boolean funcDeclToPatDecl() {
-        return false;
-    }
-
-    @Override
     public boolean nestMultipleLambdas() {
         return false;
     }

@@ -20,12 +20,6 @@ public interface ComplexHaskell {
      */
     Set<ASTVariable> getFreeVars();
 
-    /**
-     * Transforms a series of function declarations for one specific function
-     * into an equivalent pattern declaration.
-     * @return whether the transformation was successful
-     */
-    boolean funcDeclToPatDecl();
 
     /**
      * Transforms a lambda expression with multiple arguments to nested lambda terms with only one argument each.

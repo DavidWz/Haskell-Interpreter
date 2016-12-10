@@ -66,11 +66,6 @@ public class ASTPatDecl extends ASTDecl {
     }
 
     @Override
-    public boolean funcDeclToPatDecl() {
-        return exp.funcDeclToPatDecl();
-    }
-
-    @Override
     public boolean nestMultipleLambdas() {
         return exp.nestMultipleLambdas();
     }

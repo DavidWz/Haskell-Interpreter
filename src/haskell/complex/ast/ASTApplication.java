@@ -67,16 +67,6 @@ public class ASTApplication implements ASTExpression {
     }
 
     @Override
-    public boolean funcDeclToPatDecl() {
-        for (ASTExpression exp : exps) {
-            if (exp.funcDeclToPatDecl()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public boolean nestMultipleLambdas() {
         for (ASTExpression exp : exps) {
             if (exp.nestMultipleLambdas()) {

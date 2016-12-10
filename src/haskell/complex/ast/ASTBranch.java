@@ -77,17 +77,6 @@ public class ASTBranch implements ASTExpression {
     }
 
     @Override
-    public boolean funcDeclToPatDecl() {
-        if (condition.funcDeclToPatDecl()) {
-            return true;
-        }
-        if (ifBranch.funcDeclToPatDecl()) {
-            return true;
-        }
-        return elseBranch.funcDeclToPatDecl();
-    }
-
-    @Override
     public boolean nestMultipleLambdas() {
         if (condition.nestMultipleLambdas()) {
             return true;
