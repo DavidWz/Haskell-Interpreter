@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Transforms a let expresison with a tuple pattern to a let expression with a single variable as pattern.
  */
-public class TuplePatLetToSingleVar implements ComplexHaskellVisitor {
+public class TuplePatLetToSingleVar implements ComplexHaskellTransformation {
     @Override
     public boolean visit(ASTLet node) {
         List<ASTDecl> decls = node.getDecls();

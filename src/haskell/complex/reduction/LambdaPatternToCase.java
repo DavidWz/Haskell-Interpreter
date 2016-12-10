@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Transforms a lambda expression with a pattern which is not a variable to a case expression.
  */
-public class LambdaPatternToCase implements ComplexHaskellVisitor {
+public class LambdaPatternToCase implements ComplexHaskellTransformation {
     @Override
     public boolean visit(ASTLambda node) {
         // first try to apply the transformation as deep as possible

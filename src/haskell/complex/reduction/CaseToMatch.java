@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Transforms a case term to nested applications of the predefined match function.
  */
-public class CaseToMatch implements ComplexHaskellVisitor {
+public class CaseToMatch implements ComplexHaskellTransformation {
     /**
      * Transforms the given case expression to a nested application of the predefined match function.
      * @param caseExpr the case expression

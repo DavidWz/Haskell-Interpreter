@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class ComplexToSimpleReducer {
     private ASTExpression expression;
-    private List<ComplexHaskellVisitor> basicTransformations;
+    private List<ComplexHaskellTransformation> basicTransformations;
     private FunDeclToPatDecl funDeclToPatDecl;
     private SeparateAndNestDecls separateAndNestDecls;
 
@@ -76,7 +76,7 @@ public class ComplexToSimpleReducer {
             transformed = false;
 
             // we try to apply every rule in succession
-            for (ComplexHaskellVisitor tr : basicTransformations) {
+            for (ComplexHaskellTransformation tr : basicTransformations) {
                 if (tr.visit(expression)) {
                     // the rule was successfully applied
                     transformed = true;

@@ -11,7 +11,7 @@ import java.util.Set;
  * Transforms a let term with several declarations to nested let-terms with one declaration each.
  * This transformations also handles the separation of the declarations with entangled functions.
  */
-public class SeparateAndNestDecls implements ComplexHaskellVisitor {
+public class SeparateAndNestDecls implements ComplexHaskellTransformation {
     @Override
     public boolean visit(ASTLet node) {
         List<ASTDecl> decls = node.getDecls();

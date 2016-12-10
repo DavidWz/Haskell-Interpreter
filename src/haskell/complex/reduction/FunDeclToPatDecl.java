@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  * Transforms a series of function declarations for one specific function
  * into an equivalent pattern declaration.
  */
-public class FunDeclToPatDecl implements ComplexHaskellVisitor {
+public class FunDeclToPatDecl implements ComplexHaskellTransformation {
 
     public FunDeclToPatDecl() {
     }

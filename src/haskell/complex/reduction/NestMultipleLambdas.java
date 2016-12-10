@@ -3,14 +3,14 @@ package haskell.complex.reduction;
 import haskell.complex.ast.ASTExpression;
 import haskell.complex.ast.ASTLambda;
 import haskell.complex.ast.ASTPattern;
-import haskell.complex.ast.ComplexHaskellVisitor;
+import haskell.complex.ast.ComplexHaskellTransformation;
 
 import java.util.List;
 
 /**
  * Transforms a lambda expression with multiple arguments to nested lambda terms with only one argument each.
  */
-public class NestMultipleLambdas implements ComplexHaskellVisitor {
+public class NestMultipleLambdas implements ComplexHaskellTransformation {
     @Override
     public boolean visit(ASTLambda node) {
         // first try to apply the transformation as deep as possible

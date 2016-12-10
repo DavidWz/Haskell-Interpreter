@@ -1,11 +1,11 @@
 package haskell.complex.ast;
 
 /**
- * Interface for visitors for complex haskell expressions.
+ * Interface for visitors which transform complex haskell expressions.
  * Every visit method returns whether the visitor was successful in doing what it was supposed to do for that node.
  * The default behavior for visiting a node is that the visit method is simply called for every sub-expression in that node.
  */
-public interface ComplexHaskellVisitor {
+public interface ComplexHaskellTransformation {
     default boolean visit(ASTApplication node) {
         for (ASTExpression exp : node.getExps()) {
             if (visit(exp)) {
