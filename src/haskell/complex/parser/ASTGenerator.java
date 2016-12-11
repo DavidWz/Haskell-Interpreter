@@ -2,7 +2,10 @@ package haskell.complex.parser;
 
 import haskell.complex.ast.*;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
 
+import java.util.BitSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -10,8 +13,29 @@ import java.util.stream.Collectors;
 /**
  * Generates the ast structure of a complex haskell program.
  */
-public class ASTGenerator {
+public class ASTGenerator implements ANTLRErrorListener {
     public ASTGenerator() {
+    }
+
+    /**
+     * Returns a parser for the given char stream.
+     * The parser won't output any errors to the console but instead throw exceptions.
+     * @param charStream
+     * @return
+     */
+    private ComplexHaskellParser getParser(CharStream charStream) {
+        ComplexHaskellLexer lexer = new ComplexHaskellLexer(charStream);
+        TokenStream tokens = new CommonTokenStream(lexer);
+
+        lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
+        lexer.addErrorListener(this);
+
+        ComplexHaskellParser parser = new ComplexHaskellParser(tokens);
+
+        parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
+        parser.addErrorListener(this);
+
+        return parser;
     }
 
     /**
@@ -20,15 +44,12 @@ public class ASTGenerator {
      * @return the ast of the program or empty if it could not be parsed
      */
     public Optional<ASTProgram> parseProgram(CharStream charStream) {
-        ComplexHaskellLexer lexer = new ComplexHaskellLexer(charStream);
-        TokenStream tokens = new CommonTokenStream(lexer);
-        lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
-        ComplexHaskellParser parser = new ComplexHaskellParser(tokens);
-        parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
+        ComplexHaskellParser parser = getParser(charStream);
 
         ASTGenerator.ProgramVisitor progParser = new ASTGenerator.ProgramVisitor();
         try {
-            return Optional.of(progParser.visit(parser.program()));
+            ASTProgram program = progParser.visit(parser.program());
+            return Optional.of(program);
         }
         catch(Exception e) {
             return Optional.empty();
@@ -41,15 +62,12 @@ public class ASTGenerator {
      * @return the ast of the declaration or empty if it could not be parsed
      */
     public Optional<ASTDecl> parseDeclaration(CharStream charStream) {
-        ComplexHaskellLexer lexer = new ComplexHaskellLexer(charStream);
-        lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
-        TokenStream tokens = new CommonTokenStream(lexer);
-        ComplexHaskellParser parser = new ComplexHaskellParser(tokens);
-        parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
+        ComplexHaskellParser parser = getParser(charStream);
 
         ASTGenerator.DeclVisitor declParser = new ASTGenerator.DeclVisitor();
         try {
-            return Optional.of(declParser.visit(parser.decl()));
+            ASTDecl decl = declParser.visit(parser.decl());
+            return Optional.of(decl);
         }
         catch(Exception e) {
             return Optional.empty();
@@ -62,15 +80,12 @@ public class ASTGenerator {
      * @return the ast of the expression or empty if it could not be parsed
      */
     public Optional<ASTExpression> parseExpression(CharStream charStream) {
-        ComplexHaskellLexer lexer = new ComplexHaskellLexer(charStream);
-        TokenStream tokens = new CommonTokenStream(lexer);
-        lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
-        ComplexHaskellParser parser = new ComplexHaskellParser(tokens);
-        parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
+        ComplexHaskellParser parser = getParser(charStream);
 
         ASTGenerator.ExpVisitor expParser = new ASTGenerator.ExpVisitor();
         try {
-            return Optional.of(expParser.visit(parser.exp()));
+            ASTExpression exp = expParser.visit(parser.exp());
+            return Optional.of(exp);
         }
         catch(Exception e) {
             return Optional.empty();
@@ -321,5 +336,25 @@ public class ASTGenerator {
 
             return new ASTLambda(pats, exp);
         }
+    }
+
+    @Override
+    public void syntaxError(Recognizer<?, ?> recognizer, Object o, int i, int i1, String s, RecognitionException e) {
+        throw new RuntimeException();
+    }
+
+    @Override
+    public void reportAmbiguity(Parser parser, DFA dfa, int i, int i1, boolean b, BitSet bitSet, ATNConfigSet atnConfigSet) {
+        throw new RuntimeException();
+    }
+
+    @Override
+    public void reportAttemptingFullContext(Parser parser, DFA dfa, int i, int i1, BitSet bitSet, ATNConfigSet atnConfigSet) {
+        throw new RuntimeException();
+    }
+
+    @Override
+    public void reportContextSensitivity(Parser parser, DFA dfa, int i, int i1, int i2, ATNConfigSet atnConfigSet) {
+        throw new RuntimeException();
     }
 }
