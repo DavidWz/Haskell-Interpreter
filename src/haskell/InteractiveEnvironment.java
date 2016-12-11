@@ -19,18 +19,30 @@ import java.util.Optional;
  * An interactive environment to write haskell programs and evaluate expressions.
  */
 public class InteractiveEnvironment {
+    public static final String QUIT_COMMAND = ":quit";
+    public static final String LOAD_COMMAND = ":load";
+    public static final String HELP_COMMAND = ":help";
+    public static final String HELP_URL = "https://github.com/DavidWz/Haskell-Interpreter";
+    public static final String VERBOSE_ARG = "--verbose";
+
     private ASTGenerator astGenerator;
     private HaskellInterpreter interpreter;
     private BufferedReader bufferedReader;
-    private final String QUIT_COMMAND = ":quit";
-    private final String LOAD_COMMAND = ":load";
-    private final String HELP_COMMAND = ":help";
-    private final String HELP_URL = "https://github.com/DavidWz/Haskell-Interpreter";
+    private boolean verbose;
 
     public InteractiveEnvironment() {
         this.astGenerator = new ASTGenerator();
         this.interpreter = new HaskellInterpreter();
         this.bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        this.verbose = false;
+    }
+
+    /**
+     * Sets whether all reduction steps should be displayed.
+     * @param verbose
+     */
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
     }
 
     /**
@@ -125,7 +137,7 @@ public class InteractiveEnvironment {
             Optional<ASTExpression> expression = astGenerator.parseExpression(charStream);
             if (expression.isPresent()) {
                 try {
-                    ASTTerm result = interpreter.evaluate(expression.get());
+                    ASTTerm result = interpreter.evaluate(expression.get(), verbose);
                     System.out.println(result);
                 } catch (TooComplexException e) {
                     System.out.println("Error: Could not evaluate the expression. Type \""+HELP_COMMAND+"\" for help.");
@@ -139,6 +151,14 @@ public class InteractiveEnvironment {
 
     public static void main(String[] args) {
         InteractiveEnvironment ie = new InteractiveEnvironment();
+
+        // check for arguments
+        for (String s : args) {
+            if (s.equals(InteractiveEnvironment.VERBOSE_ARG)) {
+                ie.setVerbose(true);
+            }
+        }
+
         ie.start();
     }
 }

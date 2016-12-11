@@ -26,7 +26,8 @@ An equivalent supported function declaration looks like this:
 `len (Cons xs _) = (plus 1 (len xs))`  
 
 ## Interactive Environment
-Run the HaskellInteractiveEnvironment jar to start the interactive environment. This program is similar to ghci.  
+Run the HaskellIntepreter jar to start the interactive environment. This program is similar to ghci.  
 Type `:quit` to exit the program. Type `:load <filename>` to load a program.  
 Simply type a function or pattern declaration to add it to the current program.  
 Simply type an expression to evaluate it.  
+You can pass the "--verbose" argument to the jar if you want to see all reduction steps (Warning: this might result in a lot of output).  
