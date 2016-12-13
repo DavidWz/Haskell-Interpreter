@@ -22,8 +22,8 @@ public class InteractiveEnvironment {
     public static final String QUIT_COMMAND = ":quit";
     public static final String LOAD_COMMAND = ":load";
     public static final String HELP_COMMAND = ":help";
+    public static final String VERBOSE_COMMAND = ":verbose";
     public static final String HELP_URL = "https://github.com/DavidWz/Haskell-Interpreter";
-    public static final String VERBOSE_ARG = "--verbose";
 
     private ASTGenerator astGenerator;
     private HaskellInterpreter interpreter;
@@ -35,14 +35,6 @@ public class InteractiveEnvironment {
         this.interpreter = new HaskellInterpreter();
         this.bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         this.verbose = false;
-    }
-
-    /**
-     * Sets whether all reduction steps should be displayed.
-     * @param verbose
-     */
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
     }
 
     /**
@@ -58,25 +50,44 @@ public class InteractiveEnvironment {
 
             try {
                 line = readLine();
-
-                if (line.equals(QUIT_COMMAND)) {
-                    endProgram = true;
-                }
-                else if(line.equals(HELP_COMMAND)) {
-                    printHelpMessage();
-                }
-                else if (line.startsWith(LOAD_COMMAND) && line.length() > LOAD_COMMAND.length()) {
-                    // +1 because space between :load <filename>
-                    String fileName = line.substring(LOAD_COMMAND.length()+1);
-                    loadProgramFromFile(fileName);
-                }
-                else {
-                    handleLine(line);
-                }
+                endProgram = handleLine(line);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Handles a user input line.
+     * @param line the line
+     * @return whether the program should be exited
+     */
+    private boolean handleLine(String line) {
+        if (line.equals(QUIT_COMMAND)) {
+            return true;
+        }
+        else if(line.equals(HELP_COMMAND)) {
+            printHelpMessage();
+        }
+        else if(line.equals(VERBOSE_COMMAND)) {
+            verbose = !verbose;
+            if (verbose) {
+                System.out.println("Verbose: On.");
+            }
+            else {
+                System.out.println("Verbose: Off.");
+            }
+        }
+        else if (line.startsWith(LOAD_COMMAND) && line.length() > LOAD_COMMAND.length()) {
+            // +1 because space between :load <filename>
+            String fileName = line.substring(LOAD_COMMAND.length()+1);
+            loadProgramFromFile(fileName);
+        }
+        else {
+            handleHaskell(line);
+        }
+
+        return false;
     }
 
     /**
@@ -121,7 +132,11 @@ public class InteractiveEnvironment {
         return bufferedReader.readLine();
     }
 
-    private void handleLine(String line) {
+    /**
+     * Handles a haskell expression or declaration.
+     * @param line
+     */
+    private void handleHaskell(String line) {
         CharStream charStream = new ANTLRInputStream(line);
 
         // try to parse the input as a declaration
@@ -138,7 +153,9 @@ public class InteractiveEnvironment {
             if (expression.isPresent()) {
                 try {
                     ASTTerm result = interpreter.evaluate(expression.get(), verbose);
-                    System.out.println(result);
+                    if (!verbose) {
+                        System.out.println(result);
+                    }
                 } catch (TooComplexException e) {
                     System.out.println("Error: Could not evaluate the expression. Type \""+HELP_COMMAND+"\" for help.");
                 }
@@ -151,14 +168,6 @@ public class InteractiveEnvironment {
 
     public static void main(String[] args) {
         InteractiveEnvironment ie = new InteractiveEnvironment();
-
-        // check for arguments
-        for (String s : args) {
-            if (s.equals(InteractiveEnvironment.VERBOSE_ARG)) {
-                ie.setVerbose(true);
-            }
-        }
-
         ie.start();
     }
 }

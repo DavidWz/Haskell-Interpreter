@@ -1,11 +1,34 @@
-package haskell.complex;
+package haskell;
 
-import haskell.HaskellInterpreter;
 import haskell.complex.ast.*;
 import haskell.complex.reduction.TooComplexException;
+import lambda.ast.ASTConstant;
+import lambda.ast.ASTTerm;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-public class Test {
-    public static void main(String[] args) {
+import static org.junit.Assert.*;
+
+/**
+ * Tests the complex haskell interpreter.
+ */
+public class HaskellInterpreterTest {
+    private static HaskellInterpreter interpreter;
+    private static ASTApplication list1;
+    private static ASTApplication list2;
+    private static ASTApplication list3;
+    private static ASTApplication list4;
+    private static ASTApplication square2;
+    private static ASTApplication lenList3;
+    private static ASTApplication lenList4;
+    private static ASTApplication squareLenList3;
+    private static ASTApplication squareLenList4;
+    private static ASTApplication factLenList3;
+    private static ASTApplication factPlusToIntEven63;
+
+    @BeforeClass
+    public static void setUp() {
         ASTProgram prog = new ASTProgram();
 
         // toInt true = 1
@@ -67,11 +90,11 @@ public class Test {
         ASTFunDecl lenNil = new ASTFunDecl(new ASTInteger(0), len, new ASTConstruct(Nil));
         prog.addDeclaration(lenNil);
 
-        // append Nil z = (Cons z Nil)
+        // append z Nil = (Cons z Nil)
         ASTTypeConstr Cons = new ASTTypeConstr("Cons");
         ASTVariable append = new ASTVariable("append");
         ASTVariable z = new ASTVariable("z");
-        ASTFunDecl appendFuncNil = new ASTFunDecl(new ASTApplication(Cons, z, Nil), append, new ASTConstruct(Nil), z);
+        ASTFunDecl appendFuncNil = new ASTFunDecl(new ASTApplication(Cons, z, Nil), append, z, new ASTConstruct(Nil));
         prog.addDeclaration(appendFuncNil);
 
         // len (Cons _ xs) = (len xs) + 1
@@ -80,48 +103,87 @@ public class Test {
         ASTFunDecl lenCons = new ASTFunDecl(new ASTApplication(plus, new ASTApplication(len, xs), new ASTInteger(1)), len, new ASTConstruct(Cons, new ASTJoker(), xs));
         prog.addDeclaration(lenCons);
 
-        // append (Cons x y) z = Cons x (append y z)
+        // append z (Cons x y) = Cons x (append z y)
         ASTVariable y = new ASTVariable("y");
-        ASTFunDecl appendFuncCons = new ASTFunDecl(new ASTApplication(Cons, x, new ASTApplication(append, y, z)), append, new ASTConstruct(Cons, x, y), z);
+        ASTFunDecl appendFuncCons = new ASTFunDecl(
+                new ASTApplication(Cons, x, new ASTApplication(append, z, y)),
+                append,
+                z,
+                new ASTConstruct(Cons, x, y));
         prog.addDeclaration(appendFuncCons);
 
+        // create the interpreter
+        interpreter = new HaskellInterpreter(prog);
+
         // list3 = (Cons 3) ((Cons 2) ((Cons 1) Nil)))
-        ASTExpression list1 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(1)), Nil);
-        ASTExpression list2 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(2)), list1);
-        ASTExpression list3 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(3)), list2);
+        list1 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(1)), Nil);
+        list2 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(2)), list1);
+        list3 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(3)), list2);
 
         // list 4 = append list3 4
-        ASTExpression list4 = new ASTApplication(append, list3, new ASTInteger(4));
+        list4 = new ASTApplication(append, new ASTInteger(4), list3);
 
         // several test expressions
-        ASTExpression square2 = new ASTApplication(square, new ASTInteger(2));
-        ASTExpression lenList3 = new ASTApplication(len, list3);
-        ASTExpression lenList1 = new ASTApplication(len, list1);
-        ASTExpression lenList4 = new ASTApplication(len, list4);
-        ASTExpression squareLenList3 = new ASTApplication(square, lenList3);
-        ASTExpression squareLenList4 = new ASTApplication(square, lenList4);
-        ASTExpression factLenList3 = new ASTApplication(fact, lenList3);
+        square2 = new ASTApplication(square, new ASTInteger(2));
+        lenList3 = new ASTApplication(len, list3);
+        lenList4 = new ASTApplication(len, list4);
+        squareLenList3 = new ASTApplication(square, lenList3);
+        squareLenList4 = new ASTApplication(square, lenList4);
+        factLenList3 = new ASTApplication(fact, lenList3);
+        factPlusToIntEven63 = new ASTApplication(fact, new ASTApplication(plus, new ASTApplication(toInt, new ASTApplication(even, new ASTInteger(6))), new ASTInteger(3)));
+    }
 
-        ASTExpression eval = new ASTApplication(fact, new ASTApplication(plus, new ASTApplication(toInt, new ASTApplication(even, new ASTInteger(6))), new ASTInteger(3)));
-
-        System.out.println(prog+"\n");
-
-        // evaluate the expression
-        HaskellInterpreter interpreter = new HaskellInterpreter(prog);
+    /**
+     * Tests if the given expression evaluates to the given expected result.
+     * @param exp
+     * @param expectedResult
+     * @throws TooComplexException
+     */
+    private void testExpression(ASTExpression exp, ASTTerm expectedResult) {
+        System.out.print("eval[" + exp + "] = ");
+        ASTTerm result = null;
         try {
-            System.out.print("eval[" + eval + "] = ");
-            System.out.println(interpreter.evaluate(eval));
+            result = interpreter.evaluate(exp);
         } catch (TooComplexException e) {
-            System.out.println("\n"+e.getMessage());
+            fail(e.getMessage());
         }
+        System.out.println(result);
 
-        eval = squareLenList4;
+        assertEquals(result, expectedResult);
+    }
 
-        try {
-            System.out.print("eval[" + eval + "] = ");
-            System.out.println(interpreter.evaluate(eval));
-        } catch (TooComplexException e) {
-            System.out.println("\n"+e.getMessage());
-        }
+    @Test
+    public void testSquare2() {
+        testExpression(square2, new ASTConstant(4));
+    }
+
+    @Test
+    public void testLenList3() {
+        testExpression(lenList3, new ASTConstant(3));
+    }
+
+    @Test
+    public void testLenList4() {
+        testExpression(lenList4, new ASTConstant(4));
+    }
+
+    @Test
+    public void testSquareLenList3() {
+        testExpression(squareLenList3, new ASTConstant(9));
+    }
+
+    @Test
+    public void testSquareLenList4() {
+        testExpression(squareLenList4, new ASTConstant(16));
+    }
+
+    @Test
+    public void testFactLenList3() {
+        testExpression(factLenList3, new ASTConstant(6));
+    }
+
+    @Test
+    public void testFactPlusToIntEven63() {
+        testExpression(factPlusToIntEven63, new ASTConstant(24));
     }
 }

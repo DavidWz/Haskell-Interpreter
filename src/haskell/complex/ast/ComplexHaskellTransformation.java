@@ -2,6 +2,7 @@ package haskell.complex.ast;
 
 /**
  * Interface for visitors which transform complex haskell expressions.
+ * Transformations are done in-place, i.e. they don't return a result node but just change the current visited node.
  * Every visit method returns whether the visitor was successful in doing what it was supposed to do for that node.
  * The default behavior for visiting a node is that the visit method is simply called for every sub-expression in that node.
  */
