@@ -1,8 +1,9 @@
 package lambda.ast;
 
-import lambda.reduction.delta.DeltaRule;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a constant.
@@ -37,22 +38,6 @@ public class ASTConstant extends ASTTerm {
     @Override
     public int hashCode() {
         return getValue().hashCode();
-    }
-
-    @Override
-    protected Optional<ASTTerm> applyBetaReduction() {
-        return Optional.empty();
-    }
-
-    @Override
-    protected Optional<ASTTerm> applyDeltaReduction(DeltaRule delta) {
-        // try to apply the delta rule only to the constant
-        return delta.getRHS(this, new ArrayList<>());
-    }
-
-    @Override
-    public Optional<ASTTerm> applyWHNOReduction(List<DeltaRule> deltaRules) {
-        return Optional.empty();
     }
 
     @Override

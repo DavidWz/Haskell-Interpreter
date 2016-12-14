@@ -1,7 +1,9 @@
 package lambda.reduction.delta;
 
-import lambda.ast.ASTConstant;
-import lambda.ast.ASTTerm;
+import lambda.ast.*;
+import lambda.reduction.LambdaTransformation;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +11,30 @@ import java.util.Optional;
  * Represents one or several delta rules, i.e. an actual interpretation of a value or function.
  * However, every delta rule in the same class must take the same number of arguments and the same types of constants.
  */
-public abstract class DeltaRule {
+public abstract class DeltaRule implements LambdaTransformation {
+    @Override
+    public Optional<ASTTerm> visit(ASTApplication node) {
+        // check whether the application is a constant with the correct number of arguments for this delta rule
+        ASTTerm lmomTerm = node.getLMOMTerm();
+        List<ASTTerm> arguments = node.getLMOMArguments();
+
+        if (lmomTerm instanceof ASTConstant && arguments.size() == getNumberOfArguments()) {
+            // this is a constant with the right number of arguments, so try to apply the delta rule
+            Optional<ASTTerm> result = getRHS((ASTConstant) lmomTerm, arguments);
+            if (result.isPresent()) {
+                return result;
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ASTTerm> visit(ASTConstant node) {
+        // try to apply the delta rule only to the constant
+        return getRHS(node, new ArrayList<>());
+    }
+
     /**
      * Returns the number of arguments needed for this delta rule.
      * @return the number of arguments

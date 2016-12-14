@@ -50,8 +50,8 @@ public class ArithmeticRule extends DeltaRule {
 
             // and both constants must be numbers
             if (c0.getValue() instanceof Integer && c1.getValue() instanceof Integer) {
-                Integer n0 = (Integer) c0.getValue();
-                Integer n1 = (Integer) c1.getValue();
+                int n0 = (int) c0.getValue();
+                int n1 = (int) c1.getValue();
 
                 // now we calculate the result
                 Object result;

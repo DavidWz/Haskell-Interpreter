@@ -35,7 +35,7 @@ fragment UPPER_CASE : 'A'..'Z' ;
 fragment DIGIT : '0'..'9' ;
 VARID : LOWER_CASE (LOWER_CASE | UPPER_CASE | DIGIT)*;
 TYCONSTRID : UPPER_CASE (LOWER_CASE | UPPER_CASE | DIGIT)*;
-INT : DIGIT+;
+INT : '-'?DIGIT+;
 JOKER : '_';
 
 WS: [ \n\t\r]+ -> skip;

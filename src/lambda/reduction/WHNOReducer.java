@@ -8,22 +8,88 @@ import java.util.*;
 /**
  * A class which can perform weak head normal order reductions to a lambda term.
  */
-public class WHNOReducer {
-    protected List<DeltaRule> deltaRules;
+public class WHNOReducer implements LambdaTransformation {
+    private List<LambdaTransformation> transformations;
 
     /**
-     * This standard constructor initializes the delta rules with standard delta rules.
+     * This standard constructor creates a WHNO reducer with standard beta and delta rules.
      */
     public WHNOReducer() {
-        deltaRules = new ArrayList<>();
-        deltaRules.add(new ArithmeticRule());
-        deltaRules.add(new BoolNotRule());
-        deltaRules.add(new BotRule());
-        deltaRules.add(new BranchRule());
-        deltaRules.add(new FixRule());
-        deltaRules.add(new TupleRule());
-        deltaRules.add(new ConstructorRule());
+        transformations = new ArrayList<>();
+
+        transformations.add(new BetaReduction());
+
+        transformations.add(new ArithmeticRule());
+        transformations.add(new BoolNotRule());
+        transformations.add(new BotRule());
+        transformations.add(new BranchRule());
+        transformations.add(new FixRule());
+        transformations.add(new TupleRule());
+        transformations.add(new ConstructorRule());
     }
+
+    @Override
+    public Optional<ASTTerm> visit(ASTApplication node) {
+        // first, try to do apply a reduction on this term
+        Optional<ASTTerm> reduced;
+        for (LambdaTransformation transformation : transformations) {
+            reduced = transformation.visit(node);
+            if (reduced.isPresent()) {
+                return reduced;
+            }
+        }
+
+        // try to apply the reduction in a left-most inner-most fashion
+        Optional<ASTTerm> result = visit(node.getLeft());
+        if (result.isPresent()) {
+            return Optional.of(new ASTApplication(result.get(), node.getRight()));
+        }
+        else {
+            result = visit(node.getRight());
+            if (result.isPresent()) {
+                return Optional.of(new ASTApplication(node.getLeft(), result.get()));
+            }
+            else {
+                return Optional.empty();
+            }
+        }
+    }
+
+    /**
+     * Reduces a term to weak head order normal form.
+     * @param term the term
+     * @param verbose whether reduction steps should be printed
+     * @return the WHNF
+     */
+    public ASTTerm reduceToWHNF(ASTTerm term, boolean verbose) {
+        if (verbose) {
+            System.out.println(term);
+        }
+
+        ASTTerm whnf = term;
+        Optional<ASTTerm> result = visit(term);
+        while(result.isPresent()) {
+            whnf = result.get();
+
+            if (verbose) {
+                System.out.println(" => " + result.get());
+            }
+
+            result = visit(result.get());
+        }
+
+        return whnf;
+    }
+
+    /**
+     * Reduces a term to weak head order normal form.
+     * @param term the term
+     * @return the WHNF
+     */
+    public ASTTerm reduceToWHNF(ASTTerm term) {
+        return reduceToWHNF(term, false);
+    }
+
 
     /**
      * Converts a predefined variable name to the actual ast constant that represents it. If the given name is not
@@ -60,34 +126,5 @@ public class WHNOReducer {
         }
 
         return Optional.empty();
-    }
-
-    public ASTTerm reduceToWHNF(ASTTerm term, boolean verbose) {
-        if (verbose) {
-            System.out.println(term);
-        }
-
-        ASTTerm whnf = term;
-        Optional<ASTTerm> result = term.applyWHNOReduction(deltaRules);
-        while(result.isPresent()) {
-            whnf = result.get();
-
-            if (verbose) {
-                System.out.println(" => " + result.get());
-            }
-
-            result = result.get().applyWHNOReduction(deltaRules);
-        }
-
-        return whnf;
-    }
-
-    /**
-     * Reduces a term to weak head order normal form.
-     * @param term the term
-     * @return the WHNF
-     */
-    public ASTTerm reduceToWHNF(ASTTerm term) {
-        return reduceToWHNF(term, false);
     }
 }

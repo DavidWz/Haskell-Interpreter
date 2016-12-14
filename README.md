@@ -16,7 +16,7 @@ An equivalent supported function declaration looks like this:
 `len Nil = 0`  
 `len (Cons xs _) = (plus 1 (len xs))`  
 
-Refer to `src/haskell/SampleProgram.hs` for more examples.  
+Refer to `test/haskell/SampleProgram.hs` for more examples.  
 
 ## Interactive Environment
 Run the HaskellIntepreter jar to start the interactive environment. This program is similar to ghci.  

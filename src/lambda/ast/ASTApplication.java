@@ -1,9 +1,8 @@
 package lambda.ast;
 
-import lambda.reduction.delta.DeltaRule;
-
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents an application of a left to an right.
@@ -61,68 +60,6 @@ public class ASTApplication extends ASTTerm {
     @Override
     public String toString() {
         return "(" + left.toString() + " " + right.toString() + ")";
-    }
-
-    @Override
-    protected Optional<ASTTerm> applyBetaReduction() {
-        if (left instanceof ASTAbstraction) {
-            // we can apply a beta reduction step
-            ASTAbstraction abstraction = (ASTAbstraction) left;
-
-            // apply the beta reduction as follows: (lambda x . t) r -> t [x / r]
-            return Optional.of(abstraction.getOutput().substitute(abstraction.getInput(), right));
-        }
-        else {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    protected Optional<ASTTerm> applyDeltaReduction(DeltaRule delta) {
-        List<ASTTerm> arguments = getLMOMArguments();
-        ASTTerm lmomTerm = getLMOMTerm();
-        if (lmomTerm instanceof ASTConstant && arguments.size() == delta.getNumberOfArguments()) {
-            // this is a constant with the right number of arguments, so try to apply the delta rule
-            Optional<ASTTerm> result = delta.getRHS((ASTConstant) lmomTerm, arguments);
-            if (result.isPresent()) {
-                return result;
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<ASTTerm> applyWHNOReduction(List<DeltaRule> deltaRules) {
-        // first, try to do a beta reduction
-        Optional<ASTTerm> reduced = applyBetaReduction();
-        if(reduced.isPresent()) {
-            return reduced;
-        }
-        else {
-            // if not possible, try to do a delta reduction
-            for (DeltaRule delta : deltaRules) {
-                reduced = applyDeltaReduction(delta);
-                if (reduced.isPresent()) {
-                    return reduced;
-                }
-            }
-        }
-
-        // try to apply the reduction in a left-most inner-most fashion
-        Optional<ASTTerm> result = left.applyWHNOReduction(deltaRules);
-        if (result.isPresent()) {
-            return Optional.of(new ASTApplication(result.get(), right));
-        }
-        else {
-            result = right.applyWHNOReduction(deltaRules);
-            if (result.isPresent()) {
-                return Optional.of(new ASTApplication(left, result.get()));
-            }
-            else {
-                return Optional.empty();
-            }
-        }
     }
 
     @Override

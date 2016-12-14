@@ -1,36 +1,12 @@
 package lambda.ast;
 
-import lambda.reduction.delta.DeltaRule;
-
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /**
  * Abstract super class for all lambda terms.
  */
 public abstract class ASTTerm {
-    /**
-     * Applies a weak head normal order reduction step to this ASTTerm. If no reduction step can be performed, an empty
-     * optional is returned.
-     * @param deltaRules the delta rules
-     * @return an optional containing the reduced term or empty if no reduction could be applied
-     */
-    public abstract Optional<ASTTerm> applyWHNOReduction(List<DeltaRule> deltaRules);
-
-    /**
-     * Applies a beta reduction step on the root node.
-     * @return an optional containing the reduced term or empty if no reduction could be applied
-     */
-    protected abstract Optional<ASTTerm> applyBetaReduction();
-
-    /**
-     * Applies a delta reduction step on the root node.
-     * @param delta the delta rule for this step
-     * @return an optional containing the reduced term or empty if no reduction could be applied
-     */
-    protected abstract Optional<ASTTerm> applyDeltaReduction(DeltaRule delta);
-
     /**
      * Returns the arguments of left-most outer-most applications inside this lambda term. For example, the term
      * (((a 1) (b a)) 2) results in {1, (b a), 2}.
