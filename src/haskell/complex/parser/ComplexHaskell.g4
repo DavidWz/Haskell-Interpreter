@@ -39,4 +39,4 @@ INT : DIGIT+;
 JOKER : '_';
 
 WS: [ \n\t\r]+ -> skip;
-IDENTIFIER : (LOWER_CASE | UPPER_CASE | DIGIT)+;
+REMAINDER : (LOWER_CASE | UPPER_CASE | DIGIT)+;

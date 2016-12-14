@@ -3,7 +3,6 @@ package haskell.complex.reduction;
 import haskell.complex.ast.ASTExpression;
 import haskell.complex.ast.ASTLambda;
 import haskell.complex.ast.ASTPattern;
-import haskell.complex.ast.ComplexHaskellTransformation;
 
 import java.util.List;
 

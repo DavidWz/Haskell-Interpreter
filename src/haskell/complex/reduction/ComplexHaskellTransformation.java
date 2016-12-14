@@ -1,4 +1,6 @@
-package haskell.complex.ast;
+package haskell.complex.reduction;
+
+import haskell.complex.ast.*;
 
 /**
  * Interface for visitors which transform complex haskell expressions.

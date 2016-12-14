@@ -49,6 +49,10 @@ public class ASTGenerator implements ANTLRErrorListener {
         ASTGenerator.ProgramVisitor progParser = new ASTGenerator.ProgramVisitor();
         try {
             ASTProgram program = progParser.visit(parser.program());
+            if (parser.getCurrentToken().getType() != parser.getTokenType("EOF")) {
+                // make sure the whole input was successfully parsed
+                return Optional.empty();
+            }
             return Optional.of(program);
         }
         catch(Exception e) {
@@ -67,6 +71,10 @@ public class ASTGenerator implements ANTLRErrorListener {
         ASTGenerator.DeclVisitor declParser = new ASTGenerator.DeclVisitor();
         try {
             ASTDecl decl = declParser.visit(parser.decl());
+            if (parser.getCurrentToken().getType() != parser.getTokenType("EOF")) {
+                // make sure the whole input was successfully parsed
+                return Optional.empty();
+            }
             return Optional.of(decl);
         }
         catch(Exception e) {
@@ -85,6 +93,10 @@ public class ASTGenerator implements ANTLRErrorListener {
         ASTGenerator.ExpVisitor expParser = new ASTGenerator.ExpVisitor();
         try {
             ASTExpression exp = expParser.visit(parser.exp());
+            if (parser.getCurrentToken().getType() != parser.getTokenType("EOF")) {
+                // make sure the whole input was successfully parsed
+                return Optional.empty();
+            }
             return Optional.of(exp);
         }
         catch(Exception e) {
