@@ -1,7 +1,7 @@
 package haskell.simple.ast;
 
 import lambda.ast.ASTTerm;
-import lambda.reduction.delta.BranchRule;
+import lambda.reduction.delta.BranchReduction;
 
 /**
  * Represents a simple haskell if-then-else branch.
@@ -75,7 +75,7 @@ public class ASTBranch extends ASTExpression {
 
     @Override
     public ASTTerm toLambdaTerm() {
-        lambda.ast.ASTTerm result = new lambda.ast.ASTApplication(new lambda.ast.ASTConstant(BranchRule.Operator.IF), condition.toLambdaTerm());
+        lambda.ast.ASTTerm result = new lambda.ast.ASTApplication(new lambda.ast.ASTConstant(BranchReduction.Operator.IF), condition.toLambdaTerm());
         result = new lambda.ast.ASTApplication(result, ifBranch.toLambdaTerm());
         result = new lambda.ast.ASTApplication(result, elseBranch.toLambdaTerm());
         return result;

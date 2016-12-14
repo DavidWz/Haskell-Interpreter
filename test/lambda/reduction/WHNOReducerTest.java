@@ -1,10 +1,9 @@
 package lambda.reduction;
 
 import lambda.ast.*;
-import lambda.reduction.delta.ArithmeticRule;
-import lambda.reduction.delta.BranchRule;
-import lambda.reduction.delta.FixRule;
-import org.junit.Before;
+import lambda.reduction.delta.ArithmeticReduction;
+import lambda.reduction.delta.BranchReduction;
+import lambda.reduction.delta.FixReduction;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -24,11 +23,11 @@ public class WHNOReducerTest {
      */
     public static ASTTerm getFactFunction() {
         ASTVariable x = new ASTVariable("x");
-        ASTConstant times = new ASTConstant(ArithmeticRule.Operator.TIMES);
-        ASTConstant minus = new ASTConstant(ArithmeticRule.Operator.MINUS);
-        ASTConstant lesseq = new ASTConstant(ArithmeticRule.Operator.LESSEQ);
-        ASTConstant fix = new ASTConstant(FixRule.Operator.FIX);
-        ASTConstant _if = new ASTConstant(BranchRule.Operator.IF);
+        ASTConstant times = new ASTConstant(ArithmeticReduction.Operator.TIMES);
+        ASTConstant minus = new ASTConstant(ArithmeticReduction.Operator.MINUS);
+        ASTConstant lesseq = new ASTConstant(ArithmeticReduction.Operator.LESSEQ);
+        ASTConstant fix = new ASTConstant(FixReduction.Operator.FIX);
+        ASTConstant _if = new ASTConstant(BranchReduction.Operator.IF);
 
         // fact x = if x <= 0 then 1 else fact(x-1)
         ASTTerm decrementX = new ASTApplication(new ASTApplication(minus, x), new ASTConstant(1));
@@ -51,7 +50,7 @@ public class WHNOReducerTest {
         reducer = new WHNOReducer();
         x = new ASTVariable("x");
         y = new ASTVariable("y");
-        plus = new ASTConstant(ArithmeticRule.Operator.PLUS);
+        plus = new ASTConstant(ArithmeticReduction.Operator.PLUS);
     }
 
     @Test
@@ -85,7 +84,7 @@ public class WHNOReducerTest {
         ASTTerm plus40X = new ASTApplication(new ASTApplication(plus, new ASTConstant(40)), x);
         ASTTerm add40 = new ASTAbstraction(x, plus40X);
 
-        ASTTerm timesYY = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticRule.Operator.TIMES), y), y);
+        ASTTerm timesYY = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticReduction.Operator.TIMES), y), y);
         ASTTerm square = new ASTAbstraction(y, timesYY);
 
         ASTTerm square3 = new ASTApplication(square, new ASTConstant(3));

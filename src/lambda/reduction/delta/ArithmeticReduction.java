@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * Represents the delta rules for arithmetic operations on integers and booleans.
  */
-public class ArithmeticRule extends DeltaRule {
+public class ArithmeticReduction extends DeltaReduction {
     public enum Operator {
         PLUS,
         MINUS,

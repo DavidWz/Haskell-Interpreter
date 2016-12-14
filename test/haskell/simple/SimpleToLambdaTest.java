@@ -9,8 +9,7 @@ import lambda.ast.ASTTerm;
 import lambda.reduction.WHNOReducer;
 import lambda.reduction.WHNOReducerTest;
 import lambda.reduction.delta.*;
-import lambda.reduction.delta.BotRule.Operator;
-import org.junit.Before;
+import lambda.reduction.delta.BotReduction.Operator;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -25,19 +24,19 @@ public class SimpleToLambdaTest {
     private static WHNOReducer reducer;
     private static ASTVariable x;
     private static ASTConstant times, minus, lesseq;
-    private static ConstructorRule.Constructor list;
-    private static ConstructorRule.Constructor tree;
+    private static ConstructorReduction.Constructor list;
+    private static ConstructorReduction.Constructor tree;
 
     @BeforeClass
     public static void setUp() throws Exception {
         reducer = new WHNOReducer();
         reducer = new WHNOReducer();
         x = new ASTVariable("x");
-        times = new ASTConstant(ArithmeticRule.Operator.TIMES);
-        minus = new ASTConstant(ArithmeticRule.Operator.MINUS);
-        lesseq = new ASTConstant(ArithmeticRule.Operator.LESSEQ);
-        list = new ConstructorRule.Constructor("List");
-        tree = new ConstructorRule.Constructor("Tree");
+        times = new ASTConstant(ArithmeticReduction.Operator.TIMES);
+        minus = new ASTConstant(ArithmeticReduction.Operator.MINUS);
+        lesseq = new ASTConstant(ArithmeticReduction.Operator.LESSEQ);
+        list = new ConstructorReduction.Constructor("List");
+        tree = new ConstructorReduction.Constructor("Tree");
     }
 
     @Test
@@ -74,7 +73,7 @@ public class SimpleToLambdaTest {
         expressions.add(new ASTFunction(x, x));
         expressions.add(new ASTConstant('c'));
         ASTExpression tuple = new ASTTuple(expressions);
-        ASTExpression program = new ASTApplication(new ASTConstant(TupleRule.getIsaOperator(3)), tuple);
+        ASTExpression program = new ASTApplication(new ASTConstant(TupleReduction.getIsaOperator(3)), tuple);
 
         System.out.println(program);
         lambda.ast.ASTTerm result = program.toLambdaTerm();
@@ -83,12 +82,12 @@ public class SimpleToLambdaTest {
         // in lambda terms: isa_3-tuple (((tuple_3 5) \\x -> x) 'c')
         lambda.ast.ASTApplication lambdaTuple = new lambda.ast.ASTApplication(
                 new lambda.ast.ASTApplication(new lambda.ast.ASTApplication(
-                        new lambda.ast.ASTConstant(TupleRule.getTupleConstructor(3)),
+                        new lambda.ast.ASTConstant(TupleReduction.getTupleConstructor(3)),
                         new lambda.ast.ASTConstant(5)),
                     new ASTAbstraction(new lambda.ast.ASTVariable("x"), new lambda.ast.ASTVariable("x"))),
                 new lambda.ast.ASTConstant('c'));
         lambda.ast.ASTApplication lambdaIsaTuple = new lambda.ast.ASTApplication(
-                new lambda.ast.ASTConstant(TupleRule.getIsaOperator(3)),
+                new lambda.ast.ASTConstant(TupleReduction.getIsaOperator(3)),
                 lambdaTuple);
 
         assertEquals(result, lambdaIsaTuple);
@@ -107,7 +106,7 @@ public class SimpleToLambdaTest {
         expressions.add(new ASTConstant(7));
         ASTExpression tuple = new ASTTuple(expressions);
 
-        ASTExpression selTuple = new ASTApplication(new ASTConstant(TupleRule.getSelOperator(2, 2)), tuple);
+        ASTExpression selTuple = new ASTApplication(new ASTConstant(TupleReduction.getSelOperator(2, 2)), tuple);
         System.out.println(selTuple);
         ASTTerm result = selTuple.toLambdaTerm();
         System.out.println("Lam = " + result);
@@ -115,11 +114,11 @@ public class SimpleToLambdaTest {
         // in lambda terms:  sel_2,2 ((tuple_2 'a') 7)
         lambda.ast.ASTApplication lambdaTuple = new lambda.ast.ASTApplication(
                 new lambda.ast.ASTApplication(new lambda.ast.ASTConstant(
-                        TupleRule.getTupleConstructor(2)),
+                        TupleReduction.getTupleConstructor(2)),
                         new lambda.ast.ASTConstant('a')),
                 new lambda.ast.ASTConstant(7));
         lambda.ast.ASTApplication lambdaSelTuple = new lambda.ast.ASTApplication(
-                new lambda.ast.ASTConstant(TupleRule.getSelOperator(2, 2)),
+                new lambda.ast.ASTConstant(TupleReduction.getSelOperator(2, 2)),
                 lambdaTuple);
 
         assertEquals(result, lambdaSelTuple);
@@ -136,7 +135,7 @@ public class SimpleToLambdaTest {
         ASTExpression constr = new ASTApplication(
                 new ASTApplication(new ASTConstant(tree), new ASTConstant(Operator.BOT)),
                 new ASTConstant(5));
-        ASTExpression program = new ASTApplication(new ASTConstant(ConstructorRule.getIsaOperator(list)), constr);
+        ASTExpression program = new ASTApplication(new ASTConstant(ConstructorReduction.getIsaOperator(list)), constr);
 
         System.out.println(program);
         lambda.ast.ASTTerm result = program.toLambdaTerm();
@@ -148,7 +147,7 @@ public class SimpleToLambdaTest {
                         new lambda.ast.ASTConstant(Operator.BOT)),
                 new lambda.ast.ASTConstant(5));
         lambda.ast.ASTApplication lambdaIsaConstr = new lambda.ast.ASTApplication(
-                new lambda.ast.ASTConstant(ConstructorRule.getIsaOperator(list)),
+                new lambda.ast.ASTConstant(ConstructorReduction.getIsaOperator(list)),
                 lambdaConstr);
 
         assertEquals(result, lambdaIsaConstr);
@@ -165,7 +164,7 @@ public class SimpleToLambdaTest {
         ASTExpression constr = new ASTApplication(
                 new ASTApplication(new ASTConstant(tree), new ASTConstant(Operator.BOT)),
                 new ASTConstant(5));
-        ASTExpression program = new ASTApplication(new ASTConstant(ConstructorRule.getArgOfOperator(tree)), constr);
+        ASTExpression program = new ASTApplication(new ASTConstant(ConstructorReduction.getArgOfOperator(tree)), constr);
 
         System.out.println(program);
         lambda.ast.ASTTerm result = program.toLambdaTerm();
@@ -177,7 +176,7 @@ public class SimpleToLambdaTest {
                         new lambda.ast.ASTConstant(Operator.BOT)),
                 new lambda.ast.ASTConstant(5));
         lambda.ast.ASTApplication lambdaIsaConstr = new lambda.ast.ASTApplication(
-                new lambda.ast.ASTConstant(ConstructorRule.getArgOfOperator(tree)),
+                new lambda.ast.ASTConstant(ConstructorReduction.getArgOfOperator(tree)),
                 lambdaConstr);
 
         assertEquals(result, lambdaIsaConstr);
@@ -188,7 +187,7 @@ public class SimpleToLambdaTest {
 
         ASTTerm bot5Tuple = new lambda.ast.ASTApplication(
                 new lambda.ast.ASTApplication(
-                        new lambda.ast.ASTConstant(TupleRule.getTupleConstructor(2)),
+                        new lambda.ast.ASTConstant(TupleReduction.getTupleConstructor(2)),
                         new lambda.ast.ASTConstant(Operator.BOT)),
                 new lambda.ast.ASTConstant(5));
         assertEquals(reducedResult, bot5Tuple);

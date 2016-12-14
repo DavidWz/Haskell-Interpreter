@@ -19,13 +19,13 @@ public class WHNOReducer implements LambdaTransformation {
 
         transformations.add(new BetaReduction());
 
-        transformations.add(new ArithmeticRule());
-        transformations.add(new BoolNotRule());
-        transformations.add(new BotRule());
-        transformations.add(new BranchRule());
-        transformations.add(new FixRule());
-        transformations.add(new TupleRule());
-        transformations.add(new ConstructorRule());
+        transformations.add(new ArithmeticReduction());
+        transformations.add(new BoolNotReduction());
+        transformations.add(new BotReduction());
+        transformations.add(new BranchReduction());
+        transformations.add(new FixReduction());
+        transformations.add(new TupleReduction());
+        transformations.add(new ConstructorReduction());
     }
 
     @Override
@@ -100,27 +100,27 @@ public class WHNOReducer implements LambdaTransformation {
     public static Optional<ASTConstant> toConst(String name) {
         Optional<ASTConstant> constant;
 
-        constant = ArithmeticRule.toConst(name);
+        constant = ArithmeticReduction.toConst(name);
         if (constant.isPresent()) {
             return constant;
         }
 
-        constant = BoolNotRule.toConst(name);
+        constant = BoolNotReduction.toConst(name);
         if (constant.isPresent()) {
             return constant;
         }
 
-        constant = BotRule.toConst(name);
+        constant = BotReduction.toConst(name);
         if (constant.isPresent()) {
             return constant;
         }
 
-        constant = ConstructorRule.toConst(name);
+        constant = ConstructorReduction.toConst(name);
         if (constant.isPresent()) {
             return constant;
         }
 
-        constant = TupleRule.toConst(name);
+        constant = TupleReduction.toConst(name);
         if (constant.isPresent()) {
             return constant;
         }

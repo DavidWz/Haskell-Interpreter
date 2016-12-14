@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * Represents the bottom constant (i.e. non-termination)
  */
-public class BotRule extends DeltaRule {
+public class BotReduction extends DeltaReduction {
     public enum Operator {
         BOT
     }

@@ -1,6 +1,7 @@
 package haskell.simple.ast;
 
 import lambda.ast.ASTTerm;
+import lambda.reduction.delta.TupleReduction;
 
 import java.util.List;
 
@@ -65,7 +66,7 @@ public class ASTTuple extends ASTExpression {
             return expr.get(0).toLambdaTerm();
         }
         else {
-            lambda.ast.ASTTerm result = new lambda.ast.ASTConstant(new lambda.reduction.delta.TupleRule.TupleConstant(n));
+            lambda.ast.ASTTerm result = new lambda.ast.ASTConstant(new TupleReduction.TupleConstant(n));
 
             for (ASTExpression e : expr) {
                 result = new lambda.ast.ASTApplication(result, e.toLambdaTerm());

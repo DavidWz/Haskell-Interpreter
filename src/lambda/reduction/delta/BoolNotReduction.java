@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * Represents the boolean not operator.
  */
-public class BoolNotRule extends DeltaRule {
+public class BoolNotReduction extends DeltaReduction {
     public enum Operator {
         NOT
     }

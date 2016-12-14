@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * Represents the isa_n-tuple and sel_n,i delta rules.
  */
-public class TupleRule extends DeltaRule {
+public class TupleReduction extends DeltaReduction {
     /**
      * Represents the tupleConstructor for tupels.
      */
@@ -139,7 +139,7 @@ public class TupleRule extends DeltaRule {
     }
 
 
-    public TupleRule() {}
+    public TupleReduction() {}
 
     public static TupleConstant getTupleConstructor(int n) {
         return new TupleConstant(n);

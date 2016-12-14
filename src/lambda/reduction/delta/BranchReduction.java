@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * Represents delta rules for branches, e.g. if - else statements
  */
-public class BranchRule extends DeltaRule {
+public class BranchReduction extends DeltaReduction {
     public enum Operator {
         IF
     }

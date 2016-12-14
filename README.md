@@ -23,4 +23,4 @@ Run the HaskellIntepreter jar to start the interactive environment. This program
 Type `:quit` to exit the program. Type `:load <filename>` to load a program.  
 Simply type a function or pattern declaration to add it to the current program.  
 Simply type an expression to evaluate it (don't forget the parenthesis! e.g. `(plus 1 2)`).  
-You can use the ":verbose" command if you want to see all reduction steps (Warning: this might result in a lot of output).  
+You can use the `:verbose` command if you want to see all reduction steps (Warning: this might result in a lot of output).  

@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Represents the isa_constr and argof_constr delta rules.
  */
-public class ConstructorRule extends DeltaRule {
+public class ConstructorReduction extends DeltaReduction {
     /**
      * Represents a custom data constructor.
      */
@@ -195,7 +195,7 @@ public class ConstructorRule extends DeltaRule {
         }
     }
 
-    public ConstructorRule() {}
+    public ConstructorReduction() {}
 
     public static Constructor getConstructor(String name) {
         return new Constructor(name);
@@ -272,7 +272,7 @@ public class ConstructorRule extends DeltaRule {
                             else {
                                 int n = args.size();
                                 // return a tuple with the arguments
-                                ASTTerm tuple = new ASTConstant(TupleRule.getTupleConstructor(n));
+                                ASTTerm tuple = new ASTConstant(TupleReduction.getTupleConstructor(n));
                                 for (ASTTerm t : args) {
                                     tuple = new ASTApplication(tuple, t);
                                 }
@@ -324,7 +324,7 @@ public class ConstructorRule extends DeltaRule {
     public static Optional<ASTConstant> toConst(String name) {
         if (name.startsWith("isa_constr_")) {
             String constrName = name.substring(11);
-            return Optional.of(new ASTConstant(getIsaOperator(ConstructorRule.getConstructor(constrName))));
+            return Optional.of(new ASTConstant(getIsaOperator(ConstructorReduction.getConstructor(constrName))));
         }
         else if (name.startsWith("isa_int_")) {
             String val = name.substring(8);
@@ -338,7 +338,7 @@ public class ConstructorRule extends DeltaRule {
         }
         else if (name.startsWith("argof_")) {
             String constrName = name.substring(6);
-            return Optional.of(new ASTConstant(getArgOfOperator(ConstructorRule.getConstructor(constrName))));
+            return Optional.of(new ASTConstant(getArgOfOperator(ConstructorReduction.getConstructor(constrName))));
         }
         else {
             return Optional.empty();

@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Represents the fixpoint operator.
  */
-public class FixRule extends DeltaRule {
+public class FixReduction extends DeltaReduction {
     public enum Operator {
         FIX
     }

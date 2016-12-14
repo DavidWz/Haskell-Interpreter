@@ -11,7 +11,7 @@ import java.util.Optional;
  * Represents one or several delta rules, i.e. an actual interpretation of a value or function.
  * However, every delta rule in the same class must take the same number of arguments and the same types of constants.
  */
-public abstract class DeltaRule implements LambdaTransformation {
+public abstract class DeltaReduction implements LambdaTransformation {
     @Override
     public Optional<ASTTerm> visit(ASTApplication node) {
         // check whether the application is a constant with the correct number of arguments for this delta rule

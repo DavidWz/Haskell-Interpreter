@@ -3,7 +3,7 @@ package haskell.complex.ast;
 import haskell.complex.reduction.TooComplexException;
 import haskell.simple.ast.ASTConstant;
 import lambda.reduction.WHNOReducer;
-import lambda.reduction.delta.ConstructorRule;
+import lambda.reduction.delta.ConstructorReduction;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -64,7 +64,7 @@ public class ASTTypeConstr implements ASTExpression, ASTPattern {
             return new ASTConstant(constant.get().getValue());
         }
         else {
-            return new ASTConstant(ConstructorRule.getConstructor(name));
+            return new ASTConstant(ConstructorReduction.getConstructor(name));
         }
     }
 }
