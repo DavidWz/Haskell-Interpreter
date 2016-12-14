@@ -4,7 +4,6 @@ import haskell.complex.ast.*;
 import haskell.complex.reduction.TooComplexException;
 import lambda.ast.ASTConstant;
 import lambda.ast.ASTTerm;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -120,7 +119,7 @@ public class HaskellInterpreterTest {
         list2 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(2)), list1);
         list3 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(3)), list2);
 
-        // list 4 = append list3 4
+        // list 4 = append 4 list3
         list4 = new ASTApplication(append, new ASTInteger(4), list3);
 
         // several test expressions

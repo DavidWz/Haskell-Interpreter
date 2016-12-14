@@ -12,6 +12,7 @@ import lambda.reduction.WHNOReducer;
  */
 public class HaskellInterpreter {
     private haskell.complex.ast.ASTProgram program;
+    private WHNOReducer whnoReducer;
 
     /**
      * Creates a new interpreter with the given initial program.
@@ -20,6 +21,7 @@ public class HaskellInterpreter {
     public HaskellInterpreter(ASTProgram initialProgram) {
         assert(initialProgram != null);
         this.program = initialProgram;
+        this.whnoReducer = new WHNOReducer();
     }
 
     /**
@@ -27,6 +29,7 @@ public class HaskellInterpreter {
      */
     public HaskellInterpreter() {
         this.program = new ASTProgram();
+        this.whnoReducer = new WHNOReducer();
     }
 
     /**
@@ -80,10 +83,10 @@ public class HaskellInterpreter {
         if (verbose) {
             System.out.println("\n-- The corresponding lambda term looks like this: ");
             System.out.println(lambdaTerm);
+            System.out.println("\n-- The following reduction steps were applied: ");
         }
 
         // 3. reduce lambda expression with WHNO
-        WHNOReducer whnoReducer = new WHNOReducer();
         lambda.ast.ASTTerm result = whnoReducer.reduceToWHNF(lambdaTerm, verbose);
         if (verbose) {
             System.out.println("\n-- The final result is: ");
