@@ -9,10 +9,6 @@ import java.util.Optional;
  * Represents delta rules for branches, e.g. if - else statements
  */
 public class BranchReduction extends DeltaReduction {
-    public enum Operator {
-        IF
-    }
-
     @Override
     public int getNumberOfArguments() {
         return 1;
@@ -20,12 +16,12 @@ public class BranchReduction extends DeltaReduction {
 
     @Override
     public boolean isConstantMatching(ASTConstant c) {
-        return (c.getValue().equals(Operator.IF));
+        return (c.getValue().equals(PredefinedFunction.IF));
     }
 
     @Override
     public Optional<ASTTerm> getRHS(ASTConstant constant, List<ASTTerm> terms) {
-        // the constant must be FIX and it has only one argument
+        // the constant must be if and it has only one argument
         if (isSignatureMatching(constant, terms)) {
             ASTTerm cond = terms.get(0);
             boolean condition;

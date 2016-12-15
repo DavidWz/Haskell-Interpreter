@@ -166,36 +166,39 @@ public class TupleReduction extends DeltaReduction {
     }
 
     @Override
-    public Optional<ASTTerm> getRHS(ASTConstant constant, List<ASTTerm> terms) {
-        // the constant must be Isa_n-tuple or sel_n,i and it has only one argument
-        if (isSignatureMatching(constant, terms)) {
-            // check if the argument is a n-tupel
-            ASTTerm tupel = terms.get(0);
-            ASTTerm constr = tupel.getLMOMTerm();
-            List<ASTTerm> args = tupel.getLMOMArguments();
+    public Optional<ASTTerm> getRHS(ASTConstant function, List<ASTTerm> terms) {
+        // the function must be Isa_n-tuple or sel_n,i and it has only one argument
+        if (!isSignatureMatching(function, terms)) {
+            return Optional.empty();
+        }
 
-            if (constr instanceof ASTConstant) {
-                ASTConstant constrConstant = (ASTConstant) constr;
-                if (constrConstant.getValue() instanceof TupleConstant) {
-                    // it's an tuple, so reduce it according to the operator
+        // check if the argument is a n-tupel
+        ASTTerm tupel = terms.get(0);
+        ASTTerm constr = tupel.getLMOMTerm();
+        List<ASTTerm> args = tupel.getLMOMArguments();
 
-                    if (constant.getValue() instanceof IsATuple) {
-                        // it's isa
-                        IsATuple op = (IsATuple) constant.getValue();
-                        if (op.getN() == args.size()) {
-                            return Optional.of(new ASTConstant(true));
-                        }
-                        else {
-                            return Optional.of(new ASTConstant(false));
-                        }
+        // we can only check if it's a tupel-constructor if it's actually a fully reduced function constant
+        if (constr instanceof ASTConstant) {
+            ASTConstant constrConstant = (ASTConstant) constr;
+            if (constrConstant.getValue() instanceof TupleConstant) {
+
+                // it's a tuple, so reduce it according to the operator
+                if (function.getValue() instanceof IsATuple) {
+                    // it's isa
+                    IsATuple op = (IsATuple) function.getValue();
+                    if (op.getN() == args.size()) {
+                        return Optional.of(new ASTConstant(true));
                     }
                     else {
-                        // it's sel
-                        Sel op = (Sel) constant.getValue();
-                        if (op.getN() == args.size()) {
-                            // -1 because sel is starts counting at 1
-                            return Optional.of(args.get(op.getI()-1));
-                        }
+                        return Optional.of(new ASTConstant(false));
+                    }
+                }
+                else {
+                    // it's sel
+                    Sel op = (Sel) function.getValue();
+                    if (op.getN() == args.size()) {
+                        // -1 because sel is starts counting at 1
+                        return Optional.of(args.get(op.getI()-1));
                     }
                 }
             }

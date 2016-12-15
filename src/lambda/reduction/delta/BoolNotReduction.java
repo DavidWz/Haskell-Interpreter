@@ -10,10 +10,6 @@ import java.util.Optional;
  * Represents the boolean not operator.
  */
 public class BoolNotReduction extends DeltaReduction {
-    public enum Operator {
-        NOT
-    }
-
     @Override
     public int getNumberOfArguments() {
         return 1;
@@ -21,7 +17,7 @@ public class BoolNotReduction extends DeltaReduction {
 
     @Override
     public boolean isConstantMatching(ASTConstant c) {
-        return (c.getValue().equals(Operator.NOT));
+        return (c.getValue().equals(PredefinedFunction.NOT));
     }
 
     @Override
@@ -40,17 +36,5 @@ public class BoolNotReduction extends DeltaReduction {
         }
 
         return Optional.empty();
-    }
-
-    public static Optional<ASTConstant> toConst(String name) {
-        if (name.equals("true")) {
-            return Optional.of(new ASTConstant(true));
-        }
-        else if (name.equals("false")) {
-            return Optional.of(new ASTConstant(false));
-        }
-        else {
-            return Optional.empty();
-        }
     }
 }

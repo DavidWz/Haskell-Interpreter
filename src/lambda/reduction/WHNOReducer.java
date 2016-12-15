@@ -21,7 +21,9 @@ public class WHNOReducer implements LambdaTransformation {
         transformations.add(new BetaReduction());
 
         transformations.add(new ArithmeticReduction());
+        transformations.add(new BooleanReduction());
         transformations.add(new BoolNotReduction());
+        transformations.add(new CharReduction());
         transformations.add(new BotReduction());
         transformations.add(new BranchReduction());
         transformations.add(new FixReduction());
@@ -116,21 +118,6 @@ public class WHNOReducer implements LambdaTransformation {
     public static Optional<ASTConstant> toConst(String name) {
         Optional<ASTConstant> constant;
 
-        constant = ArithmeticReduction.toConst(name);
-        if (constant.isPresent()) {
-            return constant;
-        }
-
-        constant = BoolNotReduction.toConst(name);
-        if (constant.isPresent()) {
-            return constant;
-        }
-
-        constant = BotReduction.toConst(name);
-        if (constant.isPresent()) {
-            return constant;
-        }
-
         constant = ConstructorReduction.toConst(name);
         if (constant.isPresent()) {
             return constant;
@@ -141,6 +128,12 @@ public class WHNOReducer implements LambdaTransformation {
             return constant;
         }
 
-        return Optional.empty();
+        try {
+            PredefinedFunction operator = PredefinedFunction.valueOf(name.toUpperCase());
+            return Optional.of(new ASTConstant(operator));
+        }
+        catch (Exception e) {
+            return Optional.empty();
+        }
     }
 }

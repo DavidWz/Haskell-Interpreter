@@ -10,10 +10,6 @@ import java.util.Optional;
  * Represents the bottom constant (i.e. non-termination)
  */
 public class BotReduction extends DeltaReduction {
-    public enum Operator {
-        BOT
-    }
-
     @Override
     public int getNumberOfArguments() {
         return 0;
@@ -21,7 +17,7 @@ public class BotReduction extends DeltaReduction {
 
     @Override
     public boolean isConstantMatching(ASTConstant c) {
-        return (c.getValue().equals(Operator.BOT));
+        return (c.getValue().equals(PredefinedFunction.BOT));
     }
 
     @Override
@@ -30,15 +26,6 @@ public class BotReduction extends DeltaReduction {
         if (isSignatureMatching(constant, terms)) {
             // bot -> bot
             return Optional.of(constant);
-        }
-        else {
-            return Optional.empty();
-        }
-    }
-
-    public static Optional<ASTConstant> toConst(String name) {
-        if (name.equals("bot")) {
-            return Optional.of(new ASTConstant(Operator.BOT));
         }
         else {
             return Optional.empty();

@@ -150,51 +150,55 @@ public class ConstructorReduction extends DeltaReduction {
     }
 
     @Override
-    public Optional<ASTTerm> getRHS(ASTConstant constant, List<ASTTerm> terms) {
-        // the constant must be isa_constr, isa_int or argof_constr and it has only one argument
-        if (isSignatureMatching(constant, terms)) {
-            // check if the argument is a fitting constr
-            ASTTerm data = terms.get(0);
-            ASTTerm constr = data.getLMOMTerm();
-            List<ASTTerm> args = data.getLMOMArguments();
+    public Optional<ASTTerm> getRHS(ASTConstant function, List<ASTTerm> terms) {
+        // the function must isa_constr, isa_int or argof_constr and it has only one argument
+        if (!isSignatureMatching(function, terms)) {
+            return Optional.empty();
+        }
 
-            if (constr instanceof ASTConstant) {
-                ASTConstant constrConstant = (ASTConstant) constr;
+        ASTTerm constructorTerm = terms.get(0).getLMOMTerm();
+        List<ASTTerm> args = terms.get(0).getLMOMArguments();
 
-                if (constant.getValue() instanceof IsA) {
-                    // it's isa
-                    IsA op = (IsA) constant.getValue();
-                    // we only need to reduce it to true or false if the value is actually already reduced
-                    if (op.getValue().getClass().isAssignableFrom(constrConstant.getValue().getClass())) {
-                        // check if the constructors match
-                        if (op.getValue().equals(constrConstant.getValue())) {
-                            return Optional.of(new ASTConstant(true));
-                        } else {
-                            return Optional.of(new ASTConstant(false));
-                        }
-                    }
+        // check if the argument is a constructor
+        if (!(constructorTerm instanceof ASTConstant)) {
+            return Optional.empty();
+        }
+
+        ASTConstant constructor = (ASTConstant) constructorTerm;
+
+        // now we check if the function is IsA or Argof
+        if (function.getValue() instanceof IsA) {
+            // it's isa
+            IsA isaFunction = (IsA) function.getValue();
+
+            // we can only reduce it to true or false if the constructor classes match our isa_constructor
+            if (constructor.getValue().getClass().isInstance(isaFunction.getValue())) {
+                // now we can check if the constructor values actually match
+                if (constructor.getValue().equals(isaFunction.getValue())) {
+                    return Optional.of(new ASTConstant(true));
+                } else {
+                    return Optional.of(new ASTConstant(false));
                 }
-                else if (constant.getValue() instanceof ArgOf) {
-                    // it's argof
-                    ArgOf op = (ArgOf) constant.getValue();
+            }
+        }
+        else if (function.getValue() instanceof ArgOf) {
+            // it's argof
+            ArgOf argofFunction = (ArgOf) function.getValue();
 
-                    // check if the constructors match
-                    if (op.getConstr().equals(constrConstant.getValue())) {
-
-                        if (args.size() == 1) {
-                            // there are no 1-sized tuples
-                            return Optional.of(args.get(0));
-                        }
-                        else {
-                            int n = args.size();
-                            // return a tuple with the arguments
-                            ASTTerm tuple = new ASTConstant(TupleReduction.getTupleConstructor(n));
-                            for (ASTTerm t : args) {
-                                tuple = new ASTApplication(tuple, t);
-                            }
-                            return Optional.of(tuple);
-                        }
+            // check if the constructors match
+            if (constructor.getValue().equals(argofFunction.getConstr())) {
+                if (args.size() == 1) {
+                    // there are no 1-sized tuples
+                    return Optional.of(args.get(0));
+                }
+                else {
+                    int n = args.size();
+                    // return a tuple with the arguments
+                    ASTTerm tuple = new ASTConstant(TupleReduction.getTupleConstructor(n));
+                    for (ASTTerm t : args) {
+                        tuple = new ASTApplication(tuple, t);
                     }
+                    return Optional.of(tuple);
                 }
             }
         }

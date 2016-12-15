@@ -21,11 +21,11 @@ public class WHNOReducerTest {
      */
     public static ASTTerm getFactFunction() {
         ASTVariable x = new ASTVariable("x");
-        ASTConstant times = new ASTConstant(ArithmeticReduction.Operator.TIMES);
-        ASTConstant minus = new ASTConstant(ArithmeticReduction.Operator.MINUS);
-        ASTConstant lesseq = new ASTConstant(ArithmeticReduction.Operator.LESSEQ);
-        ASTConstant fix = new ASTConstant(FixReduction.Operator.FIX);
-        ASTConstant _if = new ASTConstant(BranchReduction.Operator.IF);
+        ASTConstant times = new ASTConstant(PredefinedFunction.TIMES);
+        ASTConstant minus = new ASTConstant(PredefinedFunction.MINUS);
+        ASTConstant lesseq = new ASTConstant(PredefinedFunction.LESSEQ);
+        ASTConstant fix = new ASTConstant(PredefinedFunction.FIX);
+        ASTConstant _if = new ASTConstant(PredefinedFunction.IF);
 
         // fact x = if x <= 0 then 1 else fact(x-1)
         ASTTerm decrementX = new ASTApplication(new ASTApplication(minus, x), new ASTConstant(1));
@@ -48,7 +48,7 @@ public class WHNOReducerTest {
         reducer = new WHNOReducer();
         x = new ASTVariable("x");
         y = new ASTVariable("y");
-        plus = new ASTConstant(ArithmeticReduction.Operator.PLUS);
+        plus = new ASTConstant(PredefinedFunction.PLUS);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class WHNOReducerTest {
         ASTTerm plus40X = new ASTApplication(new ASTApplication(plus, new ASTConstant(40.5f)), x);
         ASTTerm add40 = new ASTAbstraction(x, plus40X);
 
-        ASTTerm timesYY = new ASTApplication(new ASTApplication(new ASTConstant(ArithmeticReduction.Operator.TIMES), y), y);
+        ASTTerm timesYY = new ASTApplication(new ASTApplication(new ASTConstant(PredefinedFunction.TIMES), y), y);
         ASTTerm square = new ASTAbstraction(y, timesYY);
 
         ASTTerm square3 = new ASTApplication(square, new ASTConstant(3.0f));

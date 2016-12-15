@@ -9,7 +9,6 @@ import lambda.ast.ASTTerm;
 import lambda.reduction.WHNOReducer;
 import lambda.reduction.WHNOReducerTest;
 import lambda.reduction.delta.*;
-import lambda.reduction.delta.BotReduction.Operator;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -32,9 +31,9 @@ public class SimpleToLambdaTest {
         reducer = new WHNOReducer();
         reducer = new WHNOReducer();
         x = new ASTVariable("x");
-        times = new ASTConstant(ArithmeticReduction.Operator.TIMES);
-        minus = new ASTConstant(ArithmeticReduction.Operator.MINUS);
-        lesseq = new ASTConstant(ArithmeticReduction.Operator.LESSEQ);
+        times = new ASTConstant(PredefinedFunction.TIMES);
+        minus = new ASTConstant(PredefinedFunction.MINUS);
+        lesseq = new ASTConstant(PredefinedFunction.LESSEQ);
         list = new ConstructorReduction.Constructor("List");
         tree = new ConstructorReduction.Constructor("Tree");
     }
@@ -133,7 +132,7 @@ public class SimpleToLambdaTest {
     public void testIsaConstr() {
         // isa_List ((Tree BOT) 5)
         ASTExpression constr = new ASTApplication(
-                new ASTApplication(new ASTConstant(tree), new ASTConstant(Operator.BOT)),
+                new ASTApplication(new ASTConstant(tree), new ASTConstant(PredefinedFunction.BOT)),
                 new ASTConstant(5));
         ASTExpression program = new ASTApplication(new ASTConstant(ConstructorReduction.getIsaOperator(list)), constr);
 
@@ -144,7 +143,7 @@ public class SimpleToLambdaTest {
         // in lambda terms: isa_List ((Tree BOT) 5)
         lambda.ast.ASTApplication lambdaConstr = new lambda.ast.ASTApplication(
                 new lambda.ast.ASTApplication(new lambda.ast.ASTConstant(tree),
-                        new lambda.ast.ASTConstant(Operator.BOT)),
+                        new lambda.ast.ASTConstant(PredefinedFunction.BOT)),
                 new lambda.ast.ASTConstant(5));
         lambda.ast.ASTApplication lambdaIsaConstr = new lambda.ast.ASTApplication(
                 new lambda.ast.ASTConstant(ConstructorReduction.getIsaOperator(list)),
@@ -162,7 +161,7 @@ public class SimpleToLambdaTest {
     public void testArgofConstr() {
         // argof_Tree ((Tree BOT) 5)
         ASTExpression constr = new ASTApplication(
-                new ASTApplication(new ASTConstant(tree), new ASTConstant(Operator.BOT)),
+                new ASTApplication(new ASTConstant(tree), new ASTConstant(PredefinedFunction.BOT)),
                 new ASTConstant(5));
         ASTExpression program = new ASTApplication(new ASTConstant(ConstructorReduction.getArgOfOperator(tree)), constr);
 
@@ -173,7 +172,7 @@ public class SimpleToLambdaTest {
         // in lambda terms: argof_Tree ((Tree BOT) 5)
         lambda.ast.ASTApplication lambdaConstr = new lambda.ast.ASTApplication(
                 new lambda.ast.ASTApplication(new lambda.ast.ASTConstant(tree),
-                        new lambda.ast.ASTConstant(Operator.BOT)),
+                        new lambda.ast.ASTConstant(PredefinedFunction.BOT)),
                 new lambda.ast.ASTConstant(5));
         lambda.ast.ASTApplication lambdaIsaConstr = new lambda.ast.ASTApplication(
                 new lambda.ast.ASTConstant(ConstructorReduction.getArgOfOperator(tree)),
@@ -188,7 +187,7 @@ public class SimpleToLambdaTest {
         ASTTerm bot5Tuple = new lambda.ast.ASTApplication(
                 new lambda.ast.ASTApplication(
                         new lambda.ast.ASTConstant(TupleReduction.getTupleConstructor(2)),
-                        new lambda.ast.ASTConstant(Operator.BOT)),
+                        new lambda.ast.ASTConstant(PredefinedFunction.BOT)),
                 new lambda.ast.ASTConstant(5));
         assertEquals(reducedResult, bot5Tuple);
     }

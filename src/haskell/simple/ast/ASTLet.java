@@ -3,6 +3,7 @@ package haskell.simple.ast;
 
 import lambda.ast.ASTTerm;
 import lambda.reduction.delta.FixReduction;
+import lambda.reduction.delta.PredefinedFunction;
 
 /**
  * Represents a simple haskell let definition.
@@ -80,7 +81,7 @@ public class ASTLet extends ASTExpression {
         lambda.ast.ASTTerm basis = target.toLambdaTerm();
         lambda.ast.ASTVariable variable = (lambda.ast.ASTVariable) var.toLambdaTerm();
         lambda.ast.ASTTerm func = new lambda.ast.ASTAbstraction(variable, expr.toLambdaTerm());
-        lambda.ast.ASTTerm replacement = new lambda.ast.ASTApplication(new lambda.ast.ASTConstant(FixReduction.Operator.FIX), func);
+        lambda.ast.ASTTerm replacement = new lambda.ast.ASTApplication(new lambda.ast.ASTConstant(PredefinedFunction.FIX), func);
         return basis.substitute(variable, replacement);
     }
 }

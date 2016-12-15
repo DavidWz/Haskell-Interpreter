@@ -11,10 +11,6 @@ import java.util.Optional;
  * Represents the fixpoint operator.
  */
 public class FixReduction extends DeltaReduction {
-    public enum Operator {
-        FIX
-    }
-
     @Override
     public int getNumberOfArguments() {
         return 1;
@@ -22,7 +18,7 @@ public class FixReduction extends DeltaReduction {
 
     @Override
     public boolean isConstantMatching(ASTConstant c) {
-        return (c.getValue().equals(Operator.FIX));
+        return (c.getValue().equals(PredefinedFunction.FIX));
     }
 
     @Override
@@ -31,7 +27,7 @@ public class FixReduction extends DeltaReduction {
         if (isSignatureMatching(constant, terms)) {
             ASTTerm t = terms.get(0);
             // fix t -> t (fix t)
-            ASTApplication fix = new ASTApplication(t, new ASTApplication(new ASTConstant(Operator.FIX), t));
+            ASTApplication fix = new ASTApplication(t, new ASTApplication(new ASTConstant(PredefinedFunction.FIX), t));
             return Optional.of(fix);
         }
         else {
