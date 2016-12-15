@@ -12,6 +12,7 @@ import lambda.reduction.WHNOReducer;
  */
 public class HaskellInterpreter {
     private haskell.complex.ast.ASTProgram program;
+    private ComplexToSimpleReducer complexToSimpleReducer;
     private WHNOReducer whnoReducer;
 
     /**
@@ -21,6 +22,7 @@ public class HaskellInterpreter {
     public HaskellInterpreter(ASTProgram initialProgram) {
         assert(initialProgram != null);
         this.program = initialProgram;
+        this.complexToSimpleReducer = new ComplexToSimpleReducer();
         this.whnoReducer = new WHNOReducer();
     }
 
@@ -29,6 +31,7 @@ public class HaskellInterpreter {
      */
     public HaskellInterpreter() {
         this.program = new ASTProgram();
+        this.complexToSimpleReducer = new ComplexToSimpleReducer();
         this.whnoReducer = new WHNOReducer();
     }
 
@@ -71,8 +74,7 @@ public class HaskellInterpreter {
         }
 
         // 1. reduce complex haskell expression to simple haskell expression
-        ComplexToSimpleReducer complexToSimpleReducer = new ComplexToSimpleReducer(letProgInExpr);
-        haskell.simple.ast.ASTExpression simpleExpr = complexToSimpleReducer.reduceToSimple();
+        haskell.simple.ast.ASTExpression simpleExpr = complexToSimpleReducer.reduceToSimple(letProgInExpr);
         if (verbose) {
             System.out.println("\n-- In simple haskell, the expression looks like this: ");
             System.out.println(simpleExpr);

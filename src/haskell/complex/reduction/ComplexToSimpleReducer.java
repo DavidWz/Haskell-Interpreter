@@ -6,22 +6,14 @@ import java.util.*;
 
 /**
  * A class which can reduce complex haskell to simple haskell.
- * Note: The following functions are predefined, so you cannot overwrite them.
- * match and all functions defined in the delta rules
+ * For predefined functions, refer to @see PredefinedFunction enum.
  */
 public class ComplexToSimpleReducer {
-    private ASTExpression expression;
     private List<ComplexHaskellTransformation> basicTransformations;
     private FunDeclToPatDecl funDeclToPatDecl;
     private SeparateAndNestDecls separateAndNestDecls;
 
-    public ComplexToSimpleReducer(ASTExpression expression) {
-        assert(expression != null);
-        this.expression = expression;
-
-        // we need to init the variable manager so that it knows all variables of this expression
-        VariableManager.init(expression);
-
+    public ComplexToSimpleReducer() {
         // set up all basicTransformations
         basicTransformations = new ArrayList<>();
         basicTransformations.add(new NestMultipleLambdas());
@@ -37,25 +29,28 @@ public class ComplexToSimpleReducer {
      * @return an equivalent simple haskell expression
      * @throws TooComplexException
      */
-    public haskell.simple.ast.ASTExpression reduceToSimple() throws TooComplexException {
+    public haskell.simple.ast.ASTExpression reduceToSimple(ASTExpression expression) throws TooComplexException {
+        // we need to init the variable manager so that it knows all variables of this expression
+        VariableManager.init(expression);
+
         // first we must transform multiple function declarations for the same function to single declarations
-        applyFuncDeclToPatDecl();
+        applyFuncDeclToPatDecl(expression);
 
         // then we apply basic transformation rules as long as possible
-        applyBasicTransformationRules();
+        applyBasicTransformationRules(expression);
 
         // after this, we split the declarations according to entaglement
         // and then nest them in multiple let expressions
         separateAndNestDecls.visit(expression);
 
         // then we again apply basic transformation rules as long as possible
-        applyBasicTransformationRules();
+        applyBasicTransformationRules(expression);
 
         // after this, the complex haskell expression should be in simple haskell form
         return expression.castToSimple();
     }
 
-    private void applyFuncDeclToPatDecl() {
+    private void applyFuncDeclToPatDecl(ASTExpression expression) {
         boolean transformed;
 
         // apply the function declaration to pattern declaration rule as long as it still changes something
@@ -68,7 +63,7 @@ public class ComplexToSimpleReducer {
         } while(transformed);
     }
 
-    private void applyBasicTransformationRules() {
+    private void applyBasicTransformationRules(ASTExpression expression) {
         boolean transformed;
 
         // apply rules as long as they still change something
