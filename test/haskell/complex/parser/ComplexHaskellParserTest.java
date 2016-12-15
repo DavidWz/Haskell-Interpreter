@@ -55,6 +55,26 @@ public class ComplexHaskellParserTest {
     }
 
     @Test
+    public void testFloats() {
+        String expressionCode = "(plus -6.6 +1.0)";
+
+        Optional<ASTExpression> eval = generator.parseExpression(new ANTLRInputStream(expressionCode));
+        assertTrue(eval.isPresent());
+
+        System.out.print("eval["+eval.get()+"] = ");
+
+        HaskellInterpreter interpreter = new HaskellInterpreter();
+        try {
+            ASTTerm result = interpreter.evaluate(eval.get());
+            System.out.println(result);
+
+            assertEquals(result, new ASTConstant(-5.6f));
+        } catch (TooComplexException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
     public void testFunctionDeclarations() {
         String programCode = "fact 0 = 1\n" +
                 "fact x = (times x (fact (decr x))) \n" +

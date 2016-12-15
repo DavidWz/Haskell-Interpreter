@@ -87,7 +87,54 @@ public class ArithmeticReduction extends DeltaReduction {
                         result = n0 != n1;
                         break;
                     case POW:
-                        result = Math.pow(n0, n1);
+                        result = (int) Math.pow(n0, n1);
+                        break;
+                    default:
+                        return Optional.empty();
+                }
+
+                return Optional.of(new ASTConstant(result));
+            }
+            // or both constants must be floats
+            else if (c0.getValue() instanceof Float && c1.getValue() instanceof Float) {
+                float n0 = (float) c0.getValue();
+                float n1 = (float) c1.getValue();
+
+                // now we calculate the result
+                Object result;
+                switch (op) {
+                    case PLUS:
+                        result = n0 + n1;
+                        break;
+                    case MINUS:
+                        result = n0 - n1;
+                        break;
+                    case TIMES:
+                        result = n0 * n1;
+                        break;
+                    case DIVIDED:
+                        result = n0 / n1;
+                        break;
+                    case LESS:
+                        result = n0 < n1;
+                        break;
+                    case GREATER:
+                        result = n0 > n1;
+                        break;
+                    case LESSEQ:
+                        result = n0 <= n1;
+                        break;
+                    case GREATEREQ:
+                        result = n0 >= n1;
+                        break;
+                    case EQUAL:
+                        result = n0 == n1;
+                        break;
+                    case INEQUAL:
+                        result = n0 != n1;
+                        break;
+                    case POW:
+                        result = (float) Math.pow(n0, n1);
                         break;
                     default:
                         return Optional.empty();

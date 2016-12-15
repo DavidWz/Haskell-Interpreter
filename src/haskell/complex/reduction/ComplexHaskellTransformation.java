@@ -44,6 +44,10 @@ public interface ComplexHaskellTransformation {
         return false;
     }
 
+    default boolean visit(ASTChar node) {
+        return false;
+    }
+
     default boolean visit(ASTConstruct node) {
         return false;
     }
@@ -54,6 +58,10 @@ public interface ComplexHaskellTransformation {
                 return true;
             }
         }
+        return false;
+    }
+
+    default boolean visit(ASTFloat node) {
         return false;
     }
 
@@ -133,8 +141,14 @@ public interface ComplexHaskellTransformation {
         else if (node instanceof ASTCase) {
             return visit((ASTCase) node);
         }
+        else if (node instanceof ASTChar) {
+            return visit((ASTChar) node);
+        }
         else if (node instanceof ASTExpTuple) {
             return visit((ASTExpTuple) node);
+        }
+        else if (node instanceof ASTFloat) {
+            return visit((ASTFloat) node);
         }
         else if (node instanceof ASTInteger) {
             return visit((ASTInteger) node);
@@ -161,8 +175,14 @@ public interface ComplexHaskellTransformation {
         if (node instanceof ASTBoolean) {
             return visit((ASTBoolean) node);
         }
+        else if (node instanceof ASTChar) {
+            return visit((ASTChar) node);
+        }
         else if (node instanceof ASTConstruct) {
             return visit((ASTConstruct) node);
+        }
+        else if (node instanceof ASTFloat) {
+            return visit((ASTFloat) node);
         }
         else if (node instanceof ASTInteger) {
             return visit((ASTInteger) node);

@@ -176,6 +176,14 @@ public class ASTGenerator implements ANTLRErrorListener {
                 String intId = ctx.integer().getText();
                 int n = Integer.parseInt(intId);
                 return new ASTInteger(n);
+            } else if (ctx.floating() != null) {
+                String floatId = ctx.floating().getText();
+                float f = Float.parseFloat(floatId);
+                return new ASTFloat(f);
+            } else if (ctx.character() != null) {
+                String charId = ctx.character().getText();
+                char c = charId.charAt(1);
+                return new ASTChar(c);
             } else if (ctx.bool() != null) {
                 String bool = ctx.bool().getText();
                 boolean b = bool.equals("True");
@@ -231,6 +239,14 @@ public class ASTGenerator implements ANTLRErrorListener {
                 String intId = ctx.integer().getText();
                 int n = Integer.parseInt(intId);
                 return new ASTInteger(n);
+            } else if (ctx.floating() != null) {
+                String floatId = ctx.floating().getText();
+                float f = Float.parseFloat(floatId);
+                return new ASTFloat(f);
+            } else if (ctx.character() != null) {
+                String charId = ctx.character().getText();
+                char c = charId.charAt(1);
+                return new ASTChar(c);
             } else if (ctx.bool() != null) {
                 String bool = ctx.bool().getText();
                 boolean b = bool.equals("True");

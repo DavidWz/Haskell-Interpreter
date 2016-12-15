@@ -106,6 +106,14 @@ public class VariableManager {
         return new ASTVariable("isa_int_"+value);
     }
 
+    public static ASTVariable getIsaFloatFunc(float value) {
+        return new ASTVariable("isa_float_"+value);
+    }
+
+    public static ASTVariable getIsaCharFunc(char value) {
+        return new ASTVariable("isa_char_"+value);
+    }
+
     public static ASTVariable getIsaBoolFunc(boolean value) {
         return new ASTVariable("isa_bool_"+value);
     }

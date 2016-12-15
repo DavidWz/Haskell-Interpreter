@@ -10,8 +10,8 @@ decls : '{' decl (';' decl)* '}' | '{' '}';
 fundecl : var pat+ '=' exp;
 patdecl : pat '=' exp;
 
-exp : var | tyconstr |         integer | bool | expTuple | application | branch | let | cases | lambda;
-pat : var | tyconstr | joker | integer | bool | patTuple | construct;
+exp : var | tyconstr |         integer | bool | floating | character | expTuple | application | branch | let | cases | lambda;
+pat : var | tyconstr | joker | integer | bool | floating | character | patTuple | construct;
 
 expTuple : '(' exp (',' exp)* ')';
 patTuple : '(' pat (',' pat)* ')';
@@ -27,15 +27,19 @@ var : VARID;
 tyconstr : TYCONSTRID;
 integer : INT;
 bool : 'True' | 'False';
+floating : FLOAT;
+character : CHAR;
 joker : JOKER;
 
 
 fragment LOWER_CASE : 'a'..'z' ;
 fragment UPPER_CASE : 'A'..'Z' ;
 fragment DIGIT : '0'..'9' ;
+CHAR : '\'' . '\'';
 VARID : LOWER_CASE (LOWER_CASE | UPPER_CASE | DIGIT)*;
 TYCONSTRID : UPPER_CASE (LOWER_CASE | UPPER_CASE | DIGIT)*;
-INT : '-'?DIGIT+;
+INT : ('+'|'-')?DIGIT+;
+FLOAT : ('+'|'-')? DIGIT+ '.' DIGIT+;
 JOKER : '_';
 
 WS: [ \n\t\r]+ -> skip;

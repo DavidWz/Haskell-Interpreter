@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Represents the isa_constr and argof_constr delta rules.
+ * Represents the isa and argof delta rules.
  */
 public class ConstructorReduction extends DeltaReduction {
     /**
@@ -50,18 +50,18 @@ public class ConstructorReduction extends DeltaReduction {
     }
 
     /**
-     * Represents the isa_constr function
+     * Represents the isa_ function.
      */
-    public static class IsAConstr {
-        private Constructor constr;
+    public static class IsA<T> {
+        private T value;
 
-        public IsAConstr(Constructor constr) {
-            assert(constr != null);
-            this.constr = constr;
+        public IsA(T value) {
+            assert(value != null);
+            this.value = value;
         }
 
-        public Constructor getConstr() {
-            return constr;
+        public T getValue() {
+            return value;
         }
 
         @Override
@@ -69,92 +69,20 @@ public class ConstructorReduction extends DeltaReduction {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            IsAConstr isAConstr = (IsAConstr) o;
+            IsA<?> isa = (IsA<?>) o;
 
-            return getConstr().equals(isAConstr.getConstr());
-
-        }
-
-        @Override
-        public int hashCode() {
-            return getConstr().hashCode();
-        }
-
-        @Override
-        public String toString() {
-            return "isa_constr_" + constr;
-        }
-    }
-
-    /**
-     * Represents the isa_int function
-     */
-    public static class IsAInt {
-        private int n;
-
-        public IsAInt(int n) {
-            this.n = n;
-        }
-
-        public int getInt() {
-            return n;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            IsAInt isAInt = (IsAInt) o;
-
-            return n == isAInt.n;
+            return getValue().equals(isa.getValue());
 
         }
 
         @Override
         public int hashCode() {
-            return n;
+            return getValue().hashCode();
         }
 
         @Override
         public String toString() {
-            return "isa_int_" + n;
-        }
-    }
-
-    /**
-     * Represents the isa_bool function
-     */
-    public static class IsABool {
-        private boolean b;
-
-        public IsABool(boolean b) {
-            this.b = b;
-        }
-
-        public boolean getBool() {
-            return b;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            IsABool isABool = (IsABool) o;
-
-            return b == isABool.b;
-
-        }
-
-        @Override
-        public int hashCode() {
-            return (b ? 1 : 0);
-        }
-
-        @Override
-        public String toString() {
-            return "isa_bool_" + b;
+            return "isa_" + value;
         }
     }
 
@@ -201,16 +129,8 @@ public class ConstructorReduction extends DeltaReduction {
         return new Constructor(name);
     }
 
-    public static IsAConstr getIsaOperator(Constructor constr) {
-        return new IsAConstr(constr);
-    }
-
-    private static IsAInt getIsaIntOperator(int n) {
-        return new IsAInt(n);
-    }
-
-    private static IsABool getIsaBoolOperator(boolean b) {
-        return new IsABool(b);
+    public static <T> IsA<T> getIsaOperator(T constr) {
+        return new IsA<>(constr);
     }
 
     public static ArgOf getArgOfOperator(Constructor constr) {
@@ -224,9 +144,7 @@ public class ConstructorReduction extends DeltaReduction {
 
     @Override
     public boolean isConstantMatching(ASTConstant c) {
-        boolean isIsa = c.getValue() instanceof IsAConstr ||
-                        c.getValue() instanceof IsAInt ||
-                        c.getValue() instanceof IsABool;
+        boolean isIsa = c.getValue() instanceof IsA;
         boolean isArgOf = c.getValue() instanceof ArgOf;
         return (isIsa || isArgOf);
     }
@@ -243,75 +161,38 @@ public class ConstructorReduction extends DeltaReduction {
             if (constr instanceof ASTConstant) {
                 ASTConstant constrConstant = (ASTConstant) constr;
 
-                if (constrConstant.getValue() instanceof Constructor) {
-                    // it's a constructor, so reduce it according to the operator
-
-                    if (constant.getValue() instanceof IsAConstr) {
-                        // it's isa
-                        IsAConstr op = (IsAConstr) constant.getValue();
-
+                if (constant.getValue() instanceof IsA) {
+                    // it's isa
+                    IsA op = (IsA) constant.getValue();
+                    // we only need to reduce it to true or false if the value is actually already reduced
+                    if (op.getValue().getClass().isAssignableFrom(constrConstant.getValue().getClass())) {
                         // check if the constructors match
-                        if (op.getConstr().equals(constrConstant.getValue())) {
+                        if (op.getValue().equals(constrConstant.getValue())) {
                             return Optional.of(new ASTConstant(true));
-                        }
-                        else {
-                            return Optional.of(new ASTConstant(false));
-                        }
-                    }
-                    else {
-                        // it's argof
-                        ArgOf op = (ArgOf) constant.getValue();
-
-                        // check if the constructors match
-                        if (op.getConstr().equals(constrConstant.getValue())) {
-
-                            if (args.size() == 1) {
-                                // there are no 1-sized tuples
-                                return Optional.of(args.get(0));
-                            }
-                            else {
-                                int n = args.size();
-                                // return a tuple with the arguments
-                                ASTTerm tuple = new ASTConstant(TupleReduction.getTupleConstructor(n));
-                                for (ASTTerm t : args) {
-                                    tuple = new ASTApplication(tuple, t);
-                                }
-                                return Optional.of(tuple);
-                            }
-                        }
-                    }
-                }
-                else if (constrConstant.getValue() instanceof Integer) {
-                    // it's an integer, so try to reduce it with isa_int_ delta rules
-
-                    if (constant.getValue() instanceof IsAInt) {
-                        // it's isa_int
-                        IsAInt op = (IsAInt) constant.getValue();
-                        int val = (int) constrConstant.getValue();
-
-                        // check if the constructors match
-                        if (val == op.getInt()) {
-                            return Optional.of(new ASTConstant(true));
-                        }
-                        else {
+                        } else {
                             return Optional.of(new ASTConstant(false));
                         }
                     }
                 }
-                else if (constrConstant.getValue() instanceof Boolean) {
-                    // it's a boolean, so try to reduce it with isa_bool_ delta rules
+                else if (constant.getValue() instanceof ArgOf) {
+                    // it's argof
+                    ArgOf op = (ArgOf) constant.getValue();
 
-                    if (constant.getValue() instanceof IsABool) {
-                        // it's isa_bool
-                        IsABool op = (IsABool) constant.getValue();
-                        boolean val = (boolean) constrConstant.getValue();
+                    // check if the constructors match
+                    if (op.getConstr().equals(constrConstant.getValue())) {
 
-                        // check if the constructors match
-                        if (val == op.getBool()) {
-                            return Optional.of(new ASTConstant(true));
+                        if (args.size() == 1) {
+                            // there are no 1-sized tuples
+                            return Optional.of(args.get(0));
                         }
                         else {
-                            return Optional.of(new ASTConstant(false));
+                            int n = args.size();
+                            // return a tuple with the arguments
+                            ASTTerm tuple = new ASTConstant(TupleReduction.getTupleConstructor(n));
+                            for (ASTTerm t : args) {
+                                tuple = new ASTApplication(tuple, t);
+                            }
+                            return Optional.of(tuple);
                         }
                     }
                 }
@@ -329,12 +210,22 @@ public class ConstructorReduction extends DeltaReduction {
         else if (name.startsWith("isa_int_")) {
             String val = name.substring(8);
             int n = Integer.parseInt(val);
-            return Optional.of(new ASTConstant(getIsaIntOperator(n)));
+            return Optional.of(new ASTConstant(getIsaOperator(n)));
+        }
+        else if (name.startsWith("isa_char_")) {
+            String val = name.substring(9);
+            char c = val.charAt(0);
+            return Optional.of(new ASTConstant(getIsaOperator(c)));
+        }
+        else if (name.startsWith("isa_float_")) {
+            String val = name.substring(10);
+            float f = Float.parseFloat(val);
+            return Optional.of(new ASTConstant(getIsaOperator(f)));
         }
         else if (name.startsWith("isa_bool_")) {
             String val = name.substring(9);
             boolean b = Boolean.parseBoolean(val);
-            return Optional.of(new ASTConstant(getIsaBoolOperator(b)));
+            return Optional.of(new ASTConstant(getIsaOperator(b)));
         }
         else if (name.startsWith("argof_")) {
             String constrName = name.substring(6);

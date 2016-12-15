@@ -148,7 +148,7 @@ public class HaskellInterpreterTest {
         }
         System.out.println(result);
 
-        assertEquals(result, expectedResult);
+        assertEquals(expectedResult, result);
     }
 
     @Test
