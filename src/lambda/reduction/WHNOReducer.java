@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class WHNOReducer implements LambdaTransformation {
     private List<LambdaTransformation> transformations;
-    private Map<ASTTerm, ASTTerm> reductionResults;
+    private LazyReduction lazyReduction;
 
     /**
      * This standard constructor creates a WHNO reducer with standard beta and delta rules.
@@ -30,14 +30,15 @@ public class WHNOReducer implements LambdaTransformation {
         transformations.add(new TupleReduction());
         transformations.add(new ConstructorReduction());
 
-        reductionResults = new HashMap<>();
+        lazyReduction = new LazyReduction();
     }
 
     @Override
     public Optional<ASTTerm> visit(ASTApplication node) {
         // lazy evaluation: try to look up the result of this application from previous reductions
-        if (reductionResults.containsKey(node)) {
-            return Optional.of(reductionResults.get(node));
+        Optional<ASTTerm> previousResult = lazyReduction.visit(node);
+        if (previousResult.isPresent()) {
+            return previousResult;
         }
 
         // first, try to do apply a reduction on this term
@@ -46,7 +47,7 @@ public class WHNOReducer implements LambdaTransformation {
             reduced = transformation.visit(node);
             if (reduced.isPresent()) {
                 // remember the result of this reduction
-                reductionResults.put(node, reduced.get());
+                lazyReduction.rememberResult(node, reduced.get());
                 // and return it, of course
                 return reduced;
             }
@@ -56,14 +57,14 @@ public class WHNOReducer implements LambdaTransformation {
         Optional<ASTTerm> result = visit(node.getLeft());
         if (result.isPresent()) {
             ASTApplication reducedApplication = new ASTApplication(result.get(), node.getRight());
-            reductionResults.put(node, reducedApplication);
+            lazyReduction.rememberResult(node, reducedApplication);
             return Optional.of(reducedApplication);
         }
         else {
             result = visit(node.getRight());
             if (result.isPresent()) {
                 ASTApplication reducedApplication = new ASTApplication(node.getLeft(), result.get());
-                reductionResults.put(node, reducedApplication);
+                lazyReduction.rememberResult(node, reducedApplication);
                 return Optional.of(reducedApplication);
             }
             else {
@@ -87,7 +88,7 @@ public class WHNOReducer implements LambdaTransformation {
         Optional<ASTTerm> result = visit(term);
         while(result.isPresent()) {
             whnf = result.get();
-            reductionResults.put(term, whnf);
+            lazyReduction.rememberResult(term, whnf);
 
             if (verbose) {
                 System.out.println(" => " + result.get());

@@ -47,7 +47,6 @@ public class ASTAbstraction extends ASTTerm {
 
         if (!getInput().equals(that.getInput())) return false;
         return getOutput().equals(that.getOutput());
-
     }
 
     @Override
@@ -100,14 +99,7 @@ public class ASTAbstraction extends ASTTerm {
                 // the new variable name must not be within the following set:
                 freeVars.addAll(output.getFreeVars());
 
-                // we simply add an index to the input variable
-                int index = 0;
-                ASTVariable renamedVar = new ASTVariable(input.getName() + index);
-                // we need to make sure the index is not also a free variable
-                while (freeVars.contains(renamedVar)) {
-                    index++;
-                    renamedVar.setName(input.getName() + index);
-                }
+                ASTVariable renamedVar = getFreshVariable(freeVars);
 
                 // now replace the old input variable name by the new one
                 ASTTerm renamedOutput = output.substitute(input, renamedVar);
@@ -115,5 +107,23 @@ public class ASTAbstraction extends ASTTerm {
                 return new ASTAbstraction(renamedVar, renamedOutput.substitute(var, expr));
             }
         }
+    }
+
+    /**
+     * Returns a fresh variable which does not occur in the specified set.
+     * @param vars set of excluded variables
+     * @return
+     */
+    private ASTVariable getFreshVariable(Set<ASTVariable> vars) {
+        // we simply add an index to the input variable
+        int index = 0;
+        ASTVariable freshVar = new ASTVariable(input.getName() + index);
+        // we need to make sure the index is not also a free variable
+        while (vars.contains(freshVar)) {
+            index++;
+            freshVar.setName(input.getName() + index);
+        }
+
+        return freshVar;
     }
 }
