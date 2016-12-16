@@ -22,6 +22,10 @@ public class ASTExpTuple implements ASTExpression {
 
     @Override
     public String toString() {
+        if (exps.size() == 0) {
+            return "()";
+        }
+
         StringBuilder builder = new StringBuilder();
         builder.append("(");
         for (ASTExpression exp : exps) {

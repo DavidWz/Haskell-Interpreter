@@ -100,4 +100,16 @@ public class ComplexHaskellParserTest {
             fail(e.getMessage());
         }
     }
+
+    @Test
+    public void testDataDeclarations() {
+        String programCode = "data List a = Nil | Cons a (List a)\n" +
+                "data Point a = P (a, a)\n" +
+                "data ThreeFuncs a b = Funcs ((a -> b), (a -> b), (a -> b))";
+
+        Optional<ASTProgram> program = generator.parseProgram(new ANTLRInputStream(programCode));
+        assertTrue(program.isPresent());
+
+        System.out.println(program.get());
+    }
 }

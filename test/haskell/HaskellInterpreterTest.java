@@ -86,12 +86,12 @@ public class HaskellInterpreterTest {
 
         // len Nil = 0
         ASTVariable len = new ASTVariable("len");
-        ASTTypeConstr Nil = new ASTTypeConstr("Nil");
+        ASTTyConstr Nil = new ASTTyConstr("Nil");
         ASTFunDecl lenNil = new ASTFunDecl(new ASTInteger(0), len, new ASTConstruct(Nil));
         prog.addDeclaration(lenNil);
 
         // append z Nil = (Cons z Nil)
-        ASTTypeConstr Cons = new ASTTypeConstr("Cons");
+        ASTTyConstr Cons = new ASTTyConstr("Cons");
         ASTVariable append = new ASTVariable("append");
         ASTVariable z = new ASTVariable("z");
         ASTFunDecl appendFuncNil = new ASTFunDecl(new ASTApplication(Cons, z, Nil), append, z, new ASTConstruct(Nil));
@@ -121,6 +121,13 @@ public class HaskellInterpreterTest {
         ASTFunDecl genListX = new ASTFunDecl(new ASTApplication(Cons, x,
                 new ASTApplication(genList, new ASTApplication(decr, x))), genList, x);
         prog.addDeclaration(genListX);
+
+        // List a = Nil | Cons a (List a)
+        ASTTyConstr List = new ASTTyConstr("List");
+        ASTVariable a = new ASTVariable("a");
+        ASTConstrDecl ConsDecl = new ASTConstrDecl(Cons, a, new ASTTypeConstr(List, a));
+        ASTDataDecl listDecl = new ASTDataDecl(List, a, new ASTConstrDecl(Nil), ConsDecl);
+        prog.addDeclaration(listDecl);
 
         // create the interpreter
         interpreter = new HaskellInterpreter(prog);

@@ -2,6 +2,7 @@ package haskell.complex.ast;
 
 import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
+import haskell.simple.ast.*;
 import haskell.simple.ast.ASTExpression;
 
 import java.util.HashSet;
@@ -9,30 +10,46 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents a complex haskell tuple of patterns. (pat, ..., pat)
+ * Represents a tuple type.
  */
-public class ASTPatTuple implements ASTPattern {
-    private List<ASTPattern> pats;
+public class ASTTupleType implements ASTType {
+    private List<ASTType> types;
 
-    public ASTPatTuple(List<ASTPattern> pats) {
-        assert(pats != null);
-        this.pats = pats;
+    public ASTTupleType(List<ASTType> types) {
+        assert(types != null);
+        this.types = types;
     }
 
-    public List<ASTPattern> getPats() {
-        return pats;
+    public List<ASTType> getTypes() {
+        return types;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ASTTupleType that = (ASTTupleType) o;
+
+        return getTypes().equals(that.getTypes());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getTypes().hashCode();
     }
 
     @Override
     public String toString() {
-        if (pats.size() == 0) {
+        if (types.size() == 0) {
             return "()";
         }
 
         StringBuilder builder = new StringBuilder();
         builder.append("(");
-        for (ASTPattern pat : pats) {
-            builder.append(pat);
+        for (ASTType type : types) {
+            builder.append(type);
             builder.append(", ");
         }
         builder.deleteCharAt(builder.length()-1);
@@ -42,26 +59,10 @@ public class ASTPatTuple implements ASTPattern {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ASTPatTuple that = (ASTPatTuple) o;
-
-        return getPats().equals(that.getPats());
-
-    }
-
-    @Override
-    public int hashCode() {
-        return getPats().hashCode();
-    }
-
-    @Override
     public Set<ASTVariable> getAllVariables() {
         Set<ASTVariable> vars = new HashSet<>();
-        for (ASTPattern pat : pats) {
-            vars.addAll(pat.getAllVariables());
+        for (ASTType type : types) {
+            vars.addAll(type.getAllVariables());
         }
         return vars;
     }
@@ -69,15 +70,15 @@ public class ASTPatTuple implements ASTPattern {
     @Override
     public Set<ASTVariable> getFreeVars() {
         Set<ASTVariable> vars = new HashSet<>();
-        for (ASTPattern pat : pats) {
-            vars.addAll(pat.getFreeVars());
+        for (ASTType type : types) {
+            vars.addAll(type.getFreeVars());
         }
         return vars;
     }
 
     @Override
     public ASTExpression castToSimple() throws TooComplexException {
-        throw new TooComplexException(this, "Pattern tuples are not part of simple haskell.");
+        throw new TooComplexException(this, "Types are not part of simple haskell.");
     }
 
     @Override

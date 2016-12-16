@@ -124,6 +124,9 @@ public class ASTGenerator implements ANTLRErrorListener {
             } else if (ctx.patdecl() != null) {
                 PatDeclVisitor patDeclVisitor = new PatDeclVisitor();
                 return ctx.patdecl().accept(patDeclVisitor);
+            } else if (ctx.datadecl() != null) {
+                DataDeclVisitor dataDeclVisitor = new DataDeclVisitor();
+                return ctx.datadecl().accept(dataDeclVisitor);
             } else {
                 throw new RuntimeException();
             }
@@ -169,7 +172,7 @@ public class ASTGenerator implements ANTLRErrorListener {
                 return new ASTVariable(varID);
             } else if (ctx.tyconstr() != null) {
                 String tyConstrID = ctx.tyconstr().getText();
-                return new ASTTypeConstr(tyConstrID);
+                return new ASTTyConstr(tyConstrID);
             } else if (ctx.joker() != null) {
                 return new ASTJoker();
             } else if (ctx.integer() != null) {
@@ -215,7 +218,7 @@ public class ASTGenerator implements ANTLRErrorListener {
         @Override
         public ASTConstruct visitConstruct(ComplexHaskellParser.ConstructContext ctx) {
             String tyConstrID = ctx.tyconstr().getText();
-            ASTTypeConstr typeConstr = new ASTTypeConstr(tyConstrID);
+            ASTTyConstr typeConstr = new ASTTyConstr(tyConstrID);
 
             PatVisitor patVisitor = new PatVisitor();
             List<ASTPattern> pats = ctx.pat().stream().
@@ -234,7 +237,7 @@ public class ASTGenerator implements ANTLRErrorListener {
                 return new ASTVariable(varID);
             } else if (ctx.tyconstr() != null) {
                 String tyConstrID = ctx.tyconstr().getText();
-                return new ASTTypeConstr(tyConstrID);
+                return new ASTTyConstr(tyConstrID);
             } else if (ctx.integer() != null) {
                 String intId = ctx.integer().getText();
                 int n = Integer.parseInt(intId);
@@ -363,6 +366,99 @@ public class ASTGenerator implements ANTLRErrorListener {
             ASTExpression exp = ctx.exp().accept(expVisitor);
 
             return new ASTLambda(pats, exp);
+        }
+    }
+
+    private static class DataDeclVisitor extends ComplexHaskellBaseVisitor<ASTDataDecl> {
+        @Override
+        public ASTDataDecl visitDatadecl(ComplexHaskellParser.DatadeclContext ctx) {
+            String tyConstrID = ctx.tyconstr().getText();
+            ASTTyConstr tyConstr =  new ASTTyConstr(tyConstrID);
+
+            List<ASTVariable> vars = ctx.var().stream().
+                    map(var -> new ASTVariable(var.getText())).
+                    collect(Collectors.toList());
+
+            ConstrDeclVisitor constrDeclVisitor = new ConstrDeclVisitor();
+            List<ASTConstrDecl> constrDecls = ctx.constrdecl().stream().
+                    map(constrDecl -> constrDecl.accept(constrDeclVisitor)).
+                    collect(Collectors.toList());
+
+            return new ASTDataDecl(tyConstr, vars, constrDecls);
+        }
+    }
+
+    private static class ConstrDeclVisitor extends ComplexHaskellBaseVisitor<ASTConstrDecl> {
+        @Override
+        public ASTConstrDecl visitConstrdecl(ComplexHaskellParser.ConstrdeclContext ctx) {
+            String tyConstrID = ctx.tyconstr().getText();
+            ASTTyConstr tyConstr =  new ASTTyConstr(tyConstrID);
+
+            TypeVisitor typeVisitor = new TypeVisitor();
+            List<ASTType> types = ctx.type().stream().
+                    map(type -> type.accept(typeVisitor)).
+                    collect(Collectors.toList());
+
+            return new ASTConstrDecl(tyConstr, types);
+        }
+    }
+
+    private static class TypeVisitor extends ComplexHaskellBaseVisitor<ASTType> {
+        @Override
+        public ASTType visitType(ComplexHaskellParser.TypeContext ctx) {
+            if (ctx.var() != null) {
+                String varID = ctx.var().getText();
+                return new ASTVariable(varID);
+            } else if (ctx.typeconstr() != null) {
+                TypeConstrVisitor typeConstrVisitor = new TypeConstrVisitor();
+                return ctx.typeconstr().accept(typeConstrVisitor);
+            } else if (ctx.functype() != null) {
+                FuncTypeVisitor funcTypeVisitor = new FuncTypeVisitor();
+                return ctx.functype().accept(funcTypeVisitor);
+            } else if (ctx.tupletype() != null) {
+                TupleTypeVisitor tupleTypeVisitor = new TupleTypeVisitor();
+                return ctx.tupletype().accept(tupleTypeVisitor);
+            } else {
+                throw new RuntimeException();
+            }
+        }
+    }
+
+    private static class TypeConstrVisitor extends ComplexHaskellBaseVisitor<ASTTypeConstr> {
+        @Override
+        public ASTTypeConstr visitTypeconstr(ComplexHaskellParser.TypeconstrContext ctx) {
+            String tyConstrID = ctx.tyconstr().getText();
+            ASTTyConstr tyConstr =  new ASTTyConstr(tyConstrID);
+
+            TypeVisitor typeVisitor = new TypeVisitor();
+            List<ASTType> types = ctx.type().stream().
+                    map(type -> type.accept(typeVisitor)).
+                    collect(Collectors.toList());
+
+            return new ASTTypeConstr(tyConstr, types);
+        }
+    }
+
+    private static class FuncTypeVisitor extends ComplexHaskellBaseVisitor<ASTFuncType> {
+        @Override
+        public ASTFuncType visitFunctype(ComplexHaskellParser.FunctypeContext ctx) {
+            TypeVisitor typeVisitor = new TypeVisitor();
+
+            ASTType type1 = ctx.type(0).accept(typeVisitor);
+            ASTType type2 = ctx.type(1).accept(typeVisitor);
+
+            return new ASTFuncType(type1, type2);
+        }
+    }
+
+    private static class TupleTypeVisitor extends ComplexHaskellBaseVisitor<ASTTupleType> {
+        @Override
+        public ASTTupleType visitTupletype(ComplexHaskellParser.TupletypeContext ctx) {
+            TypeVisitor typeVisitor = new TypeVisitor();
+            List<ASTType> types = ctx.type().stream().
+                    map(type -> type.accept(typeVisitor)).
+                    collect(Collectors.toList());
+            return new ASTTupleType(types);
         }
     }
 

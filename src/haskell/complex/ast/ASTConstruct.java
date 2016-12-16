@@ -13,10 +13,10 @@ import java.util.*;
  * Represents a construction.
  */
 public class ASTConstruct implements ASTPattern {
-    private ASTTypeConstr type;
+    private ASTTyConstr type;
     private List<ASTPattern> pats;
 
-    public ASTTypeConstr getType() {
+    public ASTTyConstr getType() {
         return type;
     }
 
@@ -24,7 +24,7 @@ public class ASTConstruct implements ASTPattern {
         return pats;
     }
 
-    public ASTConstruct(ASTTypeConstr type, List<ASTPattern> pats) {
+    public ASTConstruct(ASTTyConstr type, List<ASTPattern> pats) {
         assert(type != null);
         assert(pats != null);
 
@@ -33,11 +33,11 @@ public class ASTConstruct implements ASTPattern {
     }
 
     public ASTConstruct(String name) {
-        this.type = new ASTTypeConstr(name);
+        this.type = new ASTTyConstr(name);
         this.pats = Collections.emptyList();
     }
 
-    public ASTConstruct(ASTTypeConstr type, ASTPattern... pats) {
+    public ASTConstruct(ASTTyConstr type, ASTPattern... pats) {
         assert(type != null);
 
         this.type = type;

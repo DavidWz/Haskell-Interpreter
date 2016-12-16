@@ -5,13 +5,16 @@ options {
 }
 
 program : decl*;
-decl : fundecl | patdecl;
+decl : fundecl | patdecl | datadecl;
 decls : '{' decl (';' decl)* '}' | '{' '}';
 fundecl : var pat+ '=' exp;
 patdecl : pat '=' exp;
+datadecl : 'data' tyconstr var* '=' constrdecl ('|' constrdecl)*;
+constrdecl : tyconstr type*;
 
 exp : var | tyconstr |         integer | bool | floating | character | expTuple | application | branch | let | cases | lambda;
 pat : var | tyconstr | joker | integer | bool | floating | character | patTuple | construct;
+type : var | typeconstr | functype | tupletype;
 
 expTuple : '(' exp (',' exp)* ')';
 patTuple : '(' pat (',' pat)* ')';
@@ -22,6 +25,10 @@ let : 'let' decls 'in' exp;
 cases : 'case' exp 'of' '{' pat '->' exp (';' pat '->' exp)* '}';
 lambda : '\\' pat+ '->' exp;
 construct : '(' tyconstr pat* ')';
+
+typeconstr : '(' tyconstr type* ')';
+functype : '(' type '->' type ')';
+tupletype : '(' (type (',' type)*)? ')';
 
 var : VARID;
 tyconstr : TYCONSTRID;

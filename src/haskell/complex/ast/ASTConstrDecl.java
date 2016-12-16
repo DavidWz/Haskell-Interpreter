@@ -10,21 +10,20 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents a type constructor.
- * Do not confuse with ASTTyConstr, which just represents the name of a type constructor.
+ * Represents a type constructor declaration.
  */
-public class ASTTypeConstr implements ASTType {
+public class ASTConstrDecl implements ComplexHaskell {
     private ASTTyConstr tyConstr;
     private List<ASTType> types;
 
-    public ASTTypeConstr(ASTTyConstr tyConstr, List<ASTType> types) {
+    public ASTConstrDecl(ASTTyConstr tyConstr, List<ASTType> types) {
         assert(tyConstr != null);
         assert(types != null);
         this.tyConstr = tyConstr;
         this.types = types;
     }
 
-    public ASTTypeConstr(ASTTyConstr tyConstr, ASTType... types) {
+    public ASTConstrDecl(ASTTyConstr tyConstr, ASTType... types) {
         assert(tyConstr != null);
         this.tyConstr = tyConstr;
         this.types = Arrays.asList(types);
@@ -43,7 +42,7 @@ public class ASTTypeConstr implements ASTType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ASTTypeConstr that = (ASTTypeConstr) o;
+        ASTConstrDecl that = (ASTConstrDecl) o;
 
         if (!getTyConstr().equals(that.getTyConstr())) return false;
         return getTypes().equals(that.getTypes());
@@ -60,11 +59,11 @@ public class ASTTypeConstr implements ASTType {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("(").append(tyConstr);
+        builder.append(tyConstr).append(" ");
         for (ASTType type : types) {
-            builder.append(" ").append(type);
+            builder.append(type).append(" ");
         }
-        builder.append(")");
+        builder.deleteCharAt(builder.length()-1);
         return builder.toString();
     }
 
@@ -88,7 +87,7 @@ public class ASTTypeConstr implements ASTType {
 
     @Override
     public ASTExpression castToSimple() throws TooComplexException {
-        throw new TooComplexException(this, "Types are not part of simple haskell.");
+        throw new TooComplexException(this, "Data declarations are not part of simple haskell.");
     }
 
     @Override

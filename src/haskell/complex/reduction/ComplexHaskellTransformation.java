@@ -107,11 +107,31 @@ public interface ComplexHaskellTransformation {
         return false;
     }
 
-    default boolean visit(ASTTypeConstr node) {
+    default boolean visit(ASTTyConstr node) {
         return false;
     }
 
     default boolean visit(ASTVariable node) {
+        return false;
+    }
+
+    default boolean visit(ASTDataDecl node) {
+        return false;
+    }
+
+    default boolean visit(ASTConstrDecl node) {
+        return false;
+    }
+
+    default boolean visit(ASTTypeConstr node) {
+        return false;
+    }
+
+    default boolean accept(ASTFuncType node) {
+        return false;
+    }
+
+    default boolean visit(ASTTupleType node) {
         return false;
     }
 }

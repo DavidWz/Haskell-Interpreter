@@ -68,7 +68,7 @@ public class VariableManager {
      * @param type the constructor
      * @return
      */
-    public static ASTVariable getIsaConstrFunc(ASTTypeConstr type) {
+    public static ASTVariable getIsaConstrFunc(ASTTyConstr type) {
         return new ASTVariable("isa_constr_"+type.getName());
     }
 
@@ -86,7 +86,7 @@ public class VariableManager {
      * @param type the constructor
      * @return
      */
-    public static ASTVariable getArgofFunc(ASTTypeConstr type) {
+    public static ASTVariable getArgofFunc(ASTTyConstr type) {
         return new ASTVariable("argof_"+type.getName());
     }
 

@@ -1,10 +1,15 @@
 package haskell;
 
 import haskell.complex.ast.ASTDecl;
+import haskell.complex.ast.ASTFunDecl;
+import haskell.complex.ast.ASTPatDecl;
 import haskell.complex.ast.ASTProgram;
 import haskell.complex.reduction.ComplexToSimpleReducer;
 import haskell.complex.reduction.TooComplexException;
 import lambda.reduction.WHNOReducer;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class offers functionality to interpret complex haskell programs.
@@ -59,6 +64,12 @@ public class HaskellInterpreter {
      * @return a non-reducible lambda term
      */
     public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression, boolean verbose) throws TooComplexException {
+        // we only use pattern and function declarations to evaluate an expression
+        List<ASTDecl> relevantDeclarations = program.getDecls().stream().
+                filter(decl -> decl instanceof ASTPatDecl || decl instanceof ASTFunDecl).
+                collect(Collectors.toList());
+        ASTProgram program = new ASTProgram(relevantDeclarations);
+
         // init: create the expression: let prog in expr
         haskell.complex.ast.ASTExpression letProgInExpr;
         if (program.getDecls().size() == 0) {

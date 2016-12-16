@@ -2,22 +2,24 @@ package haskell.complex.ast;
 
 import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
+import haskell.simple.ast.ASTConstant;
 import lambda.reduction.WHNOReducer;
+import lambda.reduction.delta.ConstructorReduction;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
 /**
- * Represents a variable, i.e. a name that starts with a lower case.
+ * Represents a type constructor, i.e. a name that starts with an upper case.
  */
-public class ASTVariable implements ASTExpression, ASTPattern, ASTType {
+public class ASTTyConstr implements ASTExpression, ASTPattern {
     private String name;
 
-    public ASTVariable(String name) {
+    public ASTTyConstr(String name) {
         assert(name != null);
         assert(!name.trim().equals(""));
-        assert(Character.isLowerCase(name.charAt(0)));
+        assert(Character.isUpperCase(name.charAt(0)));
         this.name = name;
     }
 
@@ -30,7 +32,7 @@ public class ASTVariable implements ASTExpression, ASTPattern, ASTType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ASTVariable that = (ASTVariable) o;
+        ASTTyConstr that = (ASTTyConstr) o;
 
         return getName().equals(that.getName());
 
@@ -48,26 +50,22 @@ public class ASTVariable implements ASTExpression, ASTPattern, ASTType {
 
     @Override
     public Set<ASTVariable> getAllVariables() {
-        Set<ASTVariable> vars = new HashSet<>();
-        vars.add(this);
-        return vars;
+        return Collections.emptySet();
     }
 
     @Override
     public Set<ASTVariable> getFreeVars() {
-        Set<ASTVariable> vars = new HashSet<>();
-        vars.add(this);
-        return vars;
+        return Collections.emptySet();
     }
 
     @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws TooComplexException {
         Optional<lambda.ast.ASTConstant> constant = WHNOReducer.toConst(name);
         if (constant.isPresent()) {
-            return new haskell.simple.ast.ASTConstant(constant.get().getValue());
+            return new ASTConstant(constant.get().getValue());
         }
         else {
-            return new haskell.simple.ast.ASTVariable(name);
+            return new ASTConstant(ConstructorReduction.getConstructor(name));
         }
     }
 
