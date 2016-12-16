@@ -18,7 +18,17 @@ public class LazyReduction implements LambdaTransformation {
     }
 
     public void rememberResult(ASTTerm previous, ASTTerm result) {
+        // remember the current result
         reductionResults.put(previous, result);
+
+        // ensure transitivity is stored
+        // i.e.: if (a => b) and b == previous, then update it to (a => result)
+        for (Map.Entry<ASTTerm, ASTTerm> entry : reductionResults.entrySet()) {
+            ASTTerm otherResult = entry.getValue();
+            if (otherResult.equals(previous)) {
+                entry.setValue(result);
+            }
+        }
     }
 
     public Optional<ASTTerm> visit(ASTApplication node) {

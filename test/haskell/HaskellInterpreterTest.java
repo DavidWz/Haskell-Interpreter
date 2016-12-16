@@ -25,6 +25,7 @@ public class HaskellInterpreterTest {
     private static ASTApplication squareLenList4;
     private static ASTApplication factLenList3;
     private static ASTApplication factPlusToIntEven63;
+    private static ASTApplication factLenAppend;
 
     @BeforeClass
     public static void setUp() {
@@ -111,6 +112,16 @@ public class HaskellInterpreterTest {
                 new ASTConstruct(Cons, x, y));
         prog.addDeclaration(appendFuncCons);
 
+        // genList 0 = Nil
+        ASTVariable genList = new ASTVariable("genList");
+        ASTFunDecl genList0 = new ASTFunDecl(Nil, genList, new ASTInteger(0));
+        prog.addDeclaration(genList0);
+
+        // genList x = (Cons x (genList (decr x)))
+        ASTFunDecl genListX = new ASTFunDecl(new ASTApplication(Cons, x,
+                new ASTApplication(genList, new ASTApplication(decr, x))), genList, x);
+        prog.addDeclaration(genListX);
+
         // create the interpreter
         interpreter = new HaskellInterpreter(prog);
 
@@ -130,6 +141,8 @@ public class HaskellInterpreterTest {
         squareLenList4 = new ASTApplication(square, lenList4);
         factLenList3 = new ASTApplication(fact, lenList3);
         factPlusToIntEven63 = new ASTApplication(fact, new ASTApplication(plus, new ASTApplication(toInt, new ASTApplication(even, new ASTInteger(6))), new ASTInteger(3)));
+        ASTApplication appendList4 = new ASTApplication(append, new ASTInteger(5), new ASTApplication(genList, new ASTInteger(4)));
+        factLenAppend = new ASTApplication(fact, new ASTApplication(len, appendList4));
     }
 
     /**
@@ -184,5 +197,10 @@ public class HaskellInterpreterTest {
     @Test
     public void testFactPlusToIntEven63() {
         testExpression(factPlusToIntEven63, new ASTConstant(24));
+    }
+
+    @Test
+    public void testFactLenAppend() {
+        testExpression(factLenAppend, new ASTConstant(120));
     }
 }

@@ -84,20 +84,21 @@ public class WHNOReducer implements LambdaTransformation {
             System.out.println(term);
         }
 
-        ASTTerm whnf = term;
-        Optional<ASTTerm> result = term.accept(this);
-        while(result.isPresent()) {
-            whnf = result.get();
-            lazyReduction.rememberResult(term, whnf);
+        ASTTerm currentTerm = term;
+
+        // try to reduce the term as long as possible
+        Optional<ASTTerm> reducedTerm = currentTerm.accept(this);
+        while(reducedTerm.isPresent()) {
+            currentTerm = reducedTerm.get();
 
             if (verbose) {
-                System.out.println(" => " + result.get());
+                System.out.println(" => " + currentTerm);
             }
 
-            result = result.get().accept(this);
+            reducedTerm = currentTerm.accept(this);
         }
 
-        return whnf;
+        return currentTerm;
     }
 
     /**
