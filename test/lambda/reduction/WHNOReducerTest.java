@@ -21,7 +21,7 @@ public class WHNOReducerTest {
      */
     public static ASTTerm getFactFunction() {
         ASTVariable x = new ASTVariable("x");
-        ASTConstant times = new ASTConstant(PredefinedFunction.TIMES);
+        ASTConstant times = new ASTConstant(PredefinedFunction.MULT);
         ASTConstant minus = new ASTConstant(PredefinedFunction.MINUS);
         ASTConstant lesseq = new ASTConstant(PredefinedFunction.LESSEQ);
         ASTConstant fix = new ASTConstant(PredefinedFunction.FIX);
@@ -77,12 +77,12 @@ public class WHNOReducerTest {
     }
 
     @Test
-    public void testIntegerArithmetic() {
+    public void testArithmetic() {
         // \x.(plus 40.5 x) (\y.(times y y) 3.0) => 49.5
-        ASTTerm plus40X = new ASTApplication(new ASTApplication(plus, new ASTConstant(40.5f)), x);
+        ASTTerm plus40X = new ASTApplication(new ASTApplication(new ASTConstant(PredefinedFunction.PLUSF), new ASTConstant(40.5f)), x);
         ASTTerm add40 = new ASTAbstraction(x, plus40X);
 
-        ASTTerm timesYY = new ASTApplication(new ASTApplication(new ASTConstant(PredefinedFunction.TIMES), y), y);
+        ASTTerm timesYY = new ASTApplication(new ASTApplication(new ASTConstant(PredefinedFunction.MULTF), y), y);
         ASTTerm square = new ASTAbstraction(y, timesYY);
 
         ASTTerm square3 = new ASTApplication(square, new ASTConstant(3.0f));
@@ -91,6 +91,14 @@ public class WHNOReducerTest {
         ASTTerm result = reducer.reduceToWHNF(lambda, true);
 
         assertEquals(result, new ASTConstant(49.5f));
+    }
+
+    @Test
+    public void testTypeSafeIntFloat() {
+        // (plus int float) => not reducible
+        ASTTerm lambda = new ASTApplication(new ASTApplication(plus, new ASTConstant(3.0f)), new ASTConstant(-5.0f));
+        ASTTerm result = reducer.reduceToWHNF(lambda, true);
+        assertEquals(lambda, result);
     }
 
     @Test

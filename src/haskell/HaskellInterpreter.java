@@ -68,16 +68,15 @@ public class HaskellInterpreter {
         List<ASTDecl> relevantDeclarations = program.getDecls().stream().
                 filter(decl -> decl instanceof ASTPatDecl || decl instanceof ASTFunDecl).
                 collect(Collectors.toList());
-        ASTProgram program = new ASTProgram(relevantDeclarations);
 
         // init: create the expression: let prog in expr
         haskell.complex.ast.ASTExpression letProgInExpr;
-        if (program.getDecls().size() == 0) {
+        if (relevantDeclarations.size() == 0) {
             // empty lets are not supported, so we simply evaluate the expression directly
             letProgInExpr = expression;
         }
         else {
-            letProgInExpr = new haskell.complex.ast.ASTLet(program.getDecls(), expression);
+            letProgInExpr = new haskell.complex.ast.ASTLet(relevantDeclarations, expression);
         }
         if (verbose) {
             System.out.println("\n-- The following expression will be evaluated: ");

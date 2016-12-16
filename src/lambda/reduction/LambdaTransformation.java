@@ -1,6 +1,5 @@
 package lambda.reduction;
 
-import haskell.complex.ast.*;
 import lambda.ast.*;
 import lambda.ast.ASTApplication;
 import lambda.ast.ASTVariable;

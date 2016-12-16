@@ -20,9 +20,9 @@ public class CharReduction extends DeltaReduction {
         if (c.getValue() instanceof PredefinedFunction) {
             PredefinedFunction op = (PredefinedFunction) c.getValue();
             switch (op) {
-                case EQUAL:
+                case EQUALC:
                     return true;
-                case INEQUAL:
+                case INEQUALC:
                     return true;
                 default:
                     return false;
@@ -57,10 +57,10 @@ public class CharReduction extends DeltaReduction {
             // now we calculate the result
             Object result;
             switch (op) {
-                case EQUAL:
+                case EQUALC:
                     result = ch1 == ch2;
                     break;
-                case INEQUAL:
+                case INEQUALC:
                     result = ch1 != ch2;
                     break;
                 default:

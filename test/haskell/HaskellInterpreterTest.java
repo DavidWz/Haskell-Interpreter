@@ -69,7 +69,7 @@ public class HaskellInterpreterTest {
         prog.addDeclaration(squareBasis);
 
         // square x = times x x
-        ASTVariable times = new ASTVariable("times");
+        ASTVariable times = new ASTVariable("mult");
         ASTFunDecl squareFunc = new ASTFunDecl(new ASTApplication(times, x, x), square, x);
         prog.addDeclaration(squareFunc);
 

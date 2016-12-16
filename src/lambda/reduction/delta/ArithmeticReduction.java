@@ -24,9 +24,9 @@ public class ArithmeticReduction extends DeltaReduction {
                     return true;
                 case MINUS:
                     return true;
-                case TIMES:
+                case MULT:
                     return true;
-                case DIVIDED:
+                case DIV:
                     return true;
                 case MOD:
                     return true;
@@ -43,6 +43,28 @@ public class ArithmeticReduction extends DeltaReduction {
                 case INEQUAL:
                     return true;
                 case POW:
+                    return true;
+                case PLUSF:
+                    return true;
+                case MINUSF:
+                    return true;
+                case MULTF:
+                    return true;
+                case DIVF:
+                    return true;
+                case POWF:
+                    return true;
+                case LESSF:
+                    return true;
+                case GREATERF:
+                    return true;
+                case LESSEQF:
+                    return true;
+                case GREATEREQF:
+                    return true;
+                case EQUALF:
+                    return true;
+                case INEQUALF:
                     return true;
                 default:
                     return false;
@@ -83,14 +105,17 @@ public class ArithmeticReduction extends DeltaReduction {
                 case MINUS:
                     result = n0 - n1;
                     break;
-                case TIMES:
+                case MULT:
                     result = n0 * n1;
                     break;
-                case DIVIDED:
+                case DIV:
                     result = n0 / n1;
                     break;
                 case MOD:
                     result = n0 % n1;
+                    break;
+                case POW:
+                    result = (int) Math.pow(n0, n1);
                     break;
                 case LESS:
                     result = n0 < n1;
@@ -123,37 +148,37 @@ public class ArithmeticReduction extends DeltaReduction {
             // now we calculate the result
             Object result;
             switch (op) {
-                case PLUS:
+                case PLUSF:
                     result = n0 + n1;
                     break;
-                case MINUS:
+                case MINUSF:
                     result = n0 - n1;
                     break;
-                case TIMES:
+                case MULTF:
                     result = n0 * n1;
                     break;
-                case DIVIDED:
+                case DIVF:
                     result = n0 / n1;
                     break;
-                case MOD:
-                    result = n0 % n1;
+                case POWF:
+                    result = (float) Math.pow(n0, n1);
                     break;
-                case LESS:
+                case LESSF:
                     result = n0 < n1;
                     break;
-                case GREATER:
+                case GREATERF:
                     result = n0 > n1;
                     break;
-                case LESSEQ:
+                case LESSEQF:
                     result = n0 <= n1;
                     break;
-                case GREATEREQ:
+                case GREATEREQF:
                     result = n0 >= n1;
                     break;
-                case EQUAL:
+                case EQUALF:
                     result = n0 == n1;
                     break;
-                case INEQUAL:
+                case INEQUALF:
                     result = n0 != n1;
                     break;
                 default:

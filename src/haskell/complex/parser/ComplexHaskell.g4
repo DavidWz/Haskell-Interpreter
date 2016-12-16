@@ -4,7 +4,7 @@ options {
   language = Java;
 }
 
-program : decl*;
+program : (decl '\n'+)*;
 decl : fundecl | patdecl | datadecl;
 decls : '{' decl (';' decl)* '}' | '{' '}';
 fundecl : var pat+ '=' exp;
@@ -49,5 +49,5 @@ INT : ('+'|'-')?DIGIT+;
 FLOAT : ('+'|'-')? DIGIT+ '.' DIGIT+;
 JOKER : '_';
 
-WS: [ \n\t\r]+ -> skip;
+WS: [ \t\r]+ -> skip;
 REMAINDER : (LOWER_CASE | UPPER_CASE | DIGIT)+;

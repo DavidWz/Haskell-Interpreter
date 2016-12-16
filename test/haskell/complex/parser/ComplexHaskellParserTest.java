@@ -56,7 +56,7 @@ public class ComplexHaskellParserTest {
 
     @Test
     public void testFloats() {
-        String expressionCode = "(plus -6.6 +1.0)";
+        String expressionCode = "(plusf -6.6 +1.0)";
 
         Optional<ASTExpression> eval = generator.parseExpression(new ANTLRInputStream(expressionCode));
         assertTrue(eval.isPresent());
@@ -77,8 +77,8 @@ public class ComplexHaskellParserTest {
     @Test
     public void testFunctionDeclarations() {
         String programCode = "fact 0 = 1\n" +
-                "fact x = (times x (fact (decr x))) \n" +
-                "decr x = (minus x 1)";
+                "fact x = (mult x (fact (decr x))) \n" +
+                "decr x = (minus x 1)\n";
 
         String expressionCode = "(fact (decr 6))";
 
@@ -105,7 +105,7 @@ public class ComplexHaskellParserTest {
     public void testDataDeclarations() {
         String programCode = "data List a = Nil | Cons a (List a)\n" +
                 "data Point a = P (a, a)\n" +
-                "data ThreeFuncs a b = Funcs ((a -> b), (a -> b), (a -> b))";
+                "data ThreeFuncs a b = Funcs ((a -> b), (a -> b), (a -> b))\n";
 
         Optional<ASTProgram> program = generator.parseProgram(new ANTLRInputStream(programCode));
         assertTrue(program.isPresent());

@@ -157,6 +157,7 @@ public class InteractiveEnvironment {
                         System.out.println(result);
                     }
                 } catch (TooComplexException e) {
+                    e.printStackTrace();
                     System.out.println("Error: Could not evaluate the expression. Type \""+HELP_COMMAND+"\" for help.");
                 }
             }

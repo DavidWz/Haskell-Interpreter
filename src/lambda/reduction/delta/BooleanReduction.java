@@ -20,17 +20,15 @@ public class BooleanReduction extends DeltaReduction {
         if (c.getValue() instanceof PredefinedFunction) {
             PredefinedFunction op = (PredefinedFunction) c.getValue();
             switch (op) {
-                case EQUAL:
-                    return true;
-                case INEQUAL:
-                    return true;
                 case AND:
                     return true;
                 case OR:
                     return true;
-                case IMPLIES:
+                case EQUIV:
                     return true;
                 case XOR:
+                    return true;
+                case IMPLIES:
                     return true;
                 default:
                     return false;
@@ -71,17 +69,14 @@ public class BooleanReduction extends DeltaReduction {
                 case OR:
                     result = b0 || b1;
                     break;
-                case EQUAL:
+                case EQUIV:
                     result = b0 == b1;
                     break;
-                case INEQUAL:
+                case XOR:
                     result = b0 != b1;
                     break;
                 case IMPLIES:
                     result = !b0 || b1;
-                    break;
-                case XOR:
-                    result = b0 != b1;
                     break;
                 default:
                     return Optional.empty();

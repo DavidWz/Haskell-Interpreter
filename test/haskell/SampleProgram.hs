@@ -1,3 +1,5 @@
+data List a = Nil | Cons a (List a)
+
 len Nil = 0
 len (Cons x xs) = (plus 1 (len xs))
 
@@ -12,4 +14,4 @@ append x (Cons y ys) = (Cons y (append x ys))
 decrement x = (minus x 1)
 
 fact 0 = 1
-fact x = (times x (fact (decrement x)))
+fact x = (mult x (fact (decrement x)))

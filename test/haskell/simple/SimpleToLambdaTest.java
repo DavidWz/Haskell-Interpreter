@@ -31,7 +31,7 @@ public class SimpleToLambdaTest {
         reducer = new WHNOReducer();
         reducer = new WHNOReducer();
         x = new ASTVariable("x");
-        times = new ASTConstant(PredefinedFunction.TIMES);
+        times = new ASTConstant(PredefinedFunction.MULT);
         minus = new ASTConstant(PredefinedFunction.MINUS);
         lesseq = new ASTConstant(PredefinedFunction.LESSEQ);
         list = new ConstructorReduction.Constructor("List");
