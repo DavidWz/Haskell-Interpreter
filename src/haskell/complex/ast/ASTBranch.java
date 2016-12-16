@@ -1,5 +1,6 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 
 import java.util.HashSet;
@@ -94,6 +95,11 @@ public class ASTBranch implements ASTExpression {
     @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws TooComplexException {
         return new haskell.simple.ast.ASTBranch(condition.castToSimple(), ifBranch.castToSimple(), elseBranch.castToSimple());
+    }
+
+    @Override
+    public boolean accept(ComplexHaskellTransformation tr) {
+        return tr.visit(this);
     }
 
     @Override

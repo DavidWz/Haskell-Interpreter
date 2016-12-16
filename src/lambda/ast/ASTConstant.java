@@ -1,9 +1,8 @@
 package lambda.ast;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import lambda.reduction.LambdaTransformation;
+
+import java.util.*;
 
 /**
  * Represents a constant.
@@ -65,5 +64,10 @@ public class ASTConstant extends ASTTerm {
     public ASTTerm substitute(ASTVariable var, ASTTerm expr) {
         // constants cannot be substituted because they're not free
         return this;
+    }
+
+    @Override
+    public Optional<ASTTerm> accept(LambdaTransformation tr) {
+        return tr.visit(this);
     }
 }

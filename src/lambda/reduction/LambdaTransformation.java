@@ -29,23 +29,4 @@ public interface LambdaTransformation {
     default Optional<ASTTerm> visit(ASTVariable node) {
         return Optional.empty();
     }
-
-    default Optional<ASTTerm> visit(ASTTerm node) {
-        if (node instanceof ASTAbstraction) {
-            return visit((ASTAbstraction) node);
-        }
-        else if (node instanceof ASTApplication) {
-            return visit((ASTApplication) node);
-        }
-        else if (node instanceof ASTConstant) {
-            return visit((ASTConstant) node);
-        }
-        else if (node instanceof ASTVariable) {
-            return visit((ASTVariable) node);
-        }
-        else {
-            assert(false);
-            return Optional.empty();
-        }
-    }
 }

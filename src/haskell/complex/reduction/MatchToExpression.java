@@ -111,50 +111,12 @@ public class MatchToExpression {
     }
 
     private static ASTExpression matchConstToExp(ASTPattern pat, ASTExpression exp, ASTExpression exp1, ASTExpression exp2) {
-        if (pat instanceof ASTInteger) {
-            ASTInteger intPat = (ASTInteger) pat;
-            /*
-                     match INT exp exp1 exp2
-            ----------------------------------------
-            if (isa_int_INT exp) then exp1 else exp2
-             */
-            ASTApplication isaExp = new ASTApplication(VariableManager.getIsaIntFunc(intPat.getValue()), exp);
-            return new ASTBranch(isaExp, exp1, exp2);
-        }
-        else if (pat instanceof ASTFloat) {
-            ASTFloat floatPat = (ASTFloat) pat;
-            /*
-                     match FLOAT exp exp1 exp2
-            ----------------------------------------
-            if (isa_float_FLOAT exp) then exp1 else exp2
-             */
-            ASTApplication isaExp = new ASTApplication(VariableManager.getIsaFloatFunc(floatPat.getValue()), exp);
-            return new ASTBranch(isaExp, exp1, exp2);
-        }
-        else if (pat instanceof ASTBoolean) {
-            ASTBoolean boolPat = (ASTBoolean) pat;
-            /*
-                     match BOOL exp exp1 exp2
-            ----------------------------------------
-            if (isa_bool_INT exp) then exp1 else exp2
-             */
-            ASTApplication isaExp = new ASTApplication(VariableManager.getIsaBoolFunc(boolPat.getValue()), exp);
-            return new ASTBranch(isaExp, exp1, exp2);
-        }
-        else if (pat instanceof ASTChar) {
-            ASTChar charPat = (ASTChar) pat;
-            /*
-                     match CHAR exp exp1 exp2
-            ----------------------------------------
-            if (isa_char_CHAR exp) then exp1 else exp2
-             */
-            ASTApplication isaExp = new ASTApplication(VariableManager.getIsaCharFunc(charPat.getValue()), exp);
-            return new ASTBranch(isaExp, exp1, exp2);
-        }
-        else {
-            // unknown constant, this is undefined behavior
-            assert(false);
-            throw new RuntimeException();
-        }
+        /*
+                 match CONSTANT exp exp1 exp2
+        ----------------------------------------
+        if (isa_CONSTANT exp) then exp1 else exp2
+         */
+        ASTApplication isaExp = new ASTApplication(VariableManager.getIsaFunc(pat), exp);
+        return new ASTBranch(isaExp, exp1, exp2);
     }
 }

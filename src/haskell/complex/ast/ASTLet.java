@@ -1,5 +1,6 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 
 import java.util.*;
@@ -119,5 +120,10 @@ public class ASTLet implements ASTExpression {
         return new haskell.simple.ast.ASTLet((haskell.simple.ast.ASTVariable) pat.castToSimple(),
                 patDecl.getExp().castToSimple(),
                 exp.castToSimple());
+    }
+
+    @Override
+    public boolean accept(ComplexHaskellTransformation tr) {
+        return tr.visit(this);
     }
 }

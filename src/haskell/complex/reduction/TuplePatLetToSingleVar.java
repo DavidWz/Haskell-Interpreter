@@ -18,11 +18,11 @@ public class TuplePatLetToSingleVar implements ComplexHaskellTransformation {
 
         // first, try to apply this transformation as deep as possible
         for (ASTDecl decl : decls) {
-            if (visit(decl)) {
+            if (decl.accept(this)) {
                 return true;
             }
         }
-        if (visit(exp)) {
+        if (exp.accept(this)) {
             return true;
         }
 

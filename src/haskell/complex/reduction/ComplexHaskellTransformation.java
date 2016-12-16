@@ -11,7 +11,7 @@ import haskell.complex.ast.*;
 public interface ComplexHaskellTransformation {
     default boolean visit(ASTApplication node) {
         for (ASTExpression exp : node.getExps()) {
-            if (visit(exp)) {
+            if (exp.accept(this)) {
                 return true;
             }
         }
@@ -23,21 +23,21 @@ public interface ComplexHaskellTransformation {
     }
 
     default boolean visit(ASTBranch node) {
-        if (visit(node.getCondition())) {
+        if (node.getCondition().accept(this)) {
             return true;
         }
-        if (visit(node.getIfBranch())) {
+        if (node.getIfBranch().accept(this)) {
             return true;
         }
-        return visit(node.getElseBranch());
+        return node.getElseBranch().accept(this);
     }
 
     default boolean visit(ASTCase node) {
-        if (visit(node.getExp())) {
+        if (node.getExp().accept(this)) {
             return true;
         }
         for (ASTExpression exp : node.getCaseExps()) {
-            if (visit(exp)) {
+            if (exp.accept(this)) {
                 return true;
             }
         }
@@ -54,7 +54,7 @@ public interface ComplexHaskellTransformation {
 
     default boolean visit(ASTExpTuple node) {
         for (ASTExpression exp : node.getExps()) {
-            if (visit(exp)) {
+            if (exp.accept(this)) {
                 return true;
             }
         }
@@ -66,7 +66,7 @@ public interface ComplexHaskellTransformation {
     }
 
     default boolean visit(ASTFunDecl node) {
-        return visit(node.getExp());
+        return node.getExp().accept(this);
     }
 
     default boolean visit(ASTInteger node) {
@@ -78,20 +78,20 @@ public interface ComplexHaskellTransformation {
     }
 
     default boolean visit(ASTLambda node) {
-        return visit(node.getExp());
+        return node.getExp().accept(this);
     }
 
     default boolean visit(ASTLet node) {
         for (ASTDecl decl : node.getDecls()) {
-            if (visit(decl)) {
+            if (decl.accept(this)) {
                 return true;
             }
         }
-        return visit(node.getExp());
+        return node.getExp().accept(this);
     }
 
     default boolean visit(ASTPatDecl node) {
-        return visit(node.getExp());
+        return node.getExp().accept(this);
     }
 
     default boolean visit(ASTPatTuple node) {
@@ -100,7 +100,7 @@ public interface ComplexHaskellTransformation {
 
     default boolean visit(ASTProgram node) {
         for(ASTDecl decl : node.getDecls()) {
-            if (visit(decl)) {
+            if (decl.accept(this)) {
                 return true;
             }
         }
@@ -113,95 +113,5 @@ public interface ComplexHaskellTransformation {
 
     default boolean visit(ASTVariable node) {
         return false;
-    }
-
-    default boolean visit(ASTDecl node) {
-        if (node instanceof ASTFunDecl) {
-            return visit((ASTFunDecl) node);
-        }
-        else if (node instanceof ASTPatDecl) {
-            return visit((ASTPatDecl) node);
-        }
-        else {
-            assert(false);
-            return false;
-        }
-    }
-
-    default boolean visit(ASTExpression node) {
-        if (node instanceof ASTApplication) {
-            return visit((ASTApplication) node);
-        }
-        else if (node instanceof ASTBoolean) {
-            return visit((ASTBoolean) node);
-        }
-        else if (node instanceof ASTBranch) {
-            return visit((ASTBranch) node);
-        }
-        else if (node instanceof ASTCase) {
-            return visit((ASTCase) node);
-        }
-        else if (node instanceof ASTChar) {
-            return visit((ASTChar) node);
-        }
-        else if (node instanceof ASTExpTuple) {
-            return visit((ASTExpTuple) node);
-        }
-        else if (node instanceof ASTFloat) {
-            return visit((ASTFloat) node);
-        }
-        else if (node instanceof ASTInteger) {
-            return visit((ASTInteger) node);
-        }
-        else if (node instanceof ASTLambda) {
-            return visit((ASTLambda) node);
-        }
-        else if (node instanceof ASTLet) {
-            return visit((ASTLet) node);
-        }
-        else if (node instanceof ASTTypeConstr) {
-            return visit((ASTTypeConstr) node);
-        }
-        else if (node instanceof ASTVariable) {
-            return visit((ASTVariable) node);
-        }
-        else {
-            assert(false);
-            return false;
-        }
-    }
-
-    default boolean visit(ASTPattern node) {
-        if (node instanceof ASTBoolean) {
-            return visit((ASTBoolean) node);
-        }
-        else if (node instanceof ASTChar) {
-            return visit((ASTChar) node);
-        }
-        else if (node instanceof ASTConstruct) {
-            return visit((ASTConstruct) node);
-        }
-        else if (node instanceof ASTFloat) {
-            return visit((ASTFloat) node);
-        }
-        else if (node instanceof ASTInteger) {
-            return visit((ASTInteger) node);
-        }
-        else if (node instanceof ASTJoker) {
-            return visit((ASTJoker) node);
-        }
-        else if (node instanceof ASTPatTuple) {
-            return visit((ASTPatTuple) node);
-        }
-        else if (node instanceof ASTTypeConstr) {
-            return visit((ASTTypeConstr) node);
-        }
-        else if (node instanceof ASTVariable) {
-            return visit((ASTVariable) node);
-        }
-        else {
-            assert(false);
-            return false;
-        }
     }
 }

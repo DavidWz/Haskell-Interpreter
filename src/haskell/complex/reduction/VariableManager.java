@@ -1,8 +1,6 @@
 package haskell.complex.reduction;
 
-import haskell.complex.ast.ASTTypeConstr;
-import haskell.complex.ast.ASTVariable;
-import haskell.complex.ast.ComplexHaskell;
+import haskell.complex.ast.*;
 
 import java.util.Set;
 
@@ -102,19 +100,43 @@ public class VariableManager {
         return new ASTVariable("sel_"+n+"_"+i);
     }
 
-    public static ASTVariable getIsaIntFunc(int value) {
+    private static ASTVariable getIsaIntFunc(int value) {
         return new ASTVariable("isa_int_"+value);
     }
 
-    public static ASTVariable getIsaFloatFunc(float value) {
+    private static ASTVariable getIsaFloatFunc(float value) {
         return new ASTVariable("isa_float_"+value);
     }
 
-    public static ASTVariable getIsaCharFunc(char value) {
+    private static ASTVariable getIsaCharFunc(char value) {
         return new ASTVariable("isa_char_"+value);
     }
 
-    public static ASTVariable getIsaBoolFunc(boolean value) {
+    private static ASTVariable getIsaBoolFunc(boolean value) {
         return new ASTVariable("isa_bool_"+value);
+    }
+
+    public static ASTVariable getIsaFunc(ASTPattern pat) {
+        if (pat instanceof ASTInteger) {
+            ASTInteger intPat = (ASTInteger) pat;
+            return getIsaIntFunc(intPat.getValue());
+        }
+        else if (pat instanceof ASTFloat) {
+            ASTFloat floatPat = (ASTFloat) pat;
+            return getIsaFloatFunc(floatPat.getValue());
+        }
+        else if (pat instanceof ASTBoolean) {
+            ASTBoolean boolPat = (ASTBoolean) pat;
+            return getIsaBoolFunc(boolPat.getValue());
+        }
+        else if (pat instanceof ASTChar) {
+            ASTChar charPat = (ASTChar) pat;
+            return getIsaCharFunc(charPat.getValue());
+        }
+        else {
+            // unknown constant, this is undefined behavior and should not happen
+            assert(false);
+            throw new RuntimeException();
+        }
     }
 }

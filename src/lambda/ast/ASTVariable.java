@@ -1,10 +1,9 @@
 package lambda.ast;
 
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import lambda.reduction.LambdaTransformation;
+
+import java.util.*;
 
 /**
  * Represents a variable.
@@ -76,5 +75,10 @@ public class ASTVariable extends ASTTerm {
         else {
             return this;
         }
+    }
+
+    @Override
+    public Optional<ASTTerm> accept(LambdaTransformation tr) {
+        return tr.visit(this);
     }
 }

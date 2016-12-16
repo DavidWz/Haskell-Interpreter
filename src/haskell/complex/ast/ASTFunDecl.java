@@ -1,5 +1,6 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 
 import java.util.Arrays;
@@ -117,5 +118,10 @@ public class ASTFunDecl extends ASTDecl {
     @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws TooComplexException {
         throw new TooComplexException(this, "Function declarations are not part of simple haskell.");
+    }
+
+    @Override
+    public boolean accept(ComplexHaskellTransformation tr) {
+        return tr.visit(this);
     }
 }

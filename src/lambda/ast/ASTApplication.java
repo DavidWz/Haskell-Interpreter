@@ -1,7 +1,10 @@
 package lambda.ast;
 
+import lambda.reduction.LambdaTransformation;
+
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -89,6 +92,11 @@ public class ASTApplication extends ASTTerm {
         ASTTerm replacedFunciton = left.substitute(var, expr);
         ASTTerm replacedArgument = right.substitute(var, expr);
         return new ASTApplication(replacedFunciton, replacedArgument);
+    }
+
+    @Override
+    public Optional<ASTTerm> accept(LambdaTransformation tr) {
+        return tr.visit(this);
     }
 
 }

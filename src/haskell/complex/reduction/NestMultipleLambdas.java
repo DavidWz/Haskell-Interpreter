@@ -13,7 +13,7 @@ public class NestMultipleLambdas implements ComplexHaskellTransformation {
     @Override
     public boolean visit(ASTLambda node) {
         // first try to apply the transformation as deep as possible
-        if (visit(node.getExp())) {
+        if (node.getExp().accept(this)) {
             return true;
         }
 

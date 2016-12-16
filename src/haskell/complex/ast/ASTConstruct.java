@@ -1,5 +1,6 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 import haskell.simple.ast.ASTConstant;
 import haskell.simple.ast.ASTExpression;
@@ -103,6 +104,11 @@ public class ASTConstruct implements ASTPattern {
         else {
             throw new TooComplexException(this, "Arguments of constructs must be arguments of an application.");
         }
+    }
+
+    @Override
+    public boolean accept(ComplexHaskellTransformation tr) {
+        return tr.visit(this);
     }
 
     @Override

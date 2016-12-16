@@ -1,6 +1,9 @@
 package lambda.ast;
 
+import lambda.reduction.LambdaTransformation;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -33,4 +36,11 @@ public abstract class ASTTerm {
      * @return the substituted term
      */
     public abstract ASTTerm substitute(ASTVariable var, ASTTerm expr);
+
+    /**
+     * Accepts a lambda transformation and calls its visit method for the corresponding node.
+     * @param tr
+     * @return
+     */
+    public abstract Optional<ASTTerm> accept(LambdaTransformation tr);
 }

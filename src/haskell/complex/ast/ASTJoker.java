@@ -1,5 +1,6 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 import haskell.simple.ast.ASTExpression;
 
@@ -43,5 +44,10 @@ public class ASTJoker implements ASTPattern {
     @Override
     public ASTExpression castToSimple() throws TooComplexException {
         throw new TooComplexException(this, "The joker pattern is not part of simple haskell.");
+    }
+
+    @Override
+    public boolean accept(ComplexHaskellTransformation tr) {
+        return tr.visit(this);
     }
 }

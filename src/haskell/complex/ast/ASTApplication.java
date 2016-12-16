@@ -1,5 +1,6 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 
 import java.util.Arrays;
@@ -75,6 +76,11 @@ public class ASTApplication implements ASTExpression {
         }
 
         return simpleExp;
+    }
+
+    @Override
+    public boolean accept(ComplexHaskellTransformation tr) {
+        return tr.visit(this);
     }
 
     @Override

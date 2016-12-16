@@ -1,5 +1,6 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 
 import java.util.*;
@@ -117,5 +118,10 @@ public class ASTLambda implements ASTExpression {
         else {
             throw new TooComplexException(this, "Lambdas must only map one variable.");
         }
+    }
+
+    @Override
+    public boolean accept(ComplexHaskellTransformation tr) {
+        return tr.visit(this);
     }
 }

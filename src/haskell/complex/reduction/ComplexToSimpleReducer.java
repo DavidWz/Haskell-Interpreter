@@ -41,7 +41,7 @@ public class ComplexToSimpleReducer {
 
         // after this, we split the declarations according to entaglement
         // and then nest them in multiple let expressions
-        separateAndNestDecls.visit(expression);
+        expression.accept(separateAndNestDecls);
 
         // then we again apply basic transformation rules as long as possible
         applyBasicTransformationRules(expression);
@@ -56,7 +56,7 @@ public class ComplexToSimpleReducer {
         // apply the function declaration to pattern declaration rule as long as it still changes something
         do {
             transformed = false;
-            if (funDeclToPatDecl.visit(expression)) {
+            if (expression.accept(funDeclToPatDecl)) {
                 // the rule was successfully applied
                 transformed = true;
             }
@@ -72,7 +72,7 @@ public class ComplexToSimpleReducer {
 
             // we try to apply every rule in succession
             for (ComplexHaskellTransformation tr : basicTransformations) {
-                if (tr.visit(expression)) {
+                if (expression.accept(tr)) {
                     // the rule was successfully applied
                     transformed = true;
                 }

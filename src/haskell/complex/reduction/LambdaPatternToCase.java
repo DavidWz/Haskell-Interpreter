@@ -13,7 +13,7 @@ public class LambdaPatternToCase implements ComplexHaskellTransformation {
     public boolean visit(ASTLambda node) {
         // first try to apply the transformation as deep as possible
         ASTExpression exp = node.getExp();
-        if (visit(exp)) {
+        if (exp.accept(this)) {
             return true;
         }
 

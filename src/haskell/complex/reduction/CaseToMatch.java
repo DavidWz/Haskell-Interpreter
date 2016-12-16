@@ -46,7 +46,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
         // try to apply it as deep as possible
         List<ASTExpression> exps = node.getExps();
         for (ASTExpression exp : exps) {
-            if (visit(exp)) {
+            if (exp.accept(this)) {
                 return true;
             }
         }
@@ -69,13 +69,13 @@ public class CaseToMatch implements ComplexHaskellTransformation {
         ASTExpression elseBranch = node.getElseBranch();
 
         // try to apply it as deep as possible
-        if (visit(condition)) {
+        if (condition.accept(this)) {
             return true;
         }
-        if (visit(ifBranch)) {
+        if (ifBranch.accept(this)) {
             return true;
         }
-        if (visit(elseBranch)) {
+        if (elseBranch.accept(this)) {
             return true;
         }
 
@@ -105,11 +105,11 @@ public class CaseToMatch implements ComplexHaskellTransformation {
         List<ASTExpression> caseExps = node.getCaseExps();
 
         // try to apply it as deep as possible
-        if (visit(exp)) {
+        if (exp.accept(this)) {
             return true;
         }
         for (ASTExpression e : caseExps) {
-            if (visit(e)) {
+            if (e.accept(this)) {
                 return true;
             }
         }
@@ -136,7 +136,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
 
         // try to apply it as deep as possible
         for (ASTExpression exp : exps) {
-            if (visit(exp)) {
+            if (exp.accept(this)) {
                 return true;
             }
         }
@@ -157,7 +157,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
     public boolean visit(ASTFunDecl node) {
         ASTExpression exp = node.getExp();
 
-        if (visit(exp)) {
+        if (exp.accept(this)) {
             return true;
         }
 
@@ -174,7 +174,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
     public boolean visit(ASTLambda node) {
         ASTExpression exp = node.getExp();
 
-        if (visit(exp)) {
+        if (exp.accept(this)) {
             return true;
         }
 
@@ -192,11 +192,11 @@ public class CaseToMatch implements ComplexHaskellTransformation {
         ASTExpression exp = node.getExp();
 
         for (ASTDecl decl : decls) {
-            if (visit(decl)) {
+            if (decl.accept(this)) {
                 return true;
             }
         }
-        if (visit(exp)) {
+        if (exp.accept(this)) {
             return true;
         }
 
@@ -212,7 +212,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
     public boolean visit(ASTPatDecl node) {
         ASTExpression exp = node.getExp();
 
-        if (visit(exp)) {
+        if (exp.accept(this)) {
             return true;
         }
 
@@ -228,7 +228,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
     @Override
     public boolean visit(ASTProgram node) {
         for (ASTDecl decl : node.getDecls()) {
-            if (visit(decl)) {
+            if (decl.accept(this)) {
                 return true;
             }
         }

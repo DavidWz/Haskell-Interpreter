@@ -1,5 +1,6 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 import lambda.reduction.WHNOReducer;
 
@@ -68,5 +69,10 @@ public class ASTVariable implements ASTExpression, ASTPattern {
         else {
             return new haskell.simple.ast.ASTVariable(name);
         }
+    }
+
+    @Override
+    public boolean accept(ComplexHaskellTransformation tr) {
+        return tr.visit(this);
     }
 }

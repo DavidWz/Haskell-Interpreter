@@ -1,5 +1,6 @@
 package haskell.complex.ast;
 
+import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 
 import java.util.Collections;
@@ -55,5 +56,10 @@ public class ASTInteger implements ASTExpression, ASTPattern {
     @Override
     public haskell.simple.ast.ASTExpression castToSimple() throws TooComplexException {
         return new haskell.simple.ast.ASTConstant(value);
+    }
+
+    @Override
+    public boolean accept(ComplexHaskellTransformation tr) {
+        return tr.visit(this);
     }
 }
