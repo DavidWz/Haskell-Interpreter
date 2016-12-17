@@ -1,8 +1,14 @@
 package lambda.reduction.delta;
 
+import haskell.complex.ast.ASTFuncType;
+import haskell.complex.ast.ASTTupleType;
+import haskell.complex.ast.ASTType;
+import haskell.complex.ast.ASTVariable;
 import lambda.ast.ASTConstant;
 import lambda.ast.ASTTerm;
+import lambda.type.PredefinedType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +34,24 @@ public class TupleReduction extends DeltaReduction {
 
         public int getLength() {
             return length;
+        }
+
+        public ASTType getType() {
+            // tuple_n :: a1 -> a2 -> ... -> an -> (a1, ..., an)
+
+            // (a1, ..., an)
+            List<ASTType> vars = new ArrayList<>();
+            for (int i = 1; i <= length; i++) {
+                vars.add(new ASTVariable("a"+i));
+            }
+            ASTType type = new ASTTupleType(vars);
+
+            // a1 -> a2 -> ... -> an -> tuple
+            for (int i = length; i >= 1; i--) {
+                type = new ASTFuncType(vars.get(i-1), type);
+            }
+
+            return type;
         }
 
         @Override
@@ -66,6 +90,20 @@ public class TupleReduction extends DeltaReduction {
 
         public int getN() {
             return n;
+        }
+
+        public ASTType getType() {
+            // isa_n-tuple :: (a1, ..., an) -> Bool
+
+            // (a1, ..., an)
+            List<ASTType> vars = new ArrayList<>();
+            for (int i = 1; i <= n; i++) {
+                vars.add(new ASTVariable("a"+i));
+            }
+            ASTType tuple = new ASTTupleType(vars);
+
+            ASTType type = new ASTFuncType(tuple, PredefinedType.BOOL.getType());
+            return type;
         }
 
         @Override
@@ -111,6 +149,20 @@ public class TupleReduction extends DeltaReduction {
 
         public int getI() {
             return i;
+        }
+
+        public ASTType getType() {
+            // isa_n-tuple :: (a1, ..., an) -> Bool
+
+            // (a1, ..., an)
+            List<ASTType> vars = new ArrayList<>();
+            for (int i = 1; i <= n; i++) {
+                vars.add(new ASTVariable("a"+i));
+            }
+            ASTType tuple = new ASTTupleType(vars);
+
+            ASTType type = new ASTFuncType(tuple, vars.get(i-1));
+            return type;
         }
 
         @Override

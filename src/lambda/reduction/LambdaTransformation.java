@@ -12,7 +12,7 @@ import java.util.Optional;
  * The default behavior is returning an optional empty for every node. The visit method for a general ASTTerm however
  * will call the appropriate visit method for its argument.
  */
-public interface LambdaTransformation {
+public interface LambdaTransformation extends LambdaVisitor<Optional<ASTTerm>> {
     default Optional<ASTTerm> visit(ASTAbstraction node) {
         return Optional.empty();
     }

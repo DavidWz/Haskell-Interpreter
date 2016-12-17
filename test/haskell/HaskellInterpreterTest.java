@@ -163,7 +163,7 @@ public class HaskellInterpreterTest {
         ASTTerm result = null;
         try {
             result = interpreter.evaluate(exp);
-        } catch (TooComplexException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
         System.out.println(result);

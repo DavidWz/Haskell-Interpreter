@@ -49,7 +49,7 @@ public class ComplexHaskellParserTest {
             System.out.println(result);
 
             assertEquals(result, new ASTConstant(-3));
-        } catch (TooComplexException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
     }
@@ -69,7 +69,7 @@ public class ComplexHaskellParserTest {
             System.out.println(result);
 
             assertEquals(result, new ASTConstant(-5.6f));
-        } catch (TooComplexException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
     }
@@ -96,7 +96,7 @@ public class ComplexHaskellParserTest {
             System.out.println(result);
 
             assertEquals(result, new ASTConstant(120));
-        } catch (TooComplexException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
     }

@@ -1,13 +1,13 @@
 package haskell;
 
-import haskell.complex.ast.ASTDecl;
-import haskell.complex.ast.ASTFunDecl;
-import haskell.complex.ast.ASTPatDecl;
-import haskell.complex.ast.ASTProgram;
+import haskell.complex.ast.*;
 import haskell.complex.reduction.ComplexToSimpleReducer;
 import haskell.complex.reduction.TooComplexException;
 import lambda.reduction.WHNOReducer;
+import lambda.type.TypeChecker;
+import lambda.type.TypeException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class HaskellInterpreter {
     private haskell.complex.ast.ASTProgram program;
     private ComplexToSimpleReducer complexToSimpleReducer;
+    private TypeChecker typeChecker;
     private WHNOReducer whnoReducer;
 
     /**
@@ -26,18 +27,22 @@ public class HaskellInterpreter {
      */
     public HaskellInterpreter(ASTProgram initialProgram) {
         assert(initialProgram != null);
-        this.program = initialProgram;
-        this.complexToSimpleReducer = new ComplexToSimpleReducer();
-        this.whnoReducer = new WHNOReducer();
+        init();
+        addProgram(initialProgram);
     }
 
     /**
      * Creates a new interpreter with no initial functions (except for the predefined ones).
      */
     public HaskellInterpreter() {
+        init();
+    }
+
+    private void init() {
         this.program = new ASTProgram();
         this.complexToSimpleReducer = new ComplexToSimpleReducer();
         this.whnoReducer = new WHNOReducer();
+        this.typeChecker = new TypeChecker();
     }
 
     /**
@@ -45,7 +50,7 @@ public class HaskellInterpreter {
      * @param declaration
      */
     public void addDeclaration(ASTDecl declaration) {
-        program.addDeclaration(declaration);
+        addProgram(new ASTProgram(declaration));
     }
 
     /**
@@ -53,8 +58,18 @@ public class HaskellInterpreter {
      * @param program
      */
     public void addProgram(ASTProgram program) {
+        // add the data declarations to the type checker
+        List<ASTDataDecl> dataDeclarations = program.getDecls().stream().
+                filter(decl -> decl instanceof ASTDataDecl).
+                map(decl -> (ASTDataDecl) decl).
+                collect(Collectors.toList());
+        for (ASTDataDecl dataDecl : dataDeclarations) {
+            typeChecker.addDataDeclaration(dataDecl);
+        }
+
+        // add all declarations to the program
         for (ASTDecl decl : program.getDecls()) {
-            addDeclaration(decl);
+            this.program.addDeclaration(decl);
         }
     }
 
@@ -63,20 +78,20 @@ public class HaskellInterpreter {
      * @param expression a complex haskell expression
      * @return a non-reducible lambda term
      */
-    public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression, boolean verbose) throws TooComplexException {
-        // we only use pattern and function declarations to evaluate an expression
-        List<ASTDecl> relevantDeclarations = program.getDecls().stream().
+    public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression, boolean verbose) throws TooComplexException, TypeException {
+        // we only need the function declarations actually used for the reduction
+        List<ASTDecl> functionDeclarations = program.getDecls().stream().
                 filter(decl -> decl instanceof ASTPatDecl || decl instanceof ASTFunDecl).
                 collect(Collectors.toList());
 
         // init: create the expression: let prog in expr
         haskell.complex.ast.ASTExpression letProgInExpr;
-        if (relevantDeclarations.size() == 0) {
+        if (functionDeclarations.size() == 0) {
             // empty lets are not supported, so we simply evaluate the expression directly
             letProgInExpr = expression;
         }
         else {
-            letProgInExpr = new haskell.complex.ast.ASTLet(relevantDeclarations, expression);
+            letProgInExpr = new haskell.complex.ast.ASTLet(functionDeclarations, expression);
         }
         if (verbose) {
             System.out.println("\n-- The following expression will be evaluated: ");
@@ -95,10 +110,21 @@ public class HaskellInterpreter {
         if (verbose) {
             System.out.println("\n-- The corresponding lambda term looks like this: ");
             System.out.println(lambdaTerm);
-            System.out.println("\n-- The following reduction steps were applied: ");
         }
 
-        // 3. reduce lambda expression with WHNO
+        // 3. TODO: do a static type check
+        /*ASTType type = typeChecker.checkType(lambdaTerm);
+        // the type checker will throw an exception if something's wrong
+        // so at this point we know that the expression is typed correctly
+        if (verbose) {
+            System.out.println("\n-- The type of the expression is: ");
+            System.out.println(type);
+        }*/
+
+        // 4. reduce lambda expression with WHNO
+        if (verbose) {
+            System.out.println("\n-- The following reduction steps were applied: ");
+        }
         lambda.ast.ASTTerm result = whnoReducer.reduceToWHNF(lambdaTerm, verbose);
         if (verbose) {
             System.out.println("\n-- The final result is: ");
@@ -108,7 +134,7 @@ public class HaskellInterpreter {
         return result;
     }
 
-    public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression) throws TooComplexException {
+    public lambda.ast.ASTTerm evaluate(haskell.complex.ast.ASTExpression expression) throws TooComplexException, TypeException {
         return evaluate(expression, false);
     }
 }

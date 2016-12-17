@@ -1,7 +1,5 @@
 package lambda.ast;
 
-import lambda.reduction.LambdaTransformation;
-
 import java.util.*;
 
 /**
@@ -109,8 +107,8 @@ public class ASTAbstraction extends ASTTerm {
     }
 
     @Override
-    public Optional<ASTTerm> accept(LambdaTransformation tr) {
-        return tr.visit(this);
+    public <T> T accept(LambdaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     /**

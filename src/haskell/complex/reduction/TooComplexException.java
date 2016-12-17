@@ -3,7 +3,7 @@ package haskell.complex.reduction;
 import haskell.complex.ast.ComplexHaskell;
 
 /**
- * Exceptions thrown when a complex haskell term cannot be cast to a simple haskell term.
+ * This exception is thrown when a complex haskell term cannot be cast to a simple haskell term.
  */
 public class TooComplexException extends Exception {
     private ComplexHaskell exp;

@@ -4,7 +4,7 @@ This is a haskell interpreter written in Java.
 The underlying theory is taken from the functional programming course at the RWTH Aachen university. (http://verify.rwth-aachen.de/fp16/)  
   
 ## Haskell Subset
-Refer to `src/haskell/complex/parser/ComplexHaskell.g4` for the grammar of the supported subset of Haskell.
+Refer to `src/haskell/complex/parser/ComplexHaskell.g4` for the grammar of the supported subset of Haskell.  
 For a list of predefined functions, refer to `src/lambda/reduction/delta/PredefinedFunction.java`.  
   
 As an example, consider the following data structure for lists in full haskell:  

@@ -1,7 +1,5 @@
 package lambda.ast;
 
-import lambda.reduction.LambdaTransformation;
-
 import java.util.*;
 
 /**
@@ -51,7 +49,12 @@ public class ASTConstant extends ASTTerm {
 
     @Override
     public String toString() {
-        return value.toString();
+        if (value instanceof Character) {
+            return "'"+value.toString()+"'";
+        }
+        else {
+            return value.toString();
+        }
     }
 
     @Override
@@ -67,7 +70,7 @@ public class ASTConstant extends ASTTerm {
     }
 
     @Override
-    public Optional<ASTTerm> accept(LambdaTransformation tr) {
-        return tr.visit(this);
+    public <T> T accept(LambdaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

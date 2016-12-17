@@ -5,6 +5,7 @@ import haskell.complex.reduction.TooComplexException;
 import haskell.simple.ast.ASTExpression;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a data declaration.
@@ -42,6 +43,10 @@ public class ASTDataDecl extends ASTDecl {
 
     public List<ASTConstrDecl> getConstrDecls() {
         return constrDecls;
+    }
+
+    public ASTType getType() {
+        return new ASTTypeConstr(tyConstr, vars.stream().map(var -> (ASTType) var).collect(Collectors.toList()));
     }
 
     @Override

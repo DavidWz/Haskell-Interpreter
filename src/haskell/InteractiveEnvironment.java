@@ -6,6 +6,7 @@ import haskell.complex.ast.ASTProgram;
 import haskell.complex.parser.ASTGenerator;
 import haskell.complex.reduction.TooComplexException;
 import lambda.ast.ASTTerm;
+import lambda.type.TypeException;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
@@ -157,8 +158,10 @@ public class InteractiveEnvironment {
                         System.out.println(result);
                     }
                 } catch (TooComplexException e) {
-                    e.printStackTrace();
                     System.out.println("Error: Could not evaluate the expression. Type \""+HELP_COMMAND+"\" for help.");
+                    e.printStackTrace();
+                } catch (TypeException e) {
+                    System.out.println("Error: The expression was incorrectly typed. Type \""+HELP_COMMAND+"\" for help.");
                 }
             }
             else {

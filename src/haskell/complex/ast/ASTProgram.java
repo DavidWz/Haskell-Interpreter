@@ -21,6 +21,10 @@ public class ASTProgram implements ComplexHaskell {
         this.decls = new ArrayList<>();
     }
 
+    public ASTProgram(ASTDecl... decls) {
+        this.decls = Arrays.asList(decls);
+    }
+
     public void addDeclaration(ASTDecl decl) {
         decls.add(decl);
     }
