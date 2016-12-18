@@ -90,13 +90,15 @@ public class ComplexHaskellParserTest {
         System.out.println(program.get());
         System.out.print("eval["+eval.get()+"] = ");
 
-        HaskellInterpreter interpreter = new HaskellInterpreter(program.get());
+        HaskellInterpreter interpreter = new HaskellInterpreter();
         try {
+            interpreter.addProgram(program.get());
             ASTTerm result = interpreter.evaluate(eval.get());
             System.out.println(result);
 
             assertEquals(result, new ASTConstant(120));
         } catch (Exception e) {
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }

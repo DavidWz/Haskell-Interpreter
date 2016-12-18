@@ -4,6 +4,7 @@ import haskell.complex.ast.*;
 import haskell.complex.reduction.TooComplexException;
 import lambda.ast.ASTConstant;
 import lambda.ast.ASTTerm;
+import lambda.type.TypeException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -130,7 +131,13 @@ public class HaskellInterpreterTest {
         prog.addDeclaration(listDecl);
 
         // create the interpreter
-        interpreter = new HaskellInterpreter(prog);
+        interpreter = new HaskellInterpreter();
+        try {
+            interpreter.addProgram(prog);
+        } catch (TypeException.InconsistentDataDeclException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
 
         // list3 = (Cons 3) ((Cons 2) ((Cons 1) Nil)))
         list1 = new ASTApplication(new ASTApplication(Cons, new ASTInteger(1)), Nil);

@@ -118,7 +118,11 @@ public class InteractiveEnvironment {
 
         Optional<ASTProgram> program = astGenerator.parseProgram(fileStream);
         if (program.isPresent()) {
-            interpreter.addProgram(program.get());
+            try {
+                interpreter.addProgram(program.get());
+            } catch (TypeException.InconsistentDataDeclException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
         }
         else {
             System.out.println("Error: The file did not contain a syntactically correct program.");
@@ -143,7 +147,11 @@ public class InteractiveEnvironment {
         // try to parse the input as a declaration
         Optional<ASTDecl> declaration = astGenerator.parseDeclaration(charStream);
         if (declaration.isPresent()) {
-            interpreter.addDeclaration(declaration.get());
+            try {
+                interpreter.addDeclaration(declaration.get());
+            } catch (TypeException.InconsistentDataDeclException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
         }
         else {
             // rebuild the char stream

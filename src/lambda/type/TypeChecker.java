@@ -38,10 +38,26 @@ public class TypeChecker implements LambdaVisitor<Optional<ASTType>> {
 
     /**
      * Adds a new data declaration.
-     * @param decl the declaration
+     * @param newDataDecl the declaration
      */
-    public void addDataDeclaration(ASTDataDecl decl) {
-        dataDeclarations.add(decl);
+    public void addDataDeclaration(ASTDataDecl newDataDecl) throws TypeException.InconsistentDataDeclException {
+        // check if neither the data type nor it's constructors have been added already
+        for (ASTDataDecl oldDataDecl : dataDeclarations) {
+            if (oldDataDecl.getTyConstr().equals(newDataDecl.getTyConstr())) {
+                throw new TypeException.InconsistentDataDeclException(oldDataDecl, newDataDecl);
+            }
+
+            for (ASTConstrDecl newConstrDecl : newDataDecl.getConstrDecls()) {
+                for (ASTConstrDecl oldConstrDecl : oldDataDecl.getConstrDecls()) {
+                    if (oldConstrDecl.getTyConstr().equals(newConstrDecl.getTyConstr())) {
+                        throw new TypeException.InconsistentDataDeclException(oldDataDecl, newDataDecl);
+                    }
+                }
+            }
+        }
+
+        // everything's consistent, so add it
+        dataDeclarations.add(newDataDecl);
     }
 
     /**

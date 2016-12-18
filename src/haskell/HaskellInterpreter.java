@@ -22,23 +22,9 @@ public class HaskellInterpreter {
     private WHNOReducer whnoReducer;
 
     /**
-     * Creates a new interpreter with the given initial program.
-     * @param initialProgram
-     */
-    public HaskellInterpreter(ASTProgram initialProgram) {
-        assert(initialProgram != null);
-        init();
-        addProgram(initialProgram);
-    }
-
-    /**
      * Creates a new interpreter with no initial functions (except for the predefined ones).
      */
     public HaskellInterpreter() {
-        init();
-    }
-
-    private void init() {
         this.program = new ASTProgram();
         this.complexToSimpleReducer = new ComplexToSimpleReducer();
         this.whnoReducer = new WHNOReducer();
@@ -49,27 +35,23 @@ public class HaskellInterpreter {
      * Adds a new declaration to this interpreter.
      * @param declaration
      */
-    public void addDeclaration(ASTDecl declaration) {
-        addProgram(new ASTProgram(declaration));
+    public void addDeclaration(ASTDecl declaration) throws TypeException.InconsistentDataDeclException {
+        if (declaration instanceof ASTDataDecl) {
+            // add this data declaration to the type checker
+            typeChecker.addDataDeclaration((ASTDataDecl) declaration);
+        }
+
+        // add this declaration to the program
+        this.program.addDeclaration(declaration);
     }
 
     /**
      * Adds all declarations of the given program to this interpreter.
      * @param program
      */
-    public void addProgram(ASTProgram program) {
-        // add the data declarations to the type checker
-        List<ASTDataDecl> dataDeclarations = program.getDecls().stream().
-                filter(decl -> decl instanceof ASTDataDecl).
-                map(decl -> (ASTDataDecl) decl).
-                collect(Collectors.toList());
-        for (ASTDataDecl dataDecl : dataDeclarations) {
-            typeChecker.addDataDeclaration(dataDecl);
-        }
-
-        // add all declarations to the program
+    public void addProgram(ASTProgram program) throws TypeException.InconsistentDataDeclException {
         for (ASTDecl decl : program.getDecls()) {
-            this.program.addDeclaration(decl);
+            addDeclaration(decl);
         }
     }
 
@@ -96,20 +78,21 @@ public class HaskellInterpreter {
         if (verbose) {
             System.out.println("\n-- The following expression will be evaluated: ");
             System.out.println(letProgInExpr);
+            System.out.println("\n-- In simple haskell, the expression looks like this: ");
         }
 
         // 1. reduce complex haskell expression to simple haskell expression
         haskell.simple.ast.ASTExpression simpleExpr = complexToSimpleReducer.reduceToSimple(letProgInExpr);
         if (verbose) {
-            System.out.println("\n-- In simple haskell, the expression looks like this: ");
             System.out.println(simpleExpr);
+            System.out.println("\n-- The corresponding lambda term looks like this: ");
         }
 
         // 2. reduce simple haskell expression to lambda expression
         lambda.ast.ASTTerm lambdaTerm = simpleExpr.toLambdaTerm();
         if (verbose) {
-            System.out.println("\n-- The corresponding lambda term looks like this: ");
             System.out.println(lambdaTerm);
+            System.out.println("\n-- The type of the expression is: ");
         }
 
         // 3. do a static type check
@@ -117,14 +100,11 @@ public class HaskellInterpreter {
         // the type checker will throw an exception if something's wrong
         // so at this point we know that the expression is typed correctly
         if (verbose) {
-            System.out.println("\n-- The type of the expression is: ");
             System.out.println(type);
+            System.out.println("\n-- The following reduction steps were applied: ");
         }
 
         // 4. reduce lambda expression with WHNO
-        if (verbose) {
-            System.out.println("\n-- The following reduction steps were applied: ");
-        }
         lambda.ast.ASTTerm result = whnoReducer.reduceToWHNF(lambdaTerm, verbose);
         if (verbose) {
             System.out.println("\n-- The final result is: ");

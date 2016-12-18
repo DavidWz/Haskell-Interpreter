@@ -42,7 +42,12 @@ public class TypeCheckerTest {
         ASTVariable a = new ASTVariable("a");
         ASTConstrDecl ConsDecl = new ASTConstrDecl(Cons, a, new ASTTypeConstr(List, a));
         ASTDataDecl listDecl = new ASTDataDecl(List, a, new ASTConstrDecl(Nil), ConsDecl);
-        typeChecker.addDataDeclaration(listDecl);
+        try {
+            typeChecker.addDataDeclaration(listDecl);
+        } catch (TypeException.InconsistentDataDeclException e) {
+            e.printStackTrace();
+            fail();
+        }
 
         // maybe type: data Maybe a = Nothing | Just a
         Maybe = new ASTTyConstr("Maybe");
@@ -50,7 +55,28 @@ public class TypeCheckerTest {
         ASTTyConstr Nothing = new ASTTyConstr("Nothing");
         ASTConstrDecl JustDecl = new ASTConstrDecl(Just, a);
         ASTDataDecl maybeDecl = new ASTDataDecl(Maybe, a, new ASTConstrDecl(Nothing), JustDecl);
-        typeChecker.addDataDeclaration(maybeDecl);
+        try {
+            typeChecker.addDataDeclaration(maybeDecl);
+        } catch (TypeException.InconsistentDataDeclException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testInconsistentDataDecl() {
+        ASTTyConstr AnotherList = new ASTTyConstr("AnotherList");
+        ASTTyConstr Cons = new ASTTyConstr("Cons");
+        ASTTyConstr Nil = new ASTTyConstr("Nil2");
+        ASTVariable a = new ASTVariable("a");
+        ASTConstrDecl ConsDecl = new ASTConstrDecl(Cons, a, new ASTTypeConstr(List, a));
+        ASTDataDecl AnotherListDecl = new ASTDataDecl(AnotherList, a, new ASTConstrDecl(Nil), ConsDecl);
+
+        try {
+            typeChecker.addDataDeclaration(AnotherListDecl);
+            fail("Inconsistend data decl was added.");
+        } catch (TypeException.InconsistentDataDeclException e) {
+            System.out.println("Excepcted error: " + e.getMessage());
+        }
     }
 
     @Test
