@@ -2,11 +2,27 @@ package lambda.type;
 
 import haskell.complex.ast.ASTType;
 import lambda.ast.ASTConstant;
+import lambda.ast.ASTTerm;
 
 /**
  * This exception is thrown when an expression is not correctly typed.
  */
 public abstract class TypeException extends Exception {
+    public static class IncorrectlyTypedException extends TypeException {
+        private ASTTerm term;
+
+        public IncorrectlyTypedException(ASTTerm term) {
+            this.term = term;
+        }
+
+        @Override
+        public String getMessage() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("The following expression is incorrectly typed: ").append(term);
+            return builder.toString();
+        }
+    }
+
     public static class TypeNotFoundException extends TypeException {
         private ASTConstant c;
 

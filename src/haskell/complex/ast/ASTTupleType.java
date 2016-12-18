@@ -1,8 +1,6 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
-import haskell.simple.ast.*;
 import haskell.simple.ast.ASTExpression;
 
 import java.util.HashSet;
@@ -82,7 +80,7 @@ public class ASTTupleType implements ASTType {
     }
 
     @Override
-    public boolean accept(ComplexHaskellTransformation tr) {
-        return tr.visit(this);
+    public <T> T accept(ComplexHaskellVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

@@ -114,7 +114,7 @@ public class FunDeclToPatDecl implements ComplexHaskellTransformation {
     }
 
     @Override
-    public boolean visit(ASTLet node) {
+    public Boolean visit(ASTLet node) {
         // first, try to apply this transformation as deep as possible
         for (ASTDecl decl : node.getDecls()) {
             if (decl.accept(this)) {
@@ -137,7 +137,7 @@ public class FunDeclToPatDecl implements ComplexHaskellTransformation {
     }
 
     @Override
-    public boolean visit(ASTProgram node) {
+    public Boolean visit(ASTProgram node) {
         // first, we try to apply the transformation as deep as possible
         for (ASTDecl decl : node.getDecls()) {
             if (decl.accept(this)) {

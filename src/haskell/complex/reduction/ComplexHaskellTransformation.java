@@ -8,8 +8,8 @@ import haskell.complex.ast.*;
  * Every visit method returns whether the visitor was successful in doing what it was supposed to do for that node.
  * The default behavior for visiting a node is that the visit method is simply called for every sub-expression in that node.
  */
-public interface ComplexHaskellTransformation {
-    default boolean visit(ASTApplication node) {
+public interface ComplexHaskellTransformation extends ComplexHaskellVisitor<Boolean> {
+    default Boolean visit(ASTApplication node) {
         for (ASTExpression exp : node.getExps()) {
             if (exp.accept(this)) {
                 return true;
@@ -18,11 +18,11 @@ public interface ComplexHaskellTransformation {
         return false;
     }
 
-    default boolean visit(ASTBoolean node) {
+    default Boolean visit(ASTBoolean node) {
         return false;
     }
 
-    default boolean visit(ASTBranch node) {
+    default Boolean visit(ASTBranch node) {
         if (node.getCondition().accept(this)) {
             return true;
         }
@@ -32,7 +32,7 @@ public interface ComplexHaskellTransformation {
         return node.getElseBranch().accept(this);
     }
 
-    default boolean visit(ASTCase node) {
+    default Boolean visit(ASTCase node) {
         if (node.getExp().accept(this)) {
             return true;
         }
@@ -44,15 +44,15 @@ public interface ComplexHaskellTransformation {
         return false;
     }
 
-    default boolean visit(ASTChar node) {
+    default Boolean visit(ASTChar node) {
         return false;
     }
 
-    default boolean visit(ASTConstruct node) {
+    default Boolean visit(ASTConstruct node) {
         return false;
     }
 
-    default boolean visit(ASTExpTuple node) {
+    default Boolean visit(ASTExpTuple node) {
         for (ASTExpression exp : node.getExps()) {
             if (exp.accept(this)) {
                 return true;
@@ -61,27 +61,27 @@ public interface ComplexHaskellTransformation {
         return false;
     }
 
-    default boolean visit(ASTFloat node) {
+    default Boolean visit(ASTFloat node) {
         return false;
     }
 
-    default boolean visit(ASTFunDecl node) {
+    default Boolean visit(ASTFunDecl node) {
         return node.getExp().accept(this);
     }
 
-    default boolean visit(ASTInteger node) {
+    default Boolean visit(ASTInteger node) {
         return false;
     }
 
-    default boolean visit(ASTJoker node) {
+    default Boolean visit(ASTJoker node) {
         return false;
     }
 
-    default boolean visit(ASTLambda node) {
+    default Boolean visit(ASTLambda node) {
         return node.getExp().accept(this);
     }
 
-    default boolean visit(ASTLet node) {
+    default Boolean visit(ASTLet node) {
         for (ASTDecl decl : node.getDecls()) {
             if (decl.accept(this)) {
                 return true;
@@ -90,15 +90,15 @@ public interface ComplexHaskellTransformation {
         return node.getExp().accept(this);
     }
 
-    default boolean visit(ASTPatDecl node) {
+    default Boolean visit(ASTPatDecl node) {
         return node.getExp().accept(this);
     }
 
-    default boolean visit(ASTPatTuple node) {
+    default Boolean visit(ASTPatTuple node) {
         return false;
     }
 
-    default boolean visit(ASTProgram node) {
+    default Boolean visit(ASTProgram node) {
         for(ASTDecl decl : node.getDecls()) {
             if (decl.accept(this)) {
                 return true;
@@ -107,31 +107,31 @@ public interface ComplexHaskellTransformation {
         return false;
     }
 
-    default boolean visit(ASTTyConstr node) {
+    default Boolean visit(ASTTyConstr node) {
         return false;
     }
 
-    default boolean visit(ASTVariable node) {
+    default Boolean visit(ASTVariable node) {
         return false;
     }
 
-    default boolean visit(ASTDataDecl node) {
+    default Boolean visit(ASTDataDecl node) {
         return false;
     }
 
-    default boolean visit(ASTConstrDecl node) {
+    default Boolean visit(ASTConstrDecl node) {
         return false;
     }
 
-    default boolean visit(ASTTypeConstr node) {
+    default Boolean visit(ASTTypeConstr node) {
         return false;
     }
 
-    default boolean accept(ASTFuncType node) {
+    default Boolean accept(ASTFuncType node) {
         return false;
     }
 
-    default boolean visit(ASTTupleType node) {
+    default Boolean visit(ASTTupleType node) {
         return false;
     }
 }

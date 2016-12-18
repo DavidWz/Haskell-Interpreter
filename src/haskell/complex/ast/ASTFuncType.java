@@ -1,6 +1,5 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 import haskell.simple.ast.ASTExpression;
 
@@ -77,7 +76,7 @@ public class ASTFuncType implements ASTType {
     }
 
     @Override
-    public boolean accept(ComplexHaskellTransformation tr) {
-        return tr.accept(this);
+    public <T> T accept(ComplexHaskellVisitor<T> visitor) {
+        return visitor.accept(this);
     }
 }

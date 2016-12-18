@@ -1,6 +1,5 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 
 import java.util.HashSet;
@@ -102,8 +101,8 @@ public class ASTCase implements ASTExpression {
     }
 
     @Override
-    public boolean accept(ComplexHaskellTransformation tr) {
-        return tr.visit(this);
+    public <T> T accept(ComplexHaskellVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     @Override

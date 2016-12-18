@@ -19,10 +19,9 @@ public class ConstantTypes {
      * added to this type checker yet.
      *
      * @param node the constant
-     * @return its type
-     * @throws TypeException
+     * @return its type or empty if the type could not be determined
      */
-    public static ASTType getType(ASTConstant node, List<ASTDataDecl> dataDecls) throws TypeException {
+    public static Optional<ASTType> getType(ASTConstant node, List<ASTDataDecl> dataDecls) {
         Object value = node.getValue();
         ASTType type;
 
@@ -56,26 +55,24 @@ public class ConstantTypes {
         }
         else if (value instanceof ConstructorReduction.Constructor){
             ConstructorReduction.Constructor constr = (ConstructorReduction.Constructor) value;
-            type = getType(constr, dataDecls).orElseThrow(() -> new TypeException.TypeNotFoundException(node));
+            return getType(constr, dataDecls);
         }
         else if (value instanceof ConstructorReduction.ArgOf) {
             ConstructorReduction.ArgOf argof = (ConstructorReduction.ArgOf) value;
-            type = getType(argof, dataDecls).orElseThrow(() -> new TypeException.TypeNotFoundException(node));
+            return getType(argof, dataDecls);
         }
         else if (value instanceof ConstructorReduction.IsA) {
             ConstructorReduction.IsA isaConstr = (ConstructorReduction.IsA) value;
-            type = getType(isaConstr, dataDecls).orElseThrow(() -> new TypeException.TypeNotFoundException(node));
+            return getType(isaConstr, dataDecls);
         }
         else {
-            throw new TypeException.TypeNotFoundException(node);
+            return Optional.empty();
         }
 
-        return type;
+        return Optional.of(type);
     }
 
     private static Optional<ASTType> getType(ConstructorReduction.Constructor constr, List<ASTDataDecl> dataDecls) {
-        ASTTyConstr tyConstr = new ASTTyConstr(constr.getName());
-
         // data tyconstr a1 ... am = constr type1 ... typen
         // constr :: type1 -> ... -> typen -> (tyconstr a1 ... am)
         Optional<ASTType> dataType = getDataType(constr, dataDecls);

@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class SeparateAndNestDecls implements ComplexHaskellTransformation {
     @Override
-    public boolean visit(ASTLet node) {
+    public Boolean visit(ASTLet node) {
         List<ASTDecl> decls = node.getDecls();
         ASTExpression exp = node.getExp();
 

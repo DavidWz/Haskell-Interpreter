@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class LambdaPatternToCase implements ComplexHaskellTransformation {
     @Override
-    public boolean visit(ASTLambda node) {
+    public Boolean visit(ASTLambda node) {
         // first try to apply the transformation as deep as possible
         ASTExpression exp = node.getExp();
         if (exp.accept(this)) {

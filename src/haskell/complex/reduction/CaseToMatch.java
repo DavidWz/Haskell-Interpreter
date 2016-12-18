@@ -42,7 +42,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
     }
 
     @Override
-    public boolean visit(ASTApplication node) {
+    public Boolean visit(ASTApplication node) {
         // try to apply it as deep as possible
         List<ASTExpression> exps = node.getExps();
         for (ASTExpression exp : exps) {
@@ -63,7 +63,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
     }
 
     @Override
-    public boolean visit(ASTBranch node) {
+    public Boolean visit(ASTBranch node) {
         ASTExpression condition = node.getCondition();
         ASTExpression ifBranch = node.getIfBranch();
         ASTExpression elseBranch = node.getElseBranch();
@@ -100,7 +100,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
     }
 
     @Override
-    public boolean visit(ASTCase node) {
+    public Boolean visit(ASTCase node) {
         ASTExpression exp = node.getExp();
         List<ASTExpression> caseExps = node.getCaseExps();
 
@@ -131,7 +131,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
     }
 
     @Override
-    public boolean visit(ASTExpTuple node) {
+    public Boolean visit(ASTExpTuple node) {
         List<ASTExpression> exps = node.getExps();
 
         // try to apply it as deep as possible
@@ -154,7 +154,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
 
 
     @Override
-    public boolean visit(ASTFunDecl node) {
+    public Boolean visit(ASTFunDecl node) {
         ASTExpression exp = node.getExp();
 
         if (exp.accept(this)) {
@@ -171,7 +171,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
 
 
     @Override
-    public boolean visit(ASTLambda node) {
+    public Boolean visit(ASTLambda node) {
         ASTExpression exp = node.getExp();
 
         if (exp.accept(this)) {
@@ -187,7 +187,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
     }
 
     @Override
-    public boolean visit(ASTLet node) {
+    public Boolean visit(ASTLet node) {
         List<ASTDecl> decls = node.getDecls();
         ASTExpression exp = node.getExp();
 
@@ -209,7 +209,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
     }
 
     @Override
-    public boolean visit(ASTPatDecl node) {
+    public Boolean visit(ASTPatDecl node) {
         ASTExpression exp = node.getExp();
 
         if (exp.accept(this)) {
@@ -226,7 +226,7 @@ public class CaseToMatch implements ComplexHaskellTransformation {
 
 
     @Override
-    public boolean visit(ASTProgram node) {
+    public Boolean visit(ASTProgram node) {
         for (ASTDecl decl : node.getDecls()) {
             if (decl.accept(this)) {
                 return true;

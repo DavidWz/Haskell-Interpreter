@@ -1,6 +1,5 @@
 package haskell.complex.ast;
 
-import haskell.complex.reduction.ComplexHaskellTransformation;
 import haskell.complex.reduction.TooComplexException;
 
 import java.util.Set;
@@ -30,9 +29,9 @@ public interface ComplexHaskell {
     haskell.simple.ast.ASTExpression castToSimple() throws TooComplexException;
 
     /**
-     * Accepts a complex haskell transformation visitor and calls its corresponding visit method.
-     * @param tr
+     * Accepts a complex haskell visitor and calls its corresponding visit method.
      * @return
+     * @param visitor
      */
-    boolean accept(ComplexHaskellTransformation tr);
+    <T> T accept(ComplexHaskellVisitor<T> visitor);
 }
