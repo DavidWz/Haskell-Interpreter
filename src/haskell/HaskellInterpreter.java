@@ -112,14 +112,14 @@ public class HaskellInterpreter {
             System.out.println(lambdaTerm);
         }
 
-        // 3. TODO: do a static type check
-        /*ASTType type = typeChecker.checkType(lambdaTerm);
+        // 3. do a static type check
+        ASTType type = typeChecker.checkType(lambdaTerm);
         // the type checker will throw an exception if something's wrong
         // so at this point we know that the expression is typed correctly
         if (verbose) {
             System.out.println("\n-- The type of the expression is: ");
             System.out.println(type);
-        }*/
+        }
 
         // 4. reduce lambda expression with WHNO
         if (verbose) {

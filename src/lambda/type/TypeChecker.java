@@ -13,6 +13,9 @@ import java.util.*;
  * and it will throw a type exception if the lambda term is incorrectly typed.
  */
 public class TypeChecker implements LambdaVisitor<Optional<ASTType>> {
+    private TypeUnifier typeUnifier;
+    private TypeSubstituter substituter;
+
     // list of data declarations
     private List<ASTDataDecl> dataDeclarations;
 
@@ -25,6 +28,8 @@ public class TypeChecker implements LambdaVisitor<Optional<ASTType>> {
     private int freshVarIndex;
 
     public TypeChecker(){
+        this.typeUnifier = new TypeUnifier(this);
+        this.substituter = new TypeSubstituter();
         this.dataDeclarations = new ArrayList<>();
         this.assumptions = new HashMap<>();
         this.error = Optional.empty();
@@ -83,10 +88,14 @@ public class TypeChecker implements LambdaVisitor<Optional<ASTType>> {
     public Optional<ASTType> visit(ASTAbstraction node) {
         // we replace the abstraction variable with a fresh variable
         ASTVariable argument = getFreshVariable();
+        lambda.ast.ASTVariable freshLambdaVar = new lambda.ast.ASTVariable(argument.getName());
         updateAssumption(new ASTVariable(node.getInput().getName()), argument);
 
+        // we substitute the abstraction variable with the fresh variable in the lambda term as well
+        ASTTerm output = node.getOutput().substitute(node.getInput(), freshLambdaVar);
+
         // then we determine the type of the abstraction output
-        Optional<ASTType> outputType = node.getOutput().accept(this);
+        Optional<ASTType> outputType = output.accept(this);
         if (!outputType.isPresent()) {
             // abort if the type could not be determined.
             return outputType;
@@ -114,7 +123,7 @@ public class TypeChecker implements LambdaVisitor<Optional<ASTType>> {
         // try to unify leftType  with (rightType -> var)
         ASTVariable resultVar = getFreshVariable();
         try {
-            unify(leftType.get(), new ASTFuncType(rightType.get(), resultVar));
+            typeUnifier.unify(leftType.get(), new ASTFuncType(rightType.get(), resultVar));
         }
         catch(TypeException.CannotUnifyException e) {
             error = Optional.of(e);
@@ -127,11 +136,15 @@ public class TypeChecker implements LambdaVisitor<Optional<ASTType>> {
 
     @Override
     public Optional<ASTType> visit(ASTConstant node) {
-        Optional<ASTType> type = ConstantTypes.getType(node, dataDeclarations);
+        Optional<ASTType> type = ConstantTypeResolver.getType(node, dataDeclarations);
         if (!type.isPresent()) {
             error = Optional.of(new TypeException.TypeNotFoundException(node));
+            return type;
         }
-        // TODO: replace used variables with fresh variables
+        // replace the type variables with new fresh ones
+        for (ASTVariable var : type.get().getAllVariables()) {
+            type = Optional.of(substituter.substituteVariable(var, getFreshVariable(), type.get()));
+        }
 
         return type;
     }
@@ -155,7 +168,7 @@ public class TypeChecker implements LambdaVisitor<Optional<ASTType>> {
      * Returns a fresh variable which does not occur in the assumptions or in predefined functions
      * @return
      */
-    private ASTVariable getFreshVariable() {
+    public ASTVariable getFreshVariable() {
         // we choose "b" because predefined functions only use "a..." as type variables
         String varName = "b";
 
@@ -170,8 +183,32 @@ public class TypeChecker implements LambdaVisitor<Optional<ASTType>> {
      * @param var the variable
      * @param type it's new type
      */
-    private void updateAssumption(ASTVariable var, ASTType type) {
+    public void updateAssumption(ASTVariable var, ASTType type) {
+        // {var :: old} to {var :: type}
         assumptions.put(var, type);
+
+        // check transitivity
+        for (Map.Entry<ASTVariable, ASTType> entry : assumptions.entrySet()) {
+            if (entry.getValue().equals(var)) {
+                // if {x :: var} is in our assumption set, we need to update it to {x :: type}
+                entry.setValue(type);
+            }
+            else {
+                // furthermore, we need to substitute all occurrences of var in all types
+                entry.setValue(substituter.substituteVariable(var, type, entry.getValue()));
+            }
+        }
+    }
+
+    /**
+     * Applies the type assumptions to the given type.
+     * @param type
+     */
+    public ASTType applyAssumptions(ASTType type) {
+        for (Map.Entry<ASTVariable, ASTType> entry : assumptions.entrySet()) {
+            type = substituter.substituteVariable(entry.getKey(), entry.getValue(), type);
+        }
+        return type;
     }
 
     /**
@@ -187,16 +224,5 @@ public class TypeChecker implements LambdaVisitor<Optional<ASTType>> {
         else {
             return var;
         }
-    }
-
-    /**
-     * Tries to unify type1 with type2. This method will update the assumptions accordingly.
-     * If no unifier could be found, a cannot unify exception will be thrown.
-     * @param type1
-     * @param type2
-     * @throws TypeException.CannotUnifyException
-     */
-    private void unify(ASTType type1, ASTType type2) throws TypeException.CannotUnifyException {
-        // TODO
     }
 }

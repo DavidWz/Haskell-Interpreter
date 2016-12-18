@@ -94,4 +94,9 @@ public class ASTTypeConstr implements ASTType {
     public <T> T accept(ComplexHaskellVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override
+    public <T> T accept(TypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

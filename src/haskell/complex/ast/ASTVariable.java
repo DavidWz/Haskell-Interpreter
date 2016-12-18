@@ -74,4 +74,9 @@ public class ASTVariable implements ASTExpression, ASTPattern, ASTType {
     public <T> T accept(ComplexHaskellVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override
+    public <T> T accept(TypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

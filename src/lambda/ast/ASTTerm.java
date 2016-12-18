@@ -27,7 +27,7 @@ public abstract class ASTTerm {
     public abstract Set<ASTVariable> getFreeVars();
 
     /**
-     * Substitutes all free occurences of var in this term by expr.
+     * Substitutes all free occurrences of var in this term by expr.
      * @param var the variable which will be substituted
      * @param expr the generated expression
      * @return the substituted term

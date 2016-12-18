@@ -79,4 +79,9 @@ public class ASTFuncType implements ASTType {
     public <T> T accept(ComplexHaskellVisitor<T> visitor) {
         return visitor.accept(this);
     }
+
+    @Override
+    public <T> T accept(TypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

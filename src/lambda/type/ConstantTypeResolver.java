@@ -12,7 +12,7 @@ import java.util.Optional;
 /**
  * Helper class which can return the type of constants. (both predefined and custom)
  */
-public class ConstantTypes {
+public class ConstantTypeResolver {
     /**
      * Returns the type of a lambda constant. Because it is a constant, theoretically, its type should be known.
      * If the type of this constant cannot be determined, this means the corresponding data declaration has not been

@@ -177,12 +177,15 @@ public class TypeCheckerTest {
 
     @Test
     public void testIncorrectlyTypedPredefinedFunction() {
-        ASTTerm lambda = new ASTApplication(new ASTApplication(new ASTConstant(PredefinedFunction.PLUS.getType()), new ASTConstant('a')), new ASTConstant(5));
+        ASTTerm lambda = new ASTApplication(new ASTApplication(new ASTConstant(PredefinedFunction.PLUS), new ASTConstant('a')), new ASTConstant(5));
         try {
             ASTType type = typeChecker.checkType(lambda);
-            fail(lambda + " is incorrectly typed, but the type checker thinks it of type " + type);
-        } catch (TypeException e) {
+            fail(lambda + " is incorrectly typed, but the type checker thinks it's of type " + type);
+        } catch (TypeException.CannotUnifyException e) {
             System.out.println("Expected error: " + e.getMessage());
+        } catch (TypeException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
         }
     }
 
@@ -274,9 +277,9 @@ public class TypeCheckerTest {
 
     @Test
     public void testDoublePatternMatching() {
-        String programCode = "addm Nil Nil = 0\n" +
-                "addm Nil (Just x) = x\n" +
-                "addm (Just x) Nil = x\n" +
+        String programCode = "addm Nothing Nothing = 0.0\n" +
+                "addm Nothing (Just x) = x\n" +
+                "addm (Just x) Nothing = x\n" +
                 "addm (Just x) (Just y) = (plusf x y)\n";
 
         String expressionCode = "addm";
