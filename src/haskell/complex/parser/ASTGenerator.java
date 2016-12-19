@@ -356,7 +356,7 @@ public class ASTGenerator implements ANTLRErrorListener {
 
     private static class LambdaVisitor extends ComplexHaskellBaseVisitor<ASTLambda> {
         @Override
-        public ASTLambda visitFundecl(ComplexHaskellParser.FundeclContext ctx) {
+        public ASTLambda visitLambda(ComplexHaskellParser.LambdaContext ctx) {
             PatVisitor patVisitor = new PatVisitor();
             List<ASTPattern> pats = ctx.pat().stream().
                     map(pat -> pat.accept(patVisitor)).

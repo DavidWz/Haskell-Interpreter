@@ -343,6 +343,44 @@ public class TypeCheckerTest {
         }
     }
 
+    @Test
+    public void testGenList() {
+        String programCode = "genList 0 = Nil\n" +
+                "genList x = (Cons x (genList (decrement x)))\n" +
+                "decrement x = (minus x 1)\n";
+
+        String expressionCode = "genList";
+
+        Optional<ASTProgram> program = astGenerator.parseProgram(new ANTLRInputStream(programCode));
+        Optional<ASTExpression> eval = astGenerator.parseExpression(new ANTLRInputStream(expressionCode));
+        assertTrue(program.isPresent());
+        assertTrue(eval.isPresent());
+
+        System.out.println(program.get());
+        System.out.print("typeof["+eval.get()+"] = ");
+
+        try {
+            ASTType genListType = getTypeOfExpression(program.get(), eval.get());
+            System.out.println(genListType);
+
+            assertTrue(genListType instanceof ASTFuncType);
+            ASTFuncType genListFuncType = (ASTFuncType) genListType;
+
+            assertEquals(PredefinedType.INTEGER.getType(), genListFuncType.getFrom());
+
+            assertTrue(genListFuncType.getTo() instanceof ASTTypeConstr);
+            ASTTypeConstr listInt = (ASTTypeConstr) genListFuncType.getTo();
+
+            assertEquals(List, listInt.getTyConstr());
+            assertEquals(1, listInt.getTypes().size());
+            assertEquals(PredefinedType.INTEGER.getType(), listInt.getTypes().get(0));
+        } catch (TypeException e) {
+            fail(e.getMessage());
+        } catch (TooComplexException e) {
+            fail(e.getMessage());
+        }
+    }
+
     private ASTType getTypeOfExpression(ASTProgram program, ASTExpression expression) throws TypeException, TooComplexException {
         List<ASTDecl> functionDeclarations = program.getDecls().stream().
                 filter(decl -> decl instanceof ASTPatDecl || decl instanceof ASTFunDecl).
