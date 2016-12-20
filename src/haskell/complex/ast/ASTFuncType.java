@@ -51,8 +51,14 @@ public class ASTFuncType implements ASTType {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("(").append(from).append(" -> ");
-        builder.append(to).append(")");
+
+        if (from instanceof ASTFuncType) {
+            builder.append("(").append(from).append(")");
+        }
+        else {
+            builder.append(from);
+        }
+        builder.append(" -> ").append(to);
         return builder.toString();
     }
 

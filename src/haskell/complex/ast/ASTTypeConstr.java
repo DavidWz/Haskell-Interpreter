@@ -58,6 +58,10 @@ public class ASTTypeConstr implements ASTType {
 
     @Override
     public String toString() {
+        if (types.size() == 0) {
+            return tyConstr.toString();
+        }
+
         StringBuilder builder = new StringBuilder();
         builder.append("(").append(tyConstr);
         for (ASTType type : types) {
