@@ -203,6 +203,11 @@ public class TypeChecker implements LambdaVisitor<Optional<ASTType>> {
         // {var :: old} to {var :: type}
         assumptions.put(var, type);
 
+        // if {var1 :: var2}, then also {var2 :: var1}
+        if (type instanceof ASTVariable) {
+            assumptions.put((ASTVariable) type, var);
+        }
+
         // check transitivity
         for (Map.Entry<ASTVariable, ASTType> entry : assumptions.entrySet()) {
             if (entry.getValue().equals(var)) {
