@@ -1,6 +1,6 @@
 package lambda.type;
 
-import haskell.complex.ast.*;
+import haskell.ast.*;
 
 /**
  * This class can unify two types.

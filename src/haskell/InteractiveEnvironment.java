@@ -1,10 +1,9 @@
 package haskell;
 
-import haskell.complex.ast.ASTDecl;
-import haskell.complex.ast.ASTExpression;
-import haskell.complex.ast.ASTProgram;
-import haskell.complex.parser.ASTGenerator;
-import haskell.complex.reduction.TooComplexException;
+import haskell.ast.ASTDecl;
+import haskell.ast.ASTExpression;
+import haskell.ast.ASTProgram;
+import haskell.parser.ASTGenerator;
 import lambda.ast.ASTTerm;
 import lambda.type.TypeException;
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -165,11 +164,11 @@ public class InteractiveEnvironment {
                     if (!verbose) {
                         System.out.println(result);
                     }
-                } catch (TooComplexException e) {
-                    System.out.println("Error: Could not evaluate the expression. Type \""+HELP_COMMAND+"\" for help.");
-                    e.printStackTrace();
                 } catch (TypeException e) {
                     System.out.println("Error: The expression was incorrectly typed. Type \""+HELP_COMMAND+"\" for help.");
+                } catch (Exception e) {
+                    System.out.println("Unexpected error: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
             else {

@@ -1,9 +1,9 @@
 package lambda.reduction.delta;
 
-import haskell.complex.ast.ASTFuncType;
-import haskell.complex.ast.ASTTupleType;
-import haskell.complex.ast.ASTType;
-import haskell.complex.ast.ASTVariable;
+import haskell.ast.ASTFuncType;
+import haskell.ast.ASTTupleType;
+import haskell.ast.ASTType;
+import haskell.ast.ASTVariable;
 import lambda.ast.ASTConstant;
 import lambda.ast.ASTTerm;
 import lambda.type.PredefinedType;

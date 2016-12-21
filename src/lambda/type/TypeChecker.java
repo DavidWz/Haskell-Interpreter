@@ -1,7 +1,7 @@
 package lambda.type;
 
-import haskell.complex.ast.*;
-import haskell.complex.ast.ASTVariable;
+import haskell.ast.*;
+import haskell.ast.ASTVariable;
 import lambda.ast.*;
 import lambda.ast.ASTApplication;
 

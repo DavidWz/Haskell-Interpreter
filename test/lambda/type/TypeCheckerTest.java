@@ -1,12 +1,13 @@
 package lambda.type;
 
-import haskell.complex.ast.*;
-import haskell.complex.ast.ASTVariable;
-import haskell.complex.parser.ASTGenerator;
-import haskell.complex.reduction.ComplexToSimpleReducer;
-import haskell.complex.reduction.TooComplexException;
+import haskell.ast.*;
+import haskell.parser.ASTGenerator;
+import haskell.reduction.ComplexToSimpleReducer;
+import haskell.reduction.SimpleToLambdaReducer;
+import lambda.ast.ASTAbstraction;
+import lambda.ast.ASTConstant;
+import lambda.ast.ASTTerm;
 import lambda.reduction.WHNOReducerTest;
-import lambda.ast.*;
 import lambda.ast.ASTApplication;
 import lambda.reduction.delta.ConstructorReduction;
 import lambda.reduction.delta.PredefinedFunction;
@@ -256,9 +257,8 @@ public class TypeCheckerTest {
             assertEquals(List, listA.getTyConstr());
             assertEquals(1, listA.getTypes().size());
             assertTrue(listA.getTypes().get(0) instanceof ASTVariable);
-        } catch (TypeException e) {
-            fail(e.getMessage());
-        } catch (TooComplexException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }
@@ -294,9 +294,8 @@ public class TypeCheckerTest {
             assertEquals(List, listA.getTyConstr());
             assertEquals(1, listA.getTypes().size());
             assertTrue(listA.getTypes().get(0) instanceof ASTVariable);
-        } catch (TypeException e) {
-            fail(e.getMessage());
-        } catch (TooComplexException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }
@@ -334,10 +333,7 @@ public class TypeCheckerTest {
 
             assertEquals(maybeFloat, addmFuncTypeRight.getFrom());
             assertEquals(PredefinedType.FLOAT.getType(), addmFuncTypeRight.getTo());
-        } catch (TypeException e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        } catch (TooComplexException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
         }
@@ -374,34 +370,34 @@ public class TypeCheckerTest {
             assertEquals(List, listInt.getTyConstr());
             assertEquals(1, listInt.getTypes().size());
             assertEquals(PredefinedType.INTEGER.getType(), listInt.getTypes().get(0));
-        } catch (TypeException e) {
-            fail(e.getMessage());
-        } catch (TooComplexException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }
 
-    private ASTType getTypeOfExpression(ASTProgram program, ASTExpression expression) throws TypeException, TooComplexException {
+    private ASTType getTypeOfExpression(ASTProgram program, ASTExpression expression) throws TypeException {
         List<ASTDecl> functionDeclarations = program.getDecls().stream().
                 filter(decl -> decl instanceof ASTPatDecl || decl instanceof ASTFunDecl).
                 collect(Collectors.toList());
 
         // init: create the expression: let prog in expr
-        haskell.complex.ast.ASTExpression letProgInExpr;
+        ASTExpression letProgInExpr;
         if (functionDeclarations.size() == 0) {
             // empty lets are not supported, so we simply evaluate the expression directly
             letProgInExpr = expression;
         }
         else {
-            letProgInExpr = new haskell.complex.ast.ASTLet(functionDeclarations, expression);
+            letProgInExpr = new ASTLet(functionDeclarations, expression);
         }
 
         // 1. reduce complex haskell expression to simple haskell expression
         ComplexToSimpleReducer complexToSimpleReducer = new ComplexToSimpleReducer();
-        haskell.simple.ast.ASTExpression simpleExpr = complexToSimpleReducer.reduceToSimple(letProgInExpr);
+        ASTExpression simpleExpr = complexToSimpleReducer.reduceToSimple(letProgInExpr);
 
         // 2. reduce simple haskell expression to lambda expression
-        lambda.ast.ASTTerm lambdaTerm = simpleExpr.toLambdaTerm();
+        SimpleToLambdaReducer simpleToLambdaReducer = new SimpleToLambdaReducer();
+        lambda.ast.ASTTerm lambdaTerm = simpleExpr.accept(simpleToLambdaReducer);
 
         // 3. do a static type check
         return typeChecker.checkType(lambdaTerm);

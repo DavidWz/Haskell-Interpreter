@@ -1,6 +1,6 @@
 package lambda.reduction.delta;
 
-import haskell.complex.ast.*;
+import haskell.ast.*;
 import lambda.type.PredefinedType;
 
 /**

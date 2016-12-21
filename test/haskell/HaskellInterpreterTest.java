@@ -1,7 +1,6 @@
 package haskell;
 
-import haskell.complex.ast.*;
-import haskell.complex.reduction.TooComplexException;
+import haskell.ast.*;
 import lambda.ast.ASTConstant;
 import lambda.ast.ASTTerm;
 import lambda.type.TypeException;
@@ -163,7 +162,6 @@ public class HaskellInterpreterTest {
      * Tests if the given expression evaluates to the given expected result.
      * @param exp
      * @param expectedResult
-     * @throws TooComplexException
      */
     private void testExpression(ASTExpression exp, ASTTerm expectedResult) {
         System.out.print("eval[" + exp + "] = ");

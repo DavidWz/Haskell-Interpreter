@@ -1,7 +1,7 @@
 package lambda.type;
 
-import haskell.complex.ast.ASTDataDecl;
-import haskell.complex.ast.ASTType;
+import haskell.ast.ASTDataDecl;
+import haskell.ast.ASTType;
 import lambda.ast.ASTConstant;
 import lambda.ast.ASTTerm;
 

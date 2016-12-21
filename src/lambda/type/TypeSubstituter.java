@@ -1,6 +1,6 @@
 package lambda.type;
 
-import haskell.complex.ast.*;
+import haskell.ast.*;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,8 +1,8 @@
 package lambda.type;
 
-import haskell.complex.ast.ASTTyConstr;
-import haskell.complex.ast.ASTType;
-import haskell.complex.ast.ASTTypeConstr;
+import haskell.ast.ASTTyConstr;
+import haskell.ast.ASTType;
+import haskell.ast.ASTTypeConstr;
 
 /**
  * A list of predefined types.
