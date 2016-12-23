@@ -14,6 +14,17 @@ import java.util.Set;
 public class SeparateAndNestDecls implements ComplexHaskellTransformation {
     @Override
     public Boolean visit(ASTLet node) {
+        // first, try to apply this transformation as deep as possible
+        for (ASTDecl decl : node.getDecls()) {
+            if (decl.accept(this)) {
+                return true;
+            }
+        }
+        if (node.getExp().accept(this)) {
+            return true;
+        }
+
+        // perform the transformation
         List<ASTDecl> decls = node.getDecls();
         ASTExpression exp = node.getExp();
 
@@ -45,7 +56,7 @@ public class SeparateAndNestDecls implements ComplexHaskellTransformation {
         -------------------------------------------------------
         let decl1 in (let decl2 in (... (let decln in exp)...))
          */
-        if (decls.size() > 0) {
+        if (decls.size() > 1) {
             ASTExpression nestedLets = exp;
             while (decls.size() > 1) {
                 ASTDecl currentDecl = decls.remove(decls.size()-1);

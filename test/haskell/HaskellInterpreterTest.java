@@ -122,7 +122,7 @@ public class HaskellInterpreterTest {
                 new ASTApplication(genList, new ASTApplication(decr, x))), genList, x);
         prog.addDeclaration(genListX);
 
-        // List a = Nil | Cons a (List a)
+        // data List a = Nil | Cons a (List a)
         ASTTyConstr List = new ASTTyConstr("List");
         ASTVariable a = new ASTVariable("a");
         ASTConstrDecl ConsDecl = new ASTConstrDecl(Cons, a, new ASTTypeConstr(List, a));

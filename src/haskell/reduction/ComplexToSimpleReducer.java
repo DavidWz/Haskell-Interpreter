@@ -40,7 +40,7 @@ public class ComplexToSimpleReducer {
 
         // after this, we split the declarations according to entaglement
         // and then nest them in multiple let expressions
-        expression.accept(separateAndNestDecls);
+        applySeparateAndNestDecls(expression);
 
         // then we again apply basic transformation rules as long as possible
         applyBasicTransformationRules(expression);
@@ -75,6 +75,19 @@ public class ComplexToSimpleReducer {
                     // the rule was successfully applied
                     transformed = true;
                 }
+            }
+        } while(transformed);
+    }
+
+    private void applySeparateAndNestDecls(ASTExpression expression) {
+        boolean transformed;
+
+        // reduce let expressions as long as possible
+        do {
+            transformed = false;
+            if (expression.accept(separateAndNestDecls)) {
+                // the rule was successfully applied
+                transformed = true;
             }
         } while(transformed);
     }
